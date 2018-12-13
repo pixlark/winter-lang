@@ -77,6 +77,10 @@ bool variable_map_test()
 
 // : Call_Frame
 
+// When a function is called, a new call frame is pushed onto the call
+// stack, containing a Variable_Map for every variable that gets used
+// in that function.
+
 typedef struct {
 	Variable_Map var_map;
 } Call_Frame;
@@ -96,8 +100,74 @@ void call_frame_test()
 
 // :\ Call_Frame
 
+// : BC_Chunk
+
+// A chunk of bytecode representing a single "instruction"
+
+enum Instruction {
+	INSTR_NOP,
+	INSTR_HALT,
+};
+
+typedef struct {
+	enum Instruction instr;
+} BC_Chunk;
+
+// :\ BC_Chunk
+
+// : Winter_Machine
+
+// The central virtual machine that runs Winter bytecode
+
+typedef struct {
+	BC_Chunk * bytecode;
+	size_t ip;
+	Call_Frame ** call_stack;
+	bool running;
+} Winter_Machine;
+
+Winter_Machine * winter_machine_alloc()
+{
+	Winter_Machine * wm = malloc(sizeof(Winter_Machine));
+	wm->bytecode = NULL;
+	wm->ip = 0;
+	wm->call_stack = NULL;
+	wm->running = false;
+	return wm;
+}
+
+void winter_machine_step(Winter_Machine * wm)
+{
+	assert(wm->bytecode);
+	BC_Chunk chunk = wm->bytecode[wm->ip++];
+	switch (chunk.instr) {
+	case INSTR_NOP:
+		break;
+	case INSTR_HALT:
+		wm->running = false;
+		break;
+	}
+}
+
+void winter_machine_test()
+{
+	Winter_Machine * wm = winter_machine_alloc();
+	BC_Chunk * bytecode = NULL;
+	sb_push(bytecode, ((BC_Chunk) { INSTR_NOP }));
+	sb_push(bytecode, ((BC_Chunk) { INSTR_NOP }));
+	sb_push(bytecode, ((BC_Chunk) { INSTR_HALT }));
+	wm->bytecode = bytecode;
+	wm->running = true;
+	while (wm->running) {
+		winter_machine_step(wm);
+	}
+}
+
+// :\ Winter_Machine
+
 void vm_test()
 {
 	variable_map_test();
 	call_frame_test();
+	winter_machine_test();
 }
