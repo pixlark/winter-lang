@@ -1,2 +1,2 @@
 # Github Linguist
-*.h text diff=c
+*.h linguist-language=C
