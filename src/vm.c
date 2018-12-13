@@ -43,6 +43,18 @@ bool value_equal(Value a, Value b)
 	return false;
 }
 
+Value value_print(Value value)
+{
+	switch (value.type) {
+	case VALUE_INTEGER:
+		printf("%d\n", value._integer);
+		break;
+	case VALUE_FLOAT:
+		printf("%f\n", value._float);
+		break;
+	}
+}
+
 Value value_negate(Value a)
 {
 	switch (a.type) {
@@ -164,12 +176,25 @@ typedef struct {
 	Value value;
 } Instr_Push;
 
+typedef struct {
+	const char * name;
+} Instr_Bind;
+
+typedef struct {
+	const char * name;
+} Instr_Get;
+
 enum Instruction {
+	// No args
 	INSTR_NOP,
 	INSTR_NEGATE,
 	INSTR_ADD,
-	INSTR_PUSH,
 	INSTR_RETURN,
+	INSTR_PRINT,
+	// Args
+	INSTR_PUSH,
+	INSTR_BIND,
+	INSTR_GET,
 };
 
 // :\ Instruction
@@ -182,6 +207,8 @@ typedef struct {
 	enum Instruction instr;
 	union {
 		Instr_Push instr_push;
+		Instr_Bind instr_bind;
+		Instr_Get  instr_get;
 	};
 } BC_Chunk;
 
@@ -195,6 +222,16 @@ BC_Chunk bc_chunk_new_no_args(enum Instruction instr)
 BC_Chunk bc_chunk_new_push(Value value)
 {
 	return (BC_Chunk) { INSTR_PUSH, .instr_push = (Instr_Push) { value } };
+}
+
+BC_Chunk bc_chunk_new_bind(const char * name)
+{
+	return (BC_Chunk) { INSTR_BIND, .instr_bind = (Instr_Bind) { name } };
+}
+
+BC_Chunk bc_chunk_new_get(const char * name)
+{
+	return (BC_Chunk) { INSTR_GET, .instr_get = (Instr_Get) { name } };
 }
 
 // :\ BC_Chunk
@@ -263,6 +300,24 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_RETURN: {
 		sb_pop(wm->call_stack);
 	} break;
+	case INSTR_BIND: {
+		Instr_Bind instr = chunk.instr_bind;
+		Call_Frame * frame = sb_last(wm->call_stack);
+		Value * var_storage = malloc(sizeof(Value));
+		*var_storage = pop();
+		variable_map_add(&frame->var_map, instr.name, var_storage);
+	} break;
+	case INSTR_GET: {
+		Instr_Get instr = chunk.instr_get;
+		Call_Frame * frame = sb_last(wm->call_stack);
+		Value * var_storage = variable_map_index(&frame->var_map, instr.name);
+		push(*var_storage);
+	} break;
+	case INSTR_PRINT: {
+		value_print(pop());
+	} break;
+	default:
+		assert(false);
 	}
 }
 
@@ -270,22 +325,25 @@ void winter_machine_test()
 {
 	Winter_Machine * wm = winter_machine_alloc();
 	sb_push(wm->call_stack, call_frame_alloc());
-	
+
+	#define pb(x) sb_push(bytecode, x)
 	BC_Chunk * bytecode = NULL;
-	sb_push(bytecode, bc_chunk_new_no_args(INSTR_NOP));
-	sb_push(bytecode, bc_chunk_new_push(value_new_integer(15)));
-	sb_push(bytecode, bc_chunk_new_push(value_new_integer(4)));
-	sb_push(bytecode, bc_chunk_new_no_args(INSTR_ADD));
-	sb_push(bytecode, bc_chunk_new_no_args(INSTR_NEGATE));
-	sb_push(bytecode, bc_chunk_new_no_args(INSTR_RETURN));
-	wm->bytecode = bytecode;
+	pb(bc_chunk_new_no_args(INSTR_NOP));
+	pb(bc_chunk_new_push(value_new_integer(15)));
+	pb(bc_chunk_new_push(value_new_integer(4)));
+	pb(bc_chunk_new_no_args(INSTR_ADD));
+	pb(bc_chunk_new_no_args(INSTR_NEGATE));
+	pb(bc_chunk_new_bind("my_var"));
+	pb(bc_chunk_new_get("my_var"));
+	pb(bc_chunk_new_no_args(INSTR_PRINT));
+	pb(bc_chunk_new_no_args(INSTR_RETURN));
+	#undef pb
 	
+	wm->bytecode = bytecode;
 	wm->running = true;
 	while (wm->running) {
 		winter_machine_step(wm);
 	}
-	assert(sb_count(wm->eval_stack) > 0);
-	assert(value_equal(sb_last(wm->eval_stack), value_new_integer(-19)));
 }
 
 // :\ Winter_Machine
