@@ -1,9 +1,10 @@
 .PHONY: bin docs docs-src include src
 
 make:
+	cd src && bison --defines=../include/parser.tab.h parser.y && flex scanner.l
 	cd src && \
 	gcc -g \
-		main.c vm.c stretchy_buffer.c \
+		main.c parser.tab.c lex.yy.c vm.c value.c stretchy_buffer.c \
 		-I../include \
 		-o ../bin/winter
 
