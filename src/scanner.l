@@ -6,6 +6,8 @@
 
 %%
 
+<<EOF>> { return END_OF_FILE; }
+
 " "|"\t"|"\r"|"\n" {}
 
 "("|")"|"+"|"-"|","|"="|";" {
@@ -31,7 +33,7 @@
 
 %%
 
-void init()
+void fb_init()
 {
 	yyin = fopen("testfile", "r");
 }

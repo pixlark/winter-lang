@@ -40,11 +40,12 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 12 "parser.y" /* yacc.c:1909  */
+#line 11 "parser.y" /* yacc.c:1909  */
 
 	#include "ast.h"
 	#include "value.h"
-	Stmt ** parse();
+	Stmt * parse();
+	void fb_init();
 	#define EXPR(t)							\
 		Expr * expr = malloc(sizeof(Expr)); \
 		expr->type = t;
@@ -52,17 +53,18 @@ extern int yydebug;
 		Stmt * stmt = malloc(sizeof(Stmt)); \
 		stmt->type = t;
 
-#line 56 "../include/parser.tab.h" /* yacc.c:1909  */
+#line 57 "../include/parser.tab.h" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    PRINT = 258,
-    NAME = 259,
-    INTEGER_LITERAL = 260,
-    UMINUS = 261
+    END_OF_FILE = 258,
+    PRINT = 259,
+    NAME = 260,
+    INTEGER_LITERAL = 261,
+    UMINUS = 262
   };
 #endif
 
@@ -78,7 +80,7 @@ union YYSTYPE
 	Expr * expression;
 	Stmt * statement;
 
-#line 82 "../include/parser.tab.h" /* yacc.c:1909  */
+#line 84 "../include/parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -89,6 +91,6 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE yylval;
 
-int yyparse (Stmt *** statements);
+int yyparse (Stmt ** statement);
 
 #endif /* !YY_YY_INCLUDE_PARSER_TAB_H_INCLUDED  */

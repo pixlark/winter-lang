@@ -6,7 +6,11 @@
 
 void parse_test()
 {
-	Stmt ** statements = parse();
+	fb_init();
+	Stmt * statement;
+	do {
+		statement = parse();
+	} while (statement);
 }
 
 int main()

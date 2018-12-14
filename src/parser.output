@@ -1,6 +1,6 @@
 Grammar
 
-    0 $accept: program $end
+    0 $accept: statement $end
 
     1 expression: INTEGER_LITERAL
     2           | NAME
@@ -12,9 +12,7 @@ Grammar
     7 statement: expression ';'
     8          | NAME '=' expression ';'
     9          | PRINT expression ';'
-
-   10 program: statement
-   11        | program statement
+   10          | END_OF_FILE
 
 
 Terminals, with rules where they appear
@@ -27,52 +25,58 @@ $end (0) 0
 ';' (59) 7 8 9
 '=' (61) 8
 error (256)
-PRINT (258) 9
-NAME (259) 2 8
-INTEGER_LITERAL (260) 1
-UMINUS (261)
+END_OF_FILE (258) 10
+PRINT (259) 9
+NAME (260) 2 8
+INTEGER_LITERAL (261) 1
+UMINUS (262)
 
 
 Nonterminals, with rules where they appear
 
-$accept (13)
+$accept (14)
     on left: 0
-expression (14)
+expression (15)
     on left: 1 2 3 4 5 6, on right: 3 4 5 6 7 8 9
-statement (15)
-    on left: 7 8 9, on right: 10 11
-program (16)
-    on left: 10 11, on right: 0 11
+statement (16)
+    on left: 7 8 9 10, on right: 0
 
 
 State 0
 
-    0 $accept: . program $end
+    0 $accept: . statement $end
 
-    PRINT            shift, and go to state 1
-    NAME             shift, and go to state 2
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    END_OF_FILE      shift, and go to state 1
+    PRINT            shift, and go to state 2
+    NAME             shift, and go to state 3
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
-    expression  go to state 6
-    statement   go to state 7
-    program     go to state 8
+    expression  go to state 7
+    statement   go to state 8
 
 
 State 1
 
+   10 statement: END_OF_FILE .
+
+    $default  reduce using rule 10 (statement)
+
+
+State 2
+
     9 statement: PRINT . expression ';'
 
     NAME             shift, and go to state 9
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
     expression  go to state 10
 
 
-State 2
+State 3
 
     2 expression: NAME .
     8 statement: NAME . '=' expression ';'
@@ -82,38 +86,38 @@ State 2
     $default  reduce using rule 2 (expression)
 
 
-State 3
+State 4
 
     1 expression: INTEGER_LITERAL .
 
     $default  reduce using rule 1 (expression)
 
 
-State 4
+State 5
 
     5 expression: '-' . expression
 
     NAME             shift, and go to state 9
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
     expression  go to state 12
 
 
-State 5
+State 6
 
     6 expression: '(' . expression ')'
 
     NAME             shift, and go to state 9
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
     expression  go to state 13
 
 
-State 6
+State 7
 
     3 expression: expression . '+' expression
     4           | expression . '-' expression
@@ -124,27 +128,11 @@ State 6
     ';'  shift, and go to state 16
 
 
-State 7
-
-   10 program: statement .
-
-    $default  reduce using rule 10 (program)
-
-
 State 8
 
-    0 $accept: program . $end
-   11 program: program . statement
+    0 $accept: statement . $end
 
-    $end             shift, and go to state 17
-    PRINT            shift, and go to state 1
-    NAME             shift, and go to state 2
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
-
-    expression  go to state 6
-    statement   go to state 18
+    $end  shift, and go to state 17
 
 
 State 9
@@ -162,7 +150,7 @@ State 10
 
     '+'  shift, and go to state 14
     '-'  shift, and go to state 15
-    ';'  shift, and go to state 19
+    ';'  shift, and go to state 18
 
 
 State 11
@@ -170,11 +158,11 @@ State 11
     8 statement: NAME '=' . expression ';'
 
     NAME             shift, and go to state 9
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
-    expression  go to state 20
+    expression  go to state 19
 
 
 State 12
@@ -194,7 +182,7 @@ State 13
 
     '+'  shift, and go to state 14
     '-'  shift, and go to state 15
-    ')'  shift, and go to state 21
+    ')'  shift, and go to state 20
 
 
 State 14
@@ -202,11 +190,11 @@ State 14
     3 expression: expression '+' . expression
 
     NAME             shift, and go to state 9
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
-    expression  go to state 22
+    expression  go to state 21
 
 
 State 15
@@ -214,11 +202,11 @@ State 15
     4 expression: expression '-' . expression
 
     NAME             shift, and go to state 9
-    INTEGER_LITERAL  shift, and go to state 3
-    '-'              shift, and go to state 4
-    '('              shift, and go to state 5
+    INTEGER_LITERAL  shift, and go to state 4
+    '-'              shift, and go to state 5
+    '('              shift, and go to state 6
 
-    expression  go to state 23
+    expression  go to state 22
 
 
 State 16
@@ -230,26 +218,19 @@ State 16
 
 State 17
 
-    0 $accept: program $end .
+    0 $accept: statement $end .
 
     $default  accept
 
 
 State 18
 
-   11 program: program statement .
-
-    $default  reduce using rule 11 (program)
-
-
-State 19
-
     9 statement: PRINT expression ';' .
 
     $default  reduce using rule 9 (statement)
 
 
-State 20
+State 19
 
     3 expression: expression . '+' expression
     4           | expression . '-' expression
@@ -257,17 +238,17 @@ State 20
 
     '+'  shift, and go to state 14
     '-'  shift, and go to state 15
-    ';'  shift, and go to state 24
+    ';'  shift, and go to state 23
 
 
-State 21
+State 20
 
     6 expression: '(' expression ')' .
 
     $default  reduce using rule 6 (expression)
 
 
-State 22
+State 21
 
     3 expression: expression . '+' expression
     3           | expression '+' expression .
@@ -276,7 +257,7 @@ State 22
     $default  reduce using rule 3 (expression)
 
 
-State 23
+State 22
 
     3 expression: expression . '+' expression
     4           | expression . '-' expression
@@ -285,7 +266,7 @@ State 23
     $default  reduce using rule 4 (expression)
 
 
-State 24
+State 23
 
     8 statement: NAME '=' expression ';' .
 

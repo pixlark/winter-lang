@@ -742,27 +742,31 @@ do_action:	/* This label is used only to access EOF actions. */
 			yy_current_state = (yy_last_accepting_state);
 			goto yy_find_action;
 
+case YY_STATE_EOF(INITIAL):
+#line 9 "scanner.l"
+{ return END_OF_FILE; }
+	YY_BREAK
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 9 "scanner.l"
+#line 11 "scanner.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 11 "scanner.l"
+#line 13 "scanner.l"
 {
 	return *yytext;
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 15 "scanner.l"
+#line 17 "scanner.l"
 { return PRINT; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 17 "scanner.l"
+#line 19 "scanner.l"
 {
 	yylval.name = strdup(yytext);
 	return NAME;
@@ -770,7 +774,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "scanner.l"
+#line 24 "scanner.l"
 {
 	yylval.integer_literal = atoi(yytext);
 	return INTEGER_LITERAL;
@@ -778,7 +782,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 27 "scanner.l"
+#line 29 "scanner.l"
 {
 	fprintf(stderr, "Unrecognized character '%c'\n", *yytext);
 	exit(1);
@@ -786,12 +790,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 32 "scanner.l"
+#line 34 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 793 "lex.yy.c"
-case YY_STATE_EOF(INITIAL):
-	yyterminate();
+#line 797 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1790,11 +1792,11 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 32 "scanner.l"
+#line 34 "scanner.l"
 
 
 
-void init()
+void fb_init()
 {
 	yyin = fopen("testfile", "r");
 }
