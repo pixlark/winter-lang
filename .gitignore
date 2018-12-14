@@ -1,2 +1,6 @@
 bin/*
 docs/*
+
+src/lex.yy.c
+src/parser.tab.c
+include/parser.tab.h
