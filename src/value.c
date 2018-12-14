@@ -22,7 +22,7 @@ bool value_equal(Value a, Value b)
 		case VALUE_INTEGER:
 			return a._integer == b._integer;
 		default:
-			assert(false);
+			fatal_internal("Tried to compare two different types");
 		}
 	}
 	return false;
@@ -50,13 +50,15 @@ Value value_negate(Value a)
 		return value_new_float(-a._float);
 		break;
 	default:
-		assert(false); // TODO(pixlark): Proper error handling
+		fatal("Negate not valid on given type");
 	}
 }
 
 Value value_add(Value a, Value b)
 {
-	assert(a.type == b.type);
+	if (a.type != b.type) {
+		fatal("Add must be used on two of the same type");
+	}
 	switch (a.type) {
 	case VALUE_INTEGER:
 		return value_new_integer(a._integer + b._integer);
@@ -65,7 +67,7 @@ Value value_add(Value a, Value b)
 		return value_new_float(a._float + b._float);
 		break;
 	default:
-		assert(false);
+		fatal("Add not valid on given types");
 	}
 }
 

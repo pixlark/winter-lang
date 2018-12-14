@@ -7,3 +7,4 @@
 #include <stdbool.h>
 
 #include "stretchy_buffer.h"
+#include "error.h"

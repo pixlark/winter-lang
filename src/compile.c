@@ -14,7 +14,7 @@ void compile_operator(Compiler * compiler, Operator operator)
 		P(bc_chunk_new_no_args(INSTR_ADD));
 		break;
 	default:
-		assert(false); // TODO(pixlark): Really need some proper error handling here
+		fatal_internal("A non-compileable operator reached the compilation phase.");
 	}
 }
 

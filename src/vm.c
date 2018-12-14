@@ -167,7 +167,7 @@ void winter_machine_step(Winter_Machine * wm)
 		pop();
 		break;
 	default:
-		assert(false);
+		fatal_internal("Nonexistent instruction reached winter_machine_step()");
 	}
 }
 
