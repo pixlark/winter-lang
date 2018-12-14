@@ -59,9 +59,10 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NAME = 258,
-    INTEGER_LITERAL = 259,
-    UMINUS = 260
+    PRINT = 258,
+    NAME = 259,
+    INTEGER_LITERAL = 260,
+    UMINUS = 261
   };
 #endif
 
@@ -77,7 +78,7 @@ union YYSTYPE
 	Expr * expression;
 	Stmt * statement;
 
-#line 81 "../include/parser.tab.h" /* yacc.c:1909  */
+#line 82 "../include/parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

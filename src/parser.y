@@ -31,6 +31,7 @@
 	Stmt * statement;
 };
 
+%token PRINT;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
 
@@ -81,9 +82,20 @@ INTEGER_LITERAL {
 ;
 
 statement:
-expression {
+expression ';' {
 	STMT(STMT_EXPR);
 	stmt->expr.expr = $1;
+	$$ = stmt;
+}
+| NAME '=' expression ';' {
+	STMT(STMT_ASSIGN);
+	stmt->assign.name = $1;
+	stmt->assign.expr = $3;
+	$$ = stmt;
+}
+| PRINT expression ';' {
+	STMT(STMT_PRINT);
+	stmt->print.expr = $2;
 	$$ = stmt;
 }
 ;

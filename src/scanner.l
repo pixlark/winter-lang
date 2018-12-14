@@ -8,9 +8,11 @@
 
 " "|"\t"|"\r"|"\n" {}
 
-"("|")"|"+"|"-"|","|"=" {
+"("|")"|"+"|"-"|","|"="|";" {
 	return *yytext;
 }
+
+"print" { return PRINT; }
 
 [_A-Za-z][_A-Za-z0-9]* {
 	yylval.name = strdup(yytext);

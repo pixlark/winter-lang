@@ -49,7 +49,6 @@ typedef struct Expr {
 
 typedef enum {
 	STMT_EXPR,
-	STMT_LET,
 	STMT_ASSIGN,
 	STMT_PRINT,
 } Stmt_Type;
@@ -60,10 +59,6 @@ typedef struct Stmt {
 		struct {
 			Expr * expr;
 		} expr;
-		struct {
-			const char * name;
-			Expr * expr;
-		} let;
 		struct {
 			const char * name;
 			Expr * expr;
