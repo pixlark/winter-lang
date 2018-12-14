@@ -11,7 +11,6 @@ int main()
 	fb_init();
 
 	Winter_Machine * wm = winter_machine_alloc();
-	sb_push(wm->call_stack, call_frame_alloc());
 	
 	bool running = true;
 	while (true) {

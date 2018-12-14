@@ -1,3 +1,8 @@
+Terminals unused in grammar
+
+   FUNC
+
+
 Grammar
 
     0 $accept: statement $end
@@ -27,18 +32,19 @@ $end (0) 0
 error (256)
 END_OF_FILE (258) 10
 PRINT (259) 9
-NAME (260) 2 8
-INTEGER_LITERAL (261) 1
-UMINUS (262)
+FUNC (260)
+NAME (261) 2 8
+INTEGER_LITERAL (262) 1
+UMINUS (263)
 
 
 Nonterminals, with rules where they appear
 
-$accept (14)
+$accept (15)
     on left: 0
-expression (15)
+expression (16)
     on left: 1 2 3 4 5 6, on right: 3 4 5 6 7 8 9
-statement (16)
+statement (17)
     on left: 7 8 9 10, on right: 0
 
 

@@ -33,6 +33,7 @@
 
 %token END_OF_FILE;
 %token PRINT;
+%token FUNC;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
 

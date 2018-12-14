@@ -14,20 +14,6 @@ typedef struct {
 
 // :\ Variable_Map
 
-// : Call_Frame
-
-// When a function is called, a new call frame is pushed onto the call
-// stack, containing a Variable_Map for every variable that gets used
-// in that function.
-
-typedef struct {
-	Variable_Map var_map;
-} Call_Frame;
-
-Call_Frame * call_frame_alloc();
-
-// :\ Call_Frame
-
 // : Instruction
 
 // Each instruction in the enum either has arguments, represented by a
@@ -82,16 +68,35 @@ BC_Chunk bc_chunk_new_get(const char * name);
 
 // :\ BC_Chunk
 
+// : Call_Frame
+
+// When a function is called, a new call frame is pushed onto the call
+// stack, containing a Variable_Map for every variable that gets used
+// in that function.
+
+typedef struct {
+	Variable_Map var_map;
+	BC_Chunk * bytecode;
+	size_t ip;
+} Call_Frame;
+
+Call_Frame * call_frame_alloc();
+
+// :\ Call_Frame
+
 // : Winter_Machine
 
 // The central virtual machine that runs Winter bytecode
 
 typedef struct {
+	Variable_Map global_var_map;
 	BC_Chunk * bytecode;
 	size_t bytecode_len;
 	size_t ip;
-	Value * eval_stack;
+
 	Call_Frame ** call_stack;
+	Value * eval_stack;
+	
 	bool running;
 } Winter_Machine;
 

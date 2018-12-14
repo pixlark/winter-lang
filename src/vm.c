@@ -57,6 +57,8 @@ Call_Frame * call_frame_alloc()
 {
 	Call_Frame * frame = malloc(sizeof(Call_Frame));
 	frame->var_map = variable_map_new();
+	frame->bytecode = NULL;
+	frame->ip = 0;
 	return frame;
 }
 
@@ -120,10 +122,18 @@ void winter_machine_push(Winter_Machine * wm, Value value)
 #define pop() winter_machine_pop(wm)
 #define push(x) winter_machine_push(wm, x)
 
+Variable_Map * winter_machine_varmap(Winter_Machine * wm)
+{
+	if (sb_count(wm->call_stack) == 0) {
+		return &(wm->global_var_map);
+	} else {
+		return &(sb_last(wm->call_stack)->var_map);
+	}
+}
+
 void winter_machine_step(Winter_Machine * wm)
 {
 	if (wm->ip >= wm->bytecode_len) wm->running = false;
-	if (sb_count(wm->call_stack) == 0) wm->running = false;
 	if (!wm->running) return;
 
 	assert(wm->bytecode);
@@ -149,15 +159,15 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_BIND: {
 		Instr_Bind instr = chunk.instr_bind;
-		Call_Frame * frame = sb_last(wm->call_stack);
+		Variable_Map * varmap = winter_machine_varmap(wm);
 		Value * var_storage = malloc(sizeof(Value));
 		*var_storage = pop();
-		variable_map_add(&frame->var_map, instr.name, var_storage);
+		variable_map_add(varmap, instr.name, var_storage);
 	} break;
 	case INSTR_GET: {
 		Instr_Get instr = chunk.instr_get;
-		Call_Frame * frame = sb_last(wm->call_stack);
-		Value * var_storage = variable_map_index(&frame->var_map, instr.name);
+		Variable_Map * varmap = winter_machine_varmap(wm);
+		Value * var_storage = variable_map_index(varmap, instr.name);
 		push(*var_storage);
 	} break;
 	case INSTR_PRINT: {
