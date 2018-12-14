@@ -44,7 +44,7 @@ extern int yydebug;
 
 	#include "ast.h"
 	#include "value.h"
-	void parse();
+	Stmt ** parse();
 	#define EXPR(t)							\
 		Expr * expr = malloc(sizeof(Expr)); \
 		expr->type = t;

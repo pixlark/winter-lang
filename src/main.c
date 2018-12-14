@@ -6,7 +6,7 @@
 
 void parse_test()
 {
-	parse();
+	Stmt ** statements = parse();
 }
 
 int main()

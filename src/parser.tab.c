@@ -107,7 +107,7 @@ extern int yydebug;
 
 	#include "ast.h"
 	#include "value.h"
-	void parse();
+	Stmt ** parse();
 	#define EXPR(t)							\
 		Expr * expr = malloc(sizeof(Expr)); \
 		expr->type = t;
@@ -1584,14 +1584,15 @@ yyreturn:
 #line 112 "parser.y" /* yacc.c:1906  */
 
 
-void parse()
+Stmt ** parse()
 {
 	init();
-	Stmt ** statements;
+	Stmt ** statements = NULL;
 	if (yyparse(&statements)) {
 		fprintf(stderr, "Encountered error while parsing. Exiting.\n");
 		exit(1);
 	}
+	return statements;
 }
 
 void yyerror(Stmt *** statements, char const * s)
