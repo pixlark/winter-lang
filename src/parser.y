@@ -5,13 +5,13 @@
 	#include "stretchy_buffer.h"
 	#include "ast.h"
 	int yylex();
-	void yyerror(Stmt ** statement, char const *);
+	void yyerror(Stmt *** statement, char const *);
 %}
 
 %code requires {
 	#include "ast.h"
 	#include "value.h"
-	Stmt * parse();
+	Stmt ** parse();
 	void fb_init();
 	#define EXPR(t)							\
 		Expr * expr = malloc(sizeof(Expr)); \
@@ -22,7 +22,7 @@
 }
 
 %define parse.error verbose
-%parse-param { Stmt ** statement }
+%parse-param { Stmt *** statements }
 
 %union {
 	const char * name;
@@ -31,18 +31,18 @@
 	Stmt * statement;
 };
 
-%token END_OF_FILE;
 %token PRINT;
 %token FUNC;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
 
 %type <expression> expression;
+%type <statement> statement;
 
 %left '+' '-'
 %left UMINUS
 
-%start statement
+%start program
 
 %%
 
@@ -86,44 +86,43 @@ statement:
 expression ';' {
 	STMT(STMT_EXPR);
 	stmt->expr.expr = $1;
-	*statement = stmt;
-	YYACCEPT;
-	//$$ = stmt;
+	$$ = stmt;
 }
 | NAME '=' expression ';' {
 	STMT(STMT_ASSIGN);
 	stmt->assign.name = $1;
 	stmt->assign.expr = $3;
-	*statement = stmt;
-	YYACCEPT;
-	//$$ = stmt;
+	$$ = stmt;
 }
 | PRINT expression ';' {
 	STMT(STMT_PRINT);
 	stmt->print.expr = $2;
-	*statement = stmt;
-	YYACCEPT;
-	//$$ = stmt;
+	$$ = stmt;	
 }
-| END_OF_FILE {
-	*statement = NULL;
-	YYACCEPT;
+;
+
+program:
+statement {
+	sb_push(*statements, $1);
+}
+| program statement {
+	sb_push(*statements, $2);
 }
 ;
 
 %%
 
-Stmt * parse()
+Stmt ** parse()
 {
-	Stmt * statement = NULL;
-	if (yyparse(&statement)) {
+	Stmt ** statements = NULL;
+	if (yyparse(&statements)) {
 		fprintf(stderr, "Encountered error while parsing. Exiting.\n");
 		return NULL;
 	}
-	return statement;
+	return statements;
 }
 
-void yyerror(Stmt ** statement, char const * s)
+void yyerror(Stmt *** statement, char const * s)
 {
 	fprintf(stderr, "%s\n", s);
 }

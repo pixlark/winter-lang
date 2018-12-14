@@ -8,19 +8,16 @@
 
 int main()
 {
-	vm_test();
-	return 0;
-	
 	fb_init();
 
 	Winter_Machine * wm = winter_machine_alloc();
+
+	Stmt ** statements = parse();
 	
 	bool running = true;
-	while (true) {
-		// Lexing/Parsing
-		Stmt * statement = parse();
-		if (!statement) break;
-
+	for (int i = 0; i < sb_count(statements); i++) {
+		Stmt * statement = statements[i];
+		
 		// Lowering
 		lower_statement(statement);
 
