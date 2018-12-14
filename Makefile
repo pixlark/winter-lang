@@ -5,7 +5,7 @@ make:
 	bison --report=state --defines=../include/parser.tab.h parser.y && \
 	flex scanner.l && \
 	gcc -g \
-		main.c parser.tab.c lex.yy.c vm.c value.c stretchy_buffer.c \
+		main.c parser.tab.c lex.yy.c lowering.c vm.c value.c stretchy_buffer.c \
 		-I../include \
 		-o ../bin/winter
 

@@ -1,21 +1,21 @@
 #include "ast.h"
 #include "common.h"
+#include "lowering.h"
 #include "vm.h"
 
 #include "parser.tab.h"
 
-void parse_test()
-{
-	fb_init();
-	Stmt * statement;
-	do {
-		statement = parse();
-	} while (statement);
-}
-
 int main()
 {
-	parse_test();
-	vm_test();
+	fb_init();
+	
+	bool running = true;
+	while (true) {
+		Stmt * statement = parse();
+		if (!statement) break;
+		lower_statement(statement);
+		printf("\n");
+	}
+	
 	return 0;
 }
