@@ -15,10 +15,11 @@ Value value_new_float(float f)
 	return (Value) { VALUE_FLOAT, ._float = f };
 }
 
-Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
+Value value_new_function(const char ** parameters, size_t parameter_count, BC_Chunk * bytecode)
 {
 	Function * func = malloc(sizeof(Function));
 	func->parameters = parameters;
+	func->parameter_count = parameter_count;
 	func->bytecode = bytecode;
 	return (Value) {
 		VALUE_FUNCTION, ._function = func

@@ -132,13 +132,24 @@ Variable_Map * winter_machine_varmap(Winter_Machine * wm)
 	}
 }
 
+BC_Chunk winter_machine_advance_bytecode(Winter_Machine * wm)
+{
+	if (sb_count(wm->call_stack) == 0) {
+		return wm->bytecode[wm->ip++];
+	} else {
+		Call_Frame * frame = sb_last(wm->call_stack);
+		return frame->bytecode[frame->ip++];
+	}
+}
+
 void winter_machine_step(Winter_Machine * wm)
 {
-	if (wm->ip >= wm->bytecode_len) wm->running = false;
+	if (sb_count(wm->call_stack) == 0 &&
+		wm->ip >= wm->bytecode_len) wm->running = false;
 	if (!wm->running) return;
 
 	assert(wm->bytecode);
-	BC_Chunk chunk = wm->bytecode[wm->ip++];
+	BC_Chunk chunk = winter_machine_advance_bytecode(wm);
 	
 	switch (chunk.instr) {
 	case INSTR_NOP:
@@ -172,6 +183,9 @@ void winter_machine_step(Winter_Machine * wm)
 		Instr_Get instr = chunk.instr_get;
 		Variable_Map * varmap = winter_machine_varmap(wm);
 		Value * var_storage = variable_map_index(varmap, instr.name);
+		if (!var_storage) {
+			fatal("%s not bound", instr.name);
+		}
 		push(*var_storage);
 	} break;
 	case INSTR_PRINT: {
@@ -180,6 +194,20 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_POP:
 		pop();
 		break;
+	case INSTR_CALL: {
+		Value func_val = pop();
+		if (func_val.type != VALUE_FUNCTION) {
+			fatal("Type not callable");
+		}
+		Function func = *(func_val._function);
+		Call_Frame * frame = call_frame_alloc(func.bytecode);
+		for (int i = func.parameter_count - 1; i >= 0; i--) {
+			Value * arg_storage = malloc(sizeof(Value));
+			*arg_storage = pop();
+			variable_map_add(&(frame->var_map), func.parameters[i], arg_storage);
+		}
+		sb_push(wm->call_stack, frame);
+	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");
 	}
@@ -205,9 +233,10 @@ void winter_machine_test()
 		BC_Chunk * bytecode = NULL;
 		#define pb(x) sb_push(bytecode, x)
 		pb(bc_chunk_new_push(value_new_integer(101)));
+		pb(bc_chunk_new_no_args(INSTR_PRINT));
 		pb(bc_chunk_new_no_args(INSTR_RETURN));
 		#undef pb
-		function = value_new_function(parameters, bytecode);
+		function = value_new_function(parameters, 2, bytecode);
 	}
 	
 	#define pb(x) sb_push(bytecode, x)
@@ -220,6 +249,8 @@ void winter_machine_test()
 	pb(bc_chunk_new_bind("my_var"));
 	pb(bc_chunk_new_get("my_var"));
 	pb(bc_chunk_new_no_args(INSTR_PRINT));
+	pb(bc_chunk_new_push(function));
+	pb(bc_chunk_new_no_args(INSTR_CALL));
 	#undef pb
 
 	winter_machine_prime(wm, bytecode, sb_count(bytecode));
