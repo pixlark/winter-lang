@@ -15,6 +15,16 @@ Value value_new_float(float f)
 	return (Value) { VALUE_FLOAT, ._float = f };
 }
 
+Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
+{
+	Function * func = malloc(sizeof(Function));
+	func->parameters = parameters;
+	func->bytecode = bytecode;
+	return (Value) {
+		VALUE_FUNCTION, ._function = func
+	};
+}
+
 bool value_equal(Value a, Value b)
 {
 	if (a.type == b.type) {
@@ -22,10 +32,11 @@ bool value_equal(Value a, Value b)
 		case VALUE_INTEGER:
 			return a._integer == b._integer;
 		default:
-			fatal_internal("Tried to compare two different types");
+			fatal_internal("Type is not comparable");
 		}
+	} else {
+		fatal_internal("Can't compare differing types");
 	}
-	return false;
 }
 
 Value value_print(Value value)
@@ -36,6 +47,9 @@ Value value_print(Value value)
 		break;
 	case VALUE_FLOAT:
 		printf("%f\n", value._float);
+		break;
+	case VALUE_FUNCTION:
+		printf("<function at %p>", value._function);
 		break;
 	}
 }

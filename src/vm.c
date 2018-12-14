@@ -53,18 +53,18 @@ bool variable_map_test()
 
 // : Call_Frame
 
-Call_Frame * call_frame_alloc()
+Call_Frame * call_frame_alloc(BC_Chunk * bytecode)
 {
 	Call_Frame * frame = malloc(sizeof(Call_Frame));
 	frame->var_map = variable_map_new();
-	frame->bytecode = NULL;
+	frame->bytecode = bytecode;
 	frame->ip = 0;
 	return frame;
 }
 
 void call_frame_test()
 {
-	Call_Frame * frame = call_frame_alloc();
+	Call_Frame * frame = call_frame_alloc(NULL);
 	assert(frame->var_map.size == 0);
 }
 
@@ -101,6 +101,7 @@ BC_Chunk bc_chunk_new_get(const char * name)
 Winter_Machine * winter_machine_alloc()
 {
 	Winter_Machine * wm = malloc(sizeof(Winter_Machine));
+	wm->global_var_map = variable_map_new();
 	wm->bytecode = NULL;
 	wm->ip = 0;
 	wm->eval_stack = NULL;
@@ -155,6 +156,9 @@ void winter_machine_step(Winter_Machine * wm)
 		sb_push(wm->eval_stack, instr.value);
 	} break;
 	case INSTR_RETURN: {
+		if (sb_count(wm->call_stack) == 0) {
+			fatal("Can't return from global scope");
+		}
 		sb_pop(wm->call_stack);
 	} break;
 	case INSTR_BIND: {
@@ -192,8 +196,20 @@ void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len)
 void winter_machine_test()
 {
 	Winter_Machine * wm = winter_machine_alloc();
-	sb_push(wm->call_stack, call_frame_alloc());
 
+	Value function;
+	{
+		const char * parameters[2] = {
+			"a", "b",
+		};
+		BC_Chunk * bytecode = NULL;
+		#define pb(x) sb_push(bytecode, x)
+		pb(bc_chunk_new_push(value_new_integer(101)));
+		pb(bc_chunk_new_no_args(INSTR_RETURN));
+		#undef pb
+		function = value_new_function(parameters, bytecode);
+	}
+	
 	#define pb(x) sb_push(bytecode, x)
 	BC_Chunk * bytecode = NULL;
 	pb(bc_chunk_new_no_args(INSTR_NOP));
@@ -204,7 +220,6 @@ void winter_machine_test()
 	pb(bc_chunk_new_bind("my_var"));
 	pb(bc_chunk_new_get("my_var"));
 	pb(bc_chunk_new_no_args(INSTR_PRINT));
-	pb(bc_chunk_new_no_args(INSTR_RETURN));
 	#undef pb
 
 	winter_machine_prime(wm, bytecode, sb_count(bytecode));

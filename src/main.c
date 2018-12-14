@@ -8,6 +8,9 @@
 
 int main()
 {
+	vm_test();
+	return 0;
+	
 	fb_init();
 
 	Winter_Machine * wm = winter_machine_alloc();

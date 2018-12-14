@@ -2,6 +2,31 @@
 
 #include "common.h"
 
+// : Struct prototypes
+
+typedef struct Function Function;
+
+// :\ Struct prototypes
+
+// : Value
+
+typedef enum {
+	VALUE_INTEGER,
+	VALUE_FLOAT,
+	VALUE_FUNCTION,
+} Value_Type;
+
+typedef struct {
+	Value_Type type;
+	union {
+		int _integer;
+		float _float;
+		Function * _function;
+	};
+} Value;
+
+// :\ Value
+
 // : Variable_Map
 
 // Maps variable names to pointers to values in memory.
@@ -80,7 +105,7 @@ typedef struct {
 	size_t ip;
 } Call_Frame;
 
-Call_Frame * call_frame_alloc();
+Call_Frame * call_frame_alloc(BC_Chunk * bytecode);
 
 // :\ Call_Frame
 
@@ -105,5 +130,14 @@ void winter_machine_step(Winter_Machine * wm);
 void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len);
 
 // :\ Winter_Machine
+
+// : Function
+
+typedef struct Function {
+	const char ** parameters;
+	BC_Chunk * bytecode;
+} Function;
+
+// :\ Function
 
 void vm_test();
