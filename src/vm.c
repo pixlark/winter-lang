@@ -122,8 +122,7 @@ void winter_machine_push(Winter_Machine * wm, Value value)
 
 void winter_machine_step(Winter_Machine * wm)
 {
-	// TODO(pixlark): This is temporory, shouldn't *have* to be a sb.
-	if (wm->ip >= sb_count(wm->bytecode)) wm->running = false;
+	if (wm->ip >= wm->bytecode_len) wm->running = false;
 	if (sb_count(wm->call_stack) == 0) wm->running = false;
 	if (!wm->running) return;
 
@@ -172,9 +171,12 @@ void winter_machine_step(Winter_Machine * wm)
 	}
 }
 
-void winter_machine_reset(Winter_Machine * wm)
+void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len)
 {
+	wm->bytecode = bytecode;
+	wm->bytecode_len = len;
 	wm->ip = 0;
+	wm->running = true;
 }
 
 void winter_machine_test()
@@ -194,9 +196,8 @@ void winter_machine_test()
 	pb(bc_chunk_new_no_args(INSTR_PRINT));
 	pb(bc_chunk_new_no_args(INSTR_RETURN));
 	#undef pb
-	
-	wm->bytecode = bytecode;
-	wm->running = true;
+
+	winter_machine_prime(wm, bytecode, sb_count(bytecode));
 	while (wm->running) {
 		winter_machine_step(wm);
 	}

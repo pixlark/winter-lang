@@ -86,14 +86,9 @@ BC_Chunk bc_chunk_new_get(const char * name);
 
 // The central virtual machine that runs Winter bytecode
 
-// To set up a Winter_Machine:
-//  1. Allocate a machine with winter_machine_alloc()
-//  2. Push something onto the call_stack
-//  3. Put some bytecode into wm->bytecode
-//  4. Set wm->running to true
-//  5. Run with winter_machine_step until wm->running turns false
 typedef struct {
 	BC_Chunk * bytecode;
+	size_t bytecode_len;
 	size_t ip;
 	Value * eval_stack;
 	Call_Frame ** call_stack;
@@ -102,7 +97,7 @@ typedef struct {
 
 Winter_Machine * winter_machine_alloc();
 void winter_machine_step(Winter_Machine * wm);
-void winter_machine_reset(Winter_Machine * wm);
+void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len);
 
 // :\ Winter_Machine
 

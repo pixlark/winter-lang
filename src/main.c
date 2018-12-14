@@ -26,14 +26,16 @@ int main()
 		Compiler compiler;
 		compiler.bytecode = NULL;
 		compile_statement(&compiler, statement);
-		wm->bytecode = compiler.bytecode;
 
 		// Executing
+		winter_machine_prime(wm, compiler.bytecode,
+							 sb_count(compiler.bytecode));
 		wm->running = true;
 		while (wm->running) {
 			winter_machine_step(wm);
 		}
-		winter_machine_reset(wm);
+
+		sb_free(compiler.bytecode);
 	}
 	
 	return 0;
