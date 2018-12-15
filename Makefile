@@ -6,7 +6,7 @@ make:
 	flex scanner.l && \
 	gcc -g \
 		main.c parser.tab.c lex.yy.c lowering.c vm.c \
-		value.c compile.c stretchy_buffer.c error.c \
+		value.c compile.c stretchy_buffer.c error.c ast.c \
 		-I../include \
 		-o ../bin/winter
 
