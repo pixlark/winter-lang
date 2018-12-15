@@ -18,6 +18,8 @@
 "print"  { return PRINT;  }
 "none"   { return NONE;   }
 "return" { return RETURN; }
+"true"   { return TRUE;   }
+"false"  { return FALSE;  }
 
 [_A-Za-z][_A-Za-z0-9]* {
 	yylval.name = strdup(yytext);

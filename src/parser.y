@@ -39,6 +39,8 @@
 %token PRINT;
 %token FUNC;
 %token RETURN;
+%token TRUE;
+%token FALSE;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
 %token <float_literal> FLOAT_LITERAL;
@@ -87,6 +89,16 @@ NONE {
 | FLOAT_LITERAL {
 	EXPR(EXPR_ATOM);
 	expr->atom.value = value_new_float($1);
+	$$ = expr;
+}
+| TRUE {
+	EXPR(EXPR_ATOM);
+	expr->atom.value = value_new_bool(true);
+	$$ = expr;
+}
+| FALSE {
+	EXPR(EXPR_ATOM);
+	expr->atom.value = value_new_bool(false);
 	$$ = expr;
 }
 | NAME {

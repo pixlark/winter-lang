@@ -1,7 +1,7 @@
 * TODO Extend type system
-** TODO None-type
+** DONE None-type
 ** DONE Integers
-** TODO Floats
+** DONE Floats
 ** TODO Bool
 
 * TODO Better error messages

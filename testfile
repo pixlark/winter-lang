@@ -1,5 +1,5 @@
-func my_func() {
-	return 10;
+func is_everything_gonna_turn_out_ok() {
+	return true;
 }
 
-print my_func();
+print is_everything_gonna_turn_out_ok();

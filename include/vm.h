@@ -14,6 +14,7 @@ typedef enum {
 	VALUE_NONE,
 	VALUE_INTEGER,
 	VALUE_FLOAT,
+	VALUE_BOOL,
 	VALUE_FUNCTION,
 } Value_Type;
 
@@ -22,6 +23,7 @@ typedef struct {
 	union {
 		int _integer;
 		float _float;
+		bool _bool;
 		Function * _function;
 	};
 } Value;

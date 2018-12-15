@@ -20,6 +20,11 @@ Value value_new_float(float f)
 	return (Value) { VALUE_FLOAT, ._float = f };
 }
 
+Value value_new_bool(bool b)
+{
+	return (Value) { VALUE_BOOL, ._bool = b };
+}
+
 Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
 {
 	Function * func = malloc(sizeof(Function));
@@ -36,6 +41,8 @@ bool value_equal(Value a, Value b)
 		switch (a.type) {
 		case VALUE_INTEGER:
 			return a._integer == b._integer;
+		case VALUE_BOOL:
+			return a._bool == b._bool;
 		default:
 			fatal_internal("Type is not comparable");
 		}
@@ -55,6 +62,9 @@ Value value_print(Value value)
 		break;
 	case VALUE_FLOAT:
 		printf("%f\n", value._float);
+		break;
+	case VALUE_BOOL:
+		printf("%s\n", value._bool ? "true" : "false");
 		break;
 	case VALUE_FUNCTION:
 		printf("<function at %p>\n", value._function);
