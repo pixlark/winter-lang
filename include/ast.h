@@ -56,6 +56,7 @@ typedef enum {
 	STMT_EXPR,
 	STMT_ASSIGN,
 	STMT_PRINT,
+	STMT_RETURN,
 	STMT_FUNC_DECL,
 } Stmt_Type;
 
@@ -72,6 +73,9 @@ typedef struct Stmt {
 		struct {
 			Expr * expr;
 		} print;
+		struct {
+			Expr * expr;
+		} _return;
 		struct {
 			const char * name;
 			const char ** parameters;

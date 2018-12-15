@@ -14,9 +14,10 @@
 	return *yytext;
 }
 
-"func"  { return FUNC; }
-"print" { return PRINT; }
-"none"  { return NONE; }
+"func"   { return FUNC;   }
+"print"  { return PRINT;  }
+"none"   { return NONE;   }
+"return" { return RETURN; }
 
 [_A-Za-z][_A-Za-z0-9]* {
 	yylval.name = strdup(yytext);

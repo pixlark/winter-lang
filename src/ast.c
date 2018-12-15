@@ -22,6 +22,9 @@ void deep_free_expr(Expr * expr)
 		deep_free_expr(expr->binary.left);
 		deep_free_expr(expr->binary.right);
 		break;
+	default:
+		fatal_internal("Can't free AST Expression!");
+		break;
 	}
 }
 
@@ -37,12 +40,18 @@ void deep_free(Stmt * stmt)
 	case STMT_PRINT:
 		deep_free_expr(stmt->print.expr);
 		break;
+	case STMT_RETURN:
+		deep_free_expr(stmt->_return.expr);
+		break;
 	case STMT_FUNC_DECL:
 		sb_free(stmt->func_decl.parameters);
 		for (int i = 0; i < sb_count(stmt->func_decl.body); i++) {
 			deep_free(stmt->func_decl.body[i]);
 		}
 		sb_free(stmt->func_decl.body);
+		break;
+	default:
+		fatal_internal("Can't free AST Statement!");
 		break;
 	}
 }

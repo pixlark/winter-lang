@@ -38,6 +38,7 @@
 %token NONE;
 %token PRINT;
 %token FUNC;
+%token RETURN;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
 %token <float_literal> FLOAT_LITERAL;
@@ -178,6 +179,11 @@ expression ';' {
 	STMT(STMT_PRINT);
 	stmt->print.expr = $2;
 	$$ = stmt;	
+}
+| RETURN expression ';' {
+	STMT(STMT_RETURN);
+	stmt->_return.expr = $2;
+	$$ = stmt;
 }
 | FUNC NAME '(' arg_list ')' scope {
 	STMT(STMT_FUNC_DECL);

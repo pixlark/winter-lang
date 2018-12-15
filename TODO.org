@@ -12,3 +12,7 @@
 ** TODO While-loops
 ** TODO For-loops
 
+* DONE Functions
+** DONE First-class functions
+** DONE Function arguments
+** DONE Return values

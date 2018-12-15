@@ -61,6 +61,10 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		compile_expression(compiler, stmt->print.expr);
 		P(bc_chunk_new_no_args(INSTR_PRINT));
 		break;
+	case STMT_RETURN:
+		compile_expression(compiler, stmt->_return.expr);
+		P(bc_chunk_new_no_args(INSTR_RETURN));
+		break;
 	case STMT_FUNC_DECL: {
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
