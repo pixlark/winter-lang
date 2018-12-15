@@ -1,0 +1,14 @@
+* TODO Extend type system
+** TODO None-type
+** DONE Integers
+** TODO Floats
+** TODO Bool
+
+* TODO Better error messages
+** TODO Line numbers
+
+* TODO Control Structures
+** TODO If-statements
+** TODO While-loops
+** TODO For-loops
+
