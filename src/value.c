@@ -5,6 +5,11 @@
 
 // Holds values in memory
 
+Value value_none()
+{
+	return (Value) { VALUE_NONE };
+}
+
 Value value_new_integer(int i)
 {
 	return (Value) { VALUE_INTEGER, ._integer = i };

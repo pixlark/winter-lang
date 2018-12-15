@@ -18,6 +18,7 @@ typedef enum {
 typedef enum {
 	EXPR_ATOM,
 	EXPR_VAR,
+	EXPR_FUNCALL,
 	EXPR_UNARY,
 	EXPR_BINARY,
 } Expr_Type;
@@ -31,6 +32,10 @@ typedef struct Expr {
 		struct {
 			const char * name;
 		} var;
+		struct {
+			const char * name;
+			struct Expr ** args;
+		} funcall;
 		struct {
 			Operator operator;
 			struct Expr * operand;
@@ -51,6 +56,7 @@ typedef enum {
 	STMT_EXPR,
 	STMT_ASSIGN,
 	STMT_PRINT,
+	STMT_FUNC_DECL,
 } Stmt_Type;
 
 typedef struct Stmt {
@@ -66,7 +72,14 @@ typedef struct Stmt {
 		struct {
 			Expr * expr;
 		} print;
+		struct {
+			const char * name;
+			const char ** parameters;
+			size_t parameter_count;
+			struct Stmt ** body;
+		} func_decl;
 	};
 } Stmt;
 
 // :\ Stmt
+

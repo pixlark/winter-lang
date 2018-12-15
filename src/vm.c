@@ -142,10 +142,27 @@ BC_Chunk winter_machine_advance_bytecode(Winter_Machine * wm)
 	}
 }
 
+bool winter_machine_reached_end(Winter_Machine * wm)
+{
+	if (sb_count(wm->call_stack) == 0) {
+		return wm->ip >= wm->bytecode_len;
+	} else {
+		Call_Frame * frame = sb_last(wm->call_stack);
+		return frame->ip >= sb_count(frame->bytecode);
+	}
+}
+
 void winter_machine_step(Winter_Machine * wm)
 {
-	if (sb_count(wm->call_stack) == 0 &&
-		wm->ip >= wm->bytecode_len) wm->running = false;
+	if (winter_machine_reached_end(wm)) {
+		if (sb_count(wm->call_stack) == 0) wm->running = false;
+		else {
+			// Inferred return, return and push None to the eval stack
+			push(value_none());
+			sb_pop(wm->call_stack);
+		}
+	}
+
 	if (!wm->running) return;
 
 	assert(wm->bytecode);

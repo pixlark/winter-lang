@@ -1,6 +1,14 @@
-x = 10;
-y = 6;
-z = x - y;
-print z + y + x;
-// this is a comment
-print x;
+func test(a, b, c) {
+	print a + b + c;
+}
+
+func print_out_something(something) {
+	func inner_func(s) {
+		x = s + 2;
+		print x;
+	}
+	inner_func(something);
+}
+
+test(1, 2, 3);
+print_out_something(15);

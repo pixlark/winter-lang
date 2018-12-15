@@ -2,6 +2,7 @@
 
 #include "vm.h"
 
+Value value_none();
 Value value_new_integer(int i);
 Value value_new_float(float f);
 Value value_new_function(const char ** parameters, size_t parameter_count, BC_Chunk * bytecode);

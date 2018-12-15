@@ -11,6 +11,7 @@ typedef struct Function Function;
 // : Value
 
 typedef enum {
+	VALUE_NONE,
 	VALUE_INTEGER,
 	VALUE_FLOAT,
 	VALUE_FUNCTION,

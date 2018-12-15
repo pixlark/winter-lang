@@ -5,7 +5,7 @@
 	#include "stretchy_buffer.h"
 	#include "ast.h"
 	int yylex();
-	void yyerror(Stmt *** statement, char const *);
+	void yyerror(Stmt *** global_statements, char const * s);
 %}
 
 %code requires {
@@ -22,13 +22,16 @@
 }
 
 %define parse.error verbose
-%parse-param { Stmt *** statements }
+%parse-param { Stmt *** global_statements }
 
 %union {
 	const char * name;
+	const char ** names;
 	int integer_literal;
 	Expr * expression;
 	Stmt * statement;
+	Expr ** expressions;
+	Stmt ** statements;
 };
 
 %token PRINT;
@@ -38,6 +41,10 @@
 
 %type <expression> expression;
 %type <statement> statement;
+%type <statements> statements;
+%type <statements> scope;
+%type <names> arg_list;
+%type <expressions> comma_expression;
 
 %left '+' '-'
 %left UMINUS
@@ -45,6 +52,22 @@
 %start program
 
 %%
+
+comma_expression:
+/* empty */ {
+	$$ = NULL;
+}
+| expression {
+	Expr ** list = NULL;
+	sb_push(list, $1);
+	$$ = list;
+}
+| comma_expression ',' expression {
+	Expr ** list = $1;
+	sb_push(list, $3);
+	$$ = list;
+}
+;
 
 expression:
 INTEGER_LITERAL {
@@ -55,6 +78,12 @@ INTEGER_LITERAL {
 | NAME {
 	EXPR(EXPR_VAR);
 	expr->var.name = $1;
+	$$ = expr;
+}
+| NAME '(' comma_expression ')' {
+	EXPR(EXPR_FUNCALL);
+	expr->funcall.name = $1;
+	expr->funcall.args = $3;
 	$$ = expr;
 }
 | expression '+' expression {
@@ -82,6 +111,44 @@ INTEGER_LITERAL {
 }
 ;
 
+statements:
+statement {
+	Stmt ** list = NULL;
+	sb_push(list, $1);
+	$$ = list;
+}
+| statements statement {
+	Stmt ** list = $1;
+	sb_push(list, $2);
+	$$ = list;
+}
+;
+
+scope:
+'{' '}' {
+	$$ = NULL;
+}
+| '{' statements '}' {
+	$$ = $2;
+}
+;
+
+arg_list:
+/* empty */ {
+	$$ = NULL;
+}
+| NAME {
+	const char ** list = NULL;
+	sb_push(list, $1);
+	$$ = list;
+}
+| arg_list ',' NAME {
+	const char ** list = $1;
+	sb_push(list, $3);
+	$$ = list;
+}
+;
+
 statement:
 expression ';' {
 	STMT(STMT_EXPR);
@@ -99,14 +166,22 @@ expression ';' {
 	stmt->print.expr = $2;
 	$$ = stmt;	
 }
+| FUNC NAME '(' arg_list ')' scope {
+	STMT(STMT_FUNC_DECL);
+	stmt->func_decl.name = $2;
+	stmt->func_decl.parameters = $4;
+	stmt->func_decl.parameter_count = sb_count(stmt->func_decl.parameters);
+	stmt->func_decl.body = $6;
+	$$ = stmt;
+}
 ;
 
 program:
 statement {
-	sb_push(*statements, $1);
+	sb_push(*global_statements, $1);
 }
 | program statement {
-	sb_push(*statements, $2);
+	sb_push(*global_statements, $2);
 }
 ;
 
@@ -114,15 +189,15 @@ statement {
 
 Stmt ** parse()
 {
-	Stmt ** statements = NULL;
-	if (yyparse(&statements)) {
+	Stmt ** global_statements = NULL;
+	if (yyparse(&global_statements)) {
 		fprintf(stderr, "Encountered error while parsing. Exiting.\n");
 		return NULL;
 	}
-	return statements;
+	return global_statements;
 }
 
-void yyerror(Stmt *** statement, char const * s)
+void yyerror(Stmt *** global_statements, char const * s)
 {
 	fprintf(stderr, "%s\n", s);
 }
