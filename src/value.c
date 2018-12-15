@@ -47,6 +47,9 @@ bool value_equal(Value a, Value b)
 Value value_print(Value value)
 {
 	switch (value.type) {
+	case VALUE_NONE:
+		printf("none\n");
+		break;
 	case VALUE_INTEGER:
 		printf("%d\n", value._integer);
 		break;
@@ -54,7 +57,7 @@ Value value_print(Value value)
 		printf("%f\n", value._float);
 		break;
 	case VALUE_FUNCTION:
-		printf("<function at %p>", value._function);
+		printf("<function at %p>\n", value._function);
 		break;
 	}
 }

@@ -34,6 +34,7 @@
 	Stmt ** statements;
 };
 
+%token NONE;
 %token PRINT;
 %token FUNC;
 %token <name> NAME;
@@ -73,6 +74,11 @@ expression:
 INTEGER_LITERAL {
 	EXPR(EXPR_ATOM);
 	expr->atom.value = value_new_integer($1);
+	$$ = expr;
+}
+| NONE {
+	EXPR(EXPR_ATOM);
+	expr->atom.value = value_none();
 	$$ = expr;
 }
 | NAME {

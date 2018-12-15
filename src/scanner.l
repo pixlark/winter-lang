@@ -16,6 +16,7 @@
 
 "func"  { return FUNC; }
 "print" { return PRINT; }
+"none"  { return NONE; }
 
 [_A-Za-z][_A-Za-z0-9]* {
 	yylval.name = strdup(yytext);

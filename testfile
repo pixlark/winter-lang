@@ -1,23 +1,6 @@
-func test(a, b, c) {
-	print a + b + c;
+func my_func() {
+	print 15;
 }
 
-func print_out_something(something) {
-	func inner_func(s) {
-		func another_func(s) {
-			print s;
-		}
-		x = s + 2;
-		another_func(s + 15);
-	}
-	inner_func(something);
-}
-
-func heres_my_function(a) {
-	print a + a + a;
-}
-
-test(1, 2, 3, 4);
-print_out_something(15);
-
-heres_my_function(2);
+x = my_func;
+print x;
