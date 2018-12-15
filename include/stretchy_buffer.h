@@ -13,6 +13,7 @@
 #define sb_add(a,n)        (stb__sbmaybegrow(a,n), stb__sbn(a)+=(n), &(a)[stb__sbn(a)-(n)])
 #define sb_last(a)         ((a)[stb__sbn(a)-1])
 #define sb_pop(a)          ((a)[--stb__sbn(a)])
+#define sb_copy(a)         ((a) ? stb__copy((void*)(a), sizeof(sb_last(a)), sb_count(a)) : 0)
 
 // Get pointer to before-pointer information
 #define stb__sbraw(a) ((int *) (a) - 2)
@@ -27,5 +28,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 void * stb__sbgrowf(void *arr, int increment, int itemsize);
+void * stb__copy(void * arr, size_t elem_size, size_t elem_count);

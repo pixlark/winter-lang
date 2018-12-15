@@ -15,3 +15,11 @@ void * stb__sbgrowf(void *arr, int increment, int itemsize)
 		assert(0);
 	}
 }
+
+void * stb__copy(void * arr, size_t elem_size, size_t elem_count)
+{
+	size_t size = elem_size * elem_count + sizeof(int) * 2;
+	void * new_arr = malloc(size);
+	memcpy(new_arr, stb__sbraw(arr), size);
+	return (void*) ((int*) new_arr + 2);
+}
