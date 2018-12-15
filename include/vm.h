@@ -136,8 +136,7 @@ void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len);
 // : Function
 
 typedef struct Function {
-	const char ** parameters;
-	size_t parameter_count;
+	const char ** parameters; // sb
 	BC_Chunk * bytecode;
 } Function;
 

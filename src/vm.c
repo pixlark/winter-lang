@@ -248,7 +248,7 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		Function func = *(func_val._function);
 		Call_Frame * frame = call_frame_alloc(func.bytecode);
-		for (int i = func.parameter_count - 1; i >= 0; i--) {
+		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
 			Value * arg_storage = malloc(sizeof(Value));
 			*arg_storage = pop();
 			variable_map_add(&(frame->var_map), func.parameters[i], arg_storage);
@@ -274,16 +274,17 @@ void winter_machine_test()
 
 	Value function;
 	{
-		const char * parameters[2] = {
-			"a", "b",
-		};
+		const char ** parameters = NULL;
+		sb_push(parameters, "a");
+		sb_push(parameters, "b");
+		
 		BC_Chunk * bytecode = NULL;
 		#define pb(x) sb_push(bytecode, x)
 		pb(bc_chunk_new_push(value_new_integer(101)));
 		pb(bc_chunk_new_no_args(INSTR_PRINT));
 		pb(bc_chunk_new_no_args(INSTR_RETURN));
 		#undef pb
-		function = value_new_function(parameters, 2, bytecode);
+		function = value_new_function(parameters, bytecode);
 	}
 	
 	#define pb(x) sb_push(bytecode, x)

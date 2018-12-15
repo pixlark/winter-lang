@@ -75,7 +75,6 @@ typedef struct Stmt {
 		struct {
 			const char * name;
 			const char ** parameters;
-			size_t parameter_count;
 			struct Stmt ** body;
 		} func_decl;
 	};

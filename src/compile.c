@@ -67,8 +67,7 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		for (int i = 0; i < sb_count(stmt->func_decl.body); i++) {
 			compile_statement(&decl_compiler, stmt->func_decl.body[i]);
 		}
-		Value function = value_new_function(stmt->func_decl.parameters,
-											stmt->func_decl.parameter_count,
+		Value function = value_new_function(sb_copy(stmt->func_decl.parameters),
 											decl_compiler.bytecode);
 		P(bc_chunk_new_push(function));
 		P(bc_chunk_new_bind(stmt->func_decl.name));

@@ -170,7 +170,6 @@ expression ';' {
 	STMT(STMT_FUNC_DECL);
 	stmt->func_decl.name = $2;
 	stmt->func_decl.parameters = $4;
-	stmt->func_decl.parameter_count = sb_count(stmt->func_decl.parameters);
 	stmt->func_decl.body = $6;
 	$$ = stmt;
 }

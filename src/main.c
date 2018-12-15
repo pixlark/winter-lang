@@ -26,6 +26,9 @@ int main()
 		compiler.bytecode = NULL;
 		compile_statement(&compiler, statement);
 
+		// Free AST
+		deep_free(statement);
+		
 		// Executing
 		winter_machine_prime(wm, compiler.bytecode,
 							 sb_count(compiler.bytecode));
