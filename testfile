@@ -4,11 +4,20 @@ func test(a, b, c) {
 
 func print_out_something(something) {
 	func inner_func(s) {
+		func another_func(s) {
+			print s;
+		}
 		x = s + 2;
-		print x;
+		another_func(s + 15);
 	}
 	inner_func(something);
 }
 
-test(1, 2, 3);
+func heres_my_function(a) {
+	print a + a + a;
+}
+
+test(1, 2, 3, 4);
 print_out_something(15);
+
+heres_my_function(2);
