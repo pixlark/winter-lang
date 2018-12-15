@@ -32,7 +32,7 @@ void compile_expression(Compiler * compiler, Expr * expr)
 			compile_expression(compiler, expr->funcall.args[i]);
 		}
 		P(bc_chunk_new_get(expr->funcall.name));
-		P(bc_chunk_new_no_args(INSTR_CALL));
+		P(bc_chunk_new_call(sb_count(expr->funcall.args)));
 		break;
 	case EXPR_UNARY: {
 		compile_expression(compiler, expr->unary.operand);

@@ -118,6 +118,11 @@ BC_Chunk bc_chunk_new_get(const char * name)
 	return (BC_Chunk) { INSTR_GET, .instr_get = (Instr_Get) { name } };
 }
 
+BC_Chunk bc_chunk_new_call(size_t arg_count)
+{
+	return (BC_Chunk) { INSTR_CALL, .instr_call = (Instr_Call) { arg_count } };
+}
+
 // :\ BC_Chunk
 
 // : Winter_Machine
@@ -247,6 +252,10 @@ void winter_machine_step(Winter_Machine * wm)
 			fatal("Type not callable");
 		}
 		Function func = *(func_val._function);
+		Instr_Call instr = chunk.instr_call;
+		if (sb_count(func.parameters) != instr.arg_count) {
+			fatal("Wrong number of arguments to function");
+		}
 		Call_Frame * frame = call_frame_alloc(func.bytecode);
 		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
 			Value * arg_storage = malloc(sizeof(Value));

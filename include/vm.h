@@ -58,6 +58,10 @@ typedef struct {
 	const char * name;
 } Instr_Get;
 
+typedef struct {
+	size_t arg_count;
+} Instr_Call;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
@@ -66,11 +70,11 @@ enum Instruction {
 	INSTR_RETURN,
 	INSTR_PRINT,
 	INSTR_POP,
-	INSTR_CALL,
 	// Args
 	INSTR_PUSH,
 	INSTR_BIND,
 	INSTR_GET,
+	INSTR_CALL,
 };
 
 // :\ Instruction
@@ -85,6 +89,7 @@ typedef struct {
 		Instr_Push instr_push;
 		Instr_Bind instr_bind;
 		Instr_Get  instr_get;
+		Instr_Call instr_call;
 	};
 } BC_Chunk;
 
@@ -92,6 +97,7 @@ BC_Chunk bc_chunk_new_no_args(enum Instruction instr);
 BC_Chunk bc_chunk_new_push(Value value);
 BC_Chunk bc_chunk_new_bind(const char * name);
 BC_Chunk bc_chunk_new_get(const char * name);
+BC_Chunk bc_chunk_new_call(size_t arg_count);
 
 // :\ BC_Chunk
 
