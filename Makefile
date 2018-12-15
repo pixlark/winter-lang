@@ -2,7 +2,7 @@
 
 make:
 	cd src && \
-	bison --report=state --defines=../include/parser.tab.h parser.y && \
+	bison --defines=../include/parser.tab.h parser.y && \
 	flex scanner.l && \
 	gcc -g \
 		main.c parser.tab.c lex.yy.c lowering.c vm.c \
