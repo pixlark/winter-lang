@@ -1,6 +1,0 @@
-func my_func() {
-	print 15;
-}
-
-x = my_func;
-print x;

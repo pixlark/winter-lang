@@ -28,6 +28,7 @@
 	const char * name;
 	const char ** names;
 	int integer_literal;
+	float float_literal;
 	Expr * expression;
 	Stmt * statement;
 	Expr ** expressions;
@@ -39,6 +40,7 @@
 %token FUNC;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
+%token <float_literal> FLOAT_LITERAL;
 
 %type <expression> expression;
 %type <statement> statement;
@@ -71,14 +73,19 @@ comma_expression:
 ;
 
 expression:
-INTEGER_LITERAL {
+NONE {
+	EXPR(EXPR_ATOM);
+	expr->atom.value = value_none();
+	$$ = expr;
+}
+| INTEGER_LITERAL {
 	EXPR(EXPR_ATOM);
 	expr->atom.value = value_new_integer($1);
 	$$ = expr;
 }
-| NONE {
+| FLOAT_LITERAL {
 	EXPR(EXPR_ATOM);
-	expr->atom.value = value_none();
+	expr->atom.value = value_new_float($1);
 	$$ = expr;
 }
 | NAME {

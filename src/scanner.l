@@ -28,6 +28,11 @@
 	return INTEGER_LITERAL;
 }
 
+[-+]?[0-9]*\.?[0-9]+ {
+	yylval.float_literal = atof(yytext);
+	return FLOAT_LITERAL;
+}
+
 . {
 	fprintf(stderr, "Unrecognized character '%c'\n", *yytext);
 	exit(1);
