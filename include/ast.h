@@ -32,7 +32,7 @@ typedef struct Expr {
 			const char * name;
 		} var;
 		struct {
-			const char * name;
+			struct Expr * func;
 			struct Expr ** args;
 		} funcall;
 		struct {

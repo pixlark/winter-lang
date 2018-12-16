@@ -101,8 +101,7 @@ Expr * parse_function_call(Lexer * lexer)
 			}
 		}
 		EXPR(EXPR_FUNCALL);
-		// TODO(pixlark): Modify funcall to use expressions
-		expr->funcall.name = NULL;
+		expr->funcall.func = left;
 		expr->funcall.args = args;
 		return expr;
 	}

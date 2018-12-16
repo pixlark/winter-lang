@@ -33,7 +33,7 @@ void compile_expression(Compiler * compiler, Expr * expr)
 		for (int i = 0; i < sb_count(expr->funcall.args); i++) {
 			compile_expression(compiler, expr->funcall.args[i]);
 		}
-		P(bc_chunk_new_get(expr->funcall.name));
+		compile_expression(compiler, expr->funcall.func);
 		P(bc_chunk_new_call(sb_count(expr->funcall.args)));
 		break;
 	case EXPR_UNARY: {

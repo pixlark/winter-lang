@@ -109,9 +109,9 @@ NONE {
 	expr->var.name = $1;
 	$$ = expr;
 }
-| NAME '(' comma_expression ')' {
+| expression '(' comma_expression ')' {
 	EXPR(EXPR_FUNCALL);
-	expr->funcall.name = $1;
+	expr->funcall.func = $1;
 	expr->funcall.args = $3;
 	$$ = expr;
 }
