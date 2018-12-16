@@ -32,7 +32,9 @@ typedef struct {
 	const char * source;
 	size_t source_len;
 	size_t position;
+	Token token;
 } Lexer;
 
 Lexer * lexer_alloc(const char * source);
 Token lexer_next_token(Lexer * lexer);
+void lexer_advance(Lexer * lexer);

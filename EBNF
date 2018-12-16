@@ -9,19 +9,16 @@ atom = NONE
 	 | '(' expression ')'
 
 function_call = atom
-			  | NAME '(' comma_expression ')'
+			  | NAME '(' [comma_expression] ')'
 
 prefix = function_call
 	   | '-' prefix
 
-add_ops = prefix
-		| add_ops ('+' | '-') add_ops
+add_ops = prefix ('+' | '-') add_ops
 
 expression = add_ops
 
-comma_expression = !
-				 | expression
-				 | comma_expression ',' expression
+comma_expression = expression {',' expression}
 
 lone_expression = expression ';'
 

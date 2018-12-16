@@ -58,6 +58,7 @@ Lexer * lexer_alloc(const char * source)
 	lexer->source = source;
 	lexer->source_len = strlen(source);
 	lexer->position = 0;
+	lexer_advance(lexer);
 	return lexer;
 }
 
@@ -77,7 +78,7 @@ char lexer_peek(Lexer * lexer)
 	return lexer->source[lexer->position];
 }
 
-void lexer_advance(Lexer * lexer)
+void lexer_advance_char(Lexer * lexer)
 {
 	lexer->position++;
 }
@@ -104,7 +105,7 @@ Token lexer_next_token(Lexer * lexer)
 
 	// Whitespace
 	if (isspace(next_char)) {
-		lexer_advance(lexer);
+		lexer_advance_char(lexer);
 		goto reset;
 	}
 	
@@ -115,7 +116,7 @@ Token lexer_next_token(Lexer * lexer)
 			if (!(next_char == '_' || isalnum(next_char))) {
 				break;
 			}
-			lexer_advance(lexer);
+			lexer_advance_char(lexer);
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
@@ -148,7 +149,7 @@ Token lexer_next_token(Lexer * lexer)
 			if (!(next_char == '.' || isdigit(next_char))) {
 				break;
 			}
-			lexer_advance(lexer);
+			lexer_advance_char(lexer);
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
@@ -178,10 +179,17 @@ Token lexer_next_token(Lexer * lexer)
 	case '(':
 	case ')':
 	case ';':
+	case '+':
+	case '-':
 	case '=':
-		lexer_advance(lexer);
+		lexer_advance_char(lexer);
 		return (Token) { next_char };
 	default:
 		fatal("Unexpected character '%c'", next_char);
 	}
+}
+
+void lexer_advance(Lexer * lexer)
+{
+	lexer->token = lexer_next_token(lexer);
 }

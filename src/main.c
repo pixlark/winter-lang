@@ -5,22 +5,20 @@
 #include "vm.h"
 
 #include "lexer.h"
+#include "parser.h"
 
 #include "parser.tab.h"
 
 const char * test_source =
-	"x = 5.;"
-	"print x;";
+	"x() + 5";
 
 int main()
 {
 	Lexer * lexer = lexer_alloc(test_source);
 	while (true) {
-		Token token = lexer_next_token(lexer);
-		char * s = token_to_string(token);
-		printf("%s\n", s);
-		free(s);
-		if (token.type == TOKEN_EOF) break;
+		Expr * expr = parse_expression(lexer);
+		printf("%p\n", expr);
+		if (!expr) break;
 	}
 	
 	return 0;
