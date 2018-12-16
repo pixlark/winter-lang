@@ -1,0 +1,27 @@
+Winter EBNF Grammar Specification
+
+atom = NONE
+	 | INTEGER_LITERAL
+	 | FLOAT_LITERAL
+	 | TRUE
+	 | FALSE
+	 | NAME
+	 | '(' expression ')'
+
+function_call = atom
+			  | NAME '(' comma_expression ')'
+
+prefix = function_call
+	   | '-' prefix
+
+add_ops = prefix
+		| add_ops ('+' | '-') add_ops
+
+expression = add_ops
+
+comma_expression = !
+				 | expression
+				 | comma_expression ',' expression
+
+lone_expression = expression ';'
+
