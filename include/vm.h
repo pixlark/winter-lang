@@ -64,6 +64,10 @@ typedef struct {
 	size_t arg_count;
 } Instr_Call;
 
+typedef struct {
+	int jump_offset;
+} Instr_Condjump;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
@@ -72,6 +76,7 @@ enum Instruction {
 	INSTR_RETURN,
 	INSTR_PRINT,
 	INSTR_POP,
+	INSTR_CONDJUMP,
 	// Args
 	INSTR_PUSH,
 	INSTR_BIND,
@@ -92,6 +97,7 @@ typedef struct {
 		Instr_Bind instr_bind;
 		Instr_Get  instr_get;
 		Instr_Call instr_call;
+		Instr_Condjump instr_condjump;
 	};
 } BC_Chunk;
 
@@ -100,6 +106,7 @@ BC_Chunk bc_chunk_new_push(Value value);
 BC_Chunk bc_chunk_new_bind(const char * name);
 BC_Chunk bc_chunk_new_get(const char * name);
 BC_Chunk bc_chunk_new_call(size_t arg_count);
+BC_Chunk bc_chunk_new_condjump(int offset);
 
 // :\ BC_Chunk
 

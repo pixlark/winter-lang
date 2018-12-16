@@ -43,6 +43,13 @@ void deep_free(Stmt * stmt)
 	case STMT_RETURN:
 		deep_free_expr(stmt->_return.expr);
 		break;
+	case STMT_IF:
+		deep_free_expr(stmt->_if.expr);
+		for (int i = 0; i < sb_count(stmt->_if.body); i++) {
+			deep_free(stmt->_if.body[i]);
+		}
+		sb_free(stmt->_if.body);
+		break;
 	case STMT_FUNC_DECL:
 		sb_free(stmt->func_decl.parameters);
 		for (int i = 0; i < sb_count(stmt->func_decl.body); i++) {

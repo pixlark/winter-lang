@@ -130,6 +130,12 @@ BC_Chunk bc_chunk_new_call(size_t arg_count)
 	return (BC_Chunk) { INSTR_CALL, .instr_call = (Instr_Call) { arg_count } };
 }
 
+BC_Chunk bc_chunk_new_condjump(int offset)
+{
+	return (BC_Chunk) { INSTR_CONDJUMP,
+			.instr_condjump = (Instr_Condjump) { offset } };
+}
+
 // :\ BC_Chunk
 
 // : Winter_Machine
@@ -185,6 +191,16 @@ bool winter_machine_reached_end(Winter_Machine * wm)
 	} else {
 		Call_Frame * frame = sb_last(wm->call_stack);
 		return frame->ip >= sb_count(frame->bytecode);
+	}
+}
+
+void winter_machine_modify_ip(Winter_Machine * wm, int offset)
+{
+	if (sb_count(wm->call_stack) == 0) {
+		wm->ip += offset;
+	} else {
+		Call_Frame * frame = sb_last(wm->call_stack);
+		frame->ip += offset;
 	}
 }
 
@@ -268,6 +284,16 @@ void winter_machine_step(Winter_Machine * wm)
 			variable_map_update(&(frame->var_map), func.parameters[i], arg);
 		}
 		sb_push(wm->call_stack, frame);
+	} break;
+	case INSTR_CONDJUMP: {
+		Instr_Condjump instr = chunk.instr_condjump;
+		Value condition = pop();
+		if (condition.type != VALUE_BOOL) {
+			fatal("If condition must be bool");
+		}
+		if (!condition._bool) {
+			winter_machine_modify_ip(wm, instr.jump_offset);
+		}
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

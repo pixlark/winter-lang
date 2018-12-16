@@ -43,6 +43,7 @@
 %token RETURN;
 %token TRUE;
 %token FALSE;
+%token IF;
 %token <name> NAME;
 %token <integer_literal> INTEGER_LITERAL;
 %token <float_literal> FLOAT_LITERAL;
@@ -197,6 +198,12 @@ expression ';' {
 | RETURN expression ';' {
 	STMT(STMT_RETURN);
 	stmt->_return.expr = $2;
+	$$ = stmt;
+}
+| IF expression scope {
+	STMT(STMT_IF);
+	stmt->_if.expr = $2;
+	stmt->_if.body = $3;
 	$$ = stmt;
 }
 | FUNC NAME '(' arg_list ')' scope {

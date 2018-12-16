@@ -1,3 +1,5 @@
+* TODO String interning
+
 * DONE Extend type system
 ** DONE None-type
 ** DONE Integers
