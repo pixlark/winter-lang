@@ -37,8 +37,7 @@
 }
 
 . {
-	fprintf(stderr, "Unrecognized character '%c'\n", *yytext);
-	exit(1);
+	fatal("Unrecognized character '%c'", *yytext);
 }
 
 %%

@@ -23,7 +23,15 @@ void fatal(const char * fmt, ...)
 
 	fprintf(stderr, RED(BOLD("encountered error")) ":\n");
 	vfprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
+	
+	// Bit of a kluge, perhaps there's a better way to deal with
+	// bison's newlines
+	{
+		size_t len = strlen(fmt);
+		if (fmt[len-1] != '\n') {
+			fprintf(stderr, "\n");
+		}
+	}
 
 	va_end(args);
 	exit(1);

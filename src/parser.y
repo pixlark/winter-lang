@@ -4,6 +4,7 @@
 	#include <string.h>
 	#include "stretchy_buffer.h"
 	#include "ast.h"
+	#include "error.h"
 	int yylex();
 	void yyerror(Stmt *** global_statements, char const * s);
 %}
@@ -229,5 +230,5 @@ Stmt ** parse()
 
 void yyerror(Stmt *** global_statements, char const * s)
 {
-	fprintf(stderr, "%s\n", s);
+	fatal("%s\n", s);
 }

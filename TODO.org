@@ -1,8 +1,8 @@
-* TODO Extend type system
+* DONE Extend type system
 ** DONE None-type
 ** DONE Integers
 ** DONE Floats
-** TODO Bool
+** DONE Bool
 
 * TODO Better error messages
 ** TODO Line numbers

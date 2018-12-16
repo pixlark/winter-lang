@@ -1,5 +1,4 @@
-func is_everything_gonna_turn_out_ok() {
-	return true;
+func test {
+	return 10;
 }
 
-print is_everything_gonna_turn_out_ok();
