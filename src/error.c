@@ -42,7 +42,7 @@ void fatal_internal(const char * fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 
-	fprintf(stderr, INVERTED(BOLD(RED("internal compiler error:\n"))));
+	fprintf(stderr, INVERTED(BOLD(RED("internal compiler error"))), ":\n");
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 

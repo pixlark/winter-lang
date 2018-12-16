@@ -11,6 +11,8 @@
 
 * TODO Control Structures
 ** TODO If-statements
+*** DONE If
+*** TODO If-else and else
 ** TODO While-loops
 ** TODO For-loops
 
