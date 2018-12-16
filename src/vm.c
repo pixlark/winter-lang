@@ -16,13 +16,6 @@ Variable_Map variable_map_new()
 	return map;
 }
 
-void variable_map_add(Variable_Map * map, const char * name, Value * value)
-{
-	map->size++;
-	sb_push(map->names, name);
-	sb_push(map->values, value);
-}
-
 Value * variable_map_index(Variable_Map * map, const char * name)
 {
 	for (int i = 0; i < map->size; i++) {
@@ -34,6 +27,20 @@ Value * variable_map_index(Variable_Map * map, const char * name)
 	return NULL;
 }
 
+void variable_map_update(Variable_Map * map, const char * name, Value value)
+{
+	Value * index = variable_map_index(map, name);
+	if (index) {
+		*index = value;
+	} else {
+		map->size++;
+		sb_push(map->names, name);
+		Value * storage = malloc(sizeof(Value));
+		*storage = value;
+		sb_push(map->values, storage);
+	}
+}
+
 bool variable_map_test()
 {
 	Variable_Map map = variable_map_new();
@@ -42,7 +49,7 @@ bool variable_map_test()
 	val.type = VALUE_INTEGER;
 	val._integer = 10;
 	
-	variable_map_add(&map, "test", &val);
+	variable_map_update(&map, "test", val);
 
 	Value * val_p = variable_map_index(&map, "test");
 	assert(val_p->type == VALUE_INTEGER);
@@ -227,9 +234,8 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_BIND: {
 		Instr_Bind instr = chunk.instr_bind;
 		Variable_Map * varmap = winter_machine_varmap(wm);
-		Value * var_storage = malloc(sizeof(Value));
-		*var_storage = pop();
-		variable_map_add(varmap, instr.name, var_storage);
+		Value value = pop();
+		variable_map_update(varmap, instr.name, value);
 	} break;
 	case INSTR_GET: {
 		Instr_Get instr = chunk.instr_get;
@@ -258,9 +264,8 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		Call_Frame * frame = call_frame_alloc(func.bytecode);
 		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
-			Value * arg_storage = malloc(sizeof(Value));
-			*arg_storage = pop();
-			variable_map_add(&(frame->var_map), func.parameters[i], arg_storage);
+			Value arg = pop();
+			variable_map_update(&(frame->var_map), func.parameters[i], arg);
 		}
 		sb_push(wm->call_stack, frame);
 	} break;
