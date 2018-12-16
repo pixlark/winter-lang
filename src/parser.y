@@ -36,6 +36,7 @@
 	Stmt ** statements;
 };
 
+%token END_OF_FILE;
 %token NONE;
 %token PRINT;
 %token FUNC;
@@ -56,7 +57,7 @@
 %left '+' '-'
 %left UMINUS
 
-%start program
+%start file
 
 %%
 
@@ -213,6 +214,15 @@ statement {
 }
 | program statement {
 	sb_push(*global_statements, $2);
+}
+;
+
+file:
+END_OF_FILE {
+	YYACCEPT;
+}
+| program END_OF_FILE {
+	YYACCEPT;
 }
 ;
 
