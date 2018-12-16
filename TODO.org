@@ -16,3 +16,7 @@
 ** DONE First-class functions
 ** DONE Function arguments
 ** DONE Return values
+
+* TODO Hand-write lexer/parser
+** TODO Lexer
+** TODO Parser
