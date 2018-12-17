@@ -2,12 +2,13 @@
 
 #include "common.h"
 
-Assoc_Source assoc_source_new(size_t line,
-							  size_t start,
-							  size_t end)
+Assoc_Source assoc_source_new(Lexer * lexer,
+							  size_t line,
+							  size_t position,
+							  size_t len)
 {
 	return (Assoc_Source) {
-		line, start, end,
+		lexer, line, position, len
 	};
 }
 
@@ -33,18 +34,39 @@ void fatal(const char * fmt, ...)
 
 	fprintf(stderr, RED(BOLD("encountered error")) ":\n");
 	vfprintf(stderr, fmt, args);
-	
-	// Bit of a kluge, perhaps there's a better way to deal with
-	// bison's newlines
-	{
-		size_t len = strlen(fmt);
-		if (fmt[len-1] != '\n') {
-			fprintf(stderr, "\n");
-		}
-	}
 
 	va_end(args);
 	exit(1);
+}
+
+void print_assoc(Assoc_Source assoc)
+{
+	const char * pos = assoc.lexer->source + assoc.position;
+	// Peek back until line start
+	const char * line_start = pos;
+	while (true) {
+		if (line_start == assoc.lexer->source) break;
+		if (*line_start == '\n') break;
+		line_start--;
+	}
+	// Peek forwards until line end
+	const char * line_end = pos;
+	while (true) {
+		if ((line_end - assoc.lexer->source) == assoc.lexer->source_len - 1) break;
+		if (*line_end == '\n') break;
+		line_end++;
+	}
+	// Print line
+	printf("    " DIM("%.*s") "\n", line_end - line_start, line_start);
+	// Print underline
+	printf("    ");
+	for (int i = 0; i < (pos - line_start); i++) {
+		printf(" ");
+	}
+	for (int i = 0; i < assoc.len; i++) {
+		printf(RED("^"));
+	}
+	printf("\n");
 }
 
 void fatal_assoc(Assoc_Source assoc, const char * fmt, ...)
@@ -53,17 +75,10 @@ void fatal_assoc(Assoc_Source assoc, const char * fmt, ...)
 	va_start(args, fmt);
 
 	fprintf(stderr, RED(BOLD("encountered error")) ":\n");
-	fprintf(stderr, DIM("Line %d\n"), assoc.line);
+	fprintf(stderr, ":%d\n", assoc.line);
+	print_assoc(assoc);
 	vfprintf(stderr, fmt, args);
-	
-	// Bit of a kluge, perhaps there's a better way to deal with
-	// bison's newlines
-	{
-		size_t len = strlen(fmt);
-		if (fmt[len-1] != '\n') {
-			fprintf(stderr, "\n");
-		}
-	}
+	printf("\n");
 
 	va_end(args);
 	exit(1);	

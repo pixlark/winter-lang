@@ -51,7 +51,7 @@ void __expect(Lexer * lexer, Token_Type type)
 	if (!match(type)) {
 		fatal_assoc(token().assoc,
 					"Expected %s, got %s instead",
-					token_to_string((Token) { type }),
+					token_type_to_string(type),
 					token_to_string(lexer->token));
 	}
 }
@@ -62,7 +62,7 @@ void __weak_expect(Lexer * lexer, Token_Type type)
 	if (!is(type)) {
 		fatal_assoc(token().assoc,
 					"Expected %s, got %s instead",
-					token_to_string((Token) { type }),
+					token_type_to_string(type),
 					token_to_string(lexer->token));
 	}
 }
@@ -120,6 +120,12 @@ Expr * parse_atom(Lexer * lexer)
 		expr->var.name = token.name;
 		advance();		
 		return expr;
+	} break;
+	default: {
+		printf("");
+		fatal_assoc(token().assoc,
+					"Expected expression, got %s instead",
+					token_to_string(lexer->token));
 	} break;
 	}
 }
@@ -246,7 +252,6 @@ Expr * parse_add_ops(Lexer * lexer)
 
 Expr * parse_expression(Lexer * lexer)
 {
-	if (is(TOKEN_EOF)) return NULL;
 	return parse_add_ops(lexer);
 }
 

@@ -1,5 +1,14 @@
 #pragma once
 
+typedef struct Lexer Lexer;
+
+typedef struct {
+	struct Lexer * lexer;
+	size_t line;
+	size_t position;
+	size_t len;
+} Assoc_Source;
+
 typedef enum {
 	// 0-255 reserved for ASCII
 	TOKEN_EOF = 256,
@@ -36,9 +45,10 @@ typedef struct {
 	Assoc_Source assoc;
 } Token;
 
+char * token_type_to_string(Token_Type type);
 char * token_to_string(Token token);
 
-typedef struct {
+struct Lexer {
 	const char * source;
 	size_t source_len;
 	size_t position;
@@ -46,7 +56,7 @@ typedef struct {
 	size_t column;
 	Token token;
 	const char ** interned_strings;
-} Lexer;
+};
 
 Lexer * lexer_alloc(const char * source);
 Token lexer_next_token(Lexer * lexer);

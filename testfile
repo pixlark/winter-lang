@@ -1,3 +1,5 @@
+x = func + 15;
+
 func abs(x) {
     if x < 0 {
         return -x;
