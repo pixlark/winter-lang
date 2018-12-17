@@ -1,5 +1,13 @@
 func test() {
-	 print 5;
+	x = 5;
+	if (true) {
+		print x;
+	}
+	if (true) {
+		print 10;
+	}
 }
 
-test();
+x = test;
+
+x();

@@ -1,38 +1,35 @@
 #include "ast.h"
 #include "common.h"
 #include "compile.h"
+#include "lexer.h"
 #include "lowering.h"
+#include "parser.h"
 #include "vm.h"
 
-#include "lexer.h"
-#include "parser.h"
-
-#include "parser.tab.h"
-
-const char * test_source =
-	"func my_func(a, b, c) { x = a + b + c; print x; }";
+char * load_string_from_file(char * path)
+{
+	FILE * file = fopen(path, "r");
+	if (file == NULL) return NULL;
+	int file_len = 0;
+	while (fgetc(file) != EOF) file_len++;
+	char * str = (char*) malloc(file_len + 1);
+	str[file_len] = '\0';
+	fseek(file, 0, SEEK_SET);
+	for (int i = 0; i < file_len; i++) str[i] = fgetc(file);
+	fclose(file);
+	return str;
+}
 
 int main()
-{
-	Lexer * lexer = lexer_alloc(test_source);
-	
-	while (true) {
-		Stmt * stmt = parse_statement(lexer);
-		printf("%p\n", stmt);
-		if (!stmt) break;
-	}
-	
-	return 0;
-	
-	fb_init();
+{	
+	const char * source = load_string_from_file("testfile");
+	Lexer * lexer = lexer_alloc(source);
 
 	Winter_Machine * wm = winter_machine_alloc();
-
-	Stmt ** statements = parse();
 	
-	bool running = true;
-	for (int i = 0; i < sb_count(statements); i++) {
-		Stmt * statement = statements[i];
+	while (true) {
+		Stmt * statement = parse_statement(lexer);
+		if (!statement) break;
 		
 		// Lowering
 		lower_statement(statement);
