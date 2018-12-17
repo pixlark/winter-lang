@@ -1,5 +1,7 @@
-x = 10;
-y = 10;
-x = 15;
-y = 15;
-print x + y;
+if false {
+	print 100;
+} else if false {
+	print 10;
+} else {
+	print 13;
+}

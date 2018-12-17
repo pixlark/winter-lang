@@ -9,6 +9,7 @@ typedef enum {
 	TOKEN_PRINT,
 	TOKEN_RETURN,
 	TOKEN_IF,
+	TOKEN_ELSE,
 	TOKEN_FUNC,
 	
 	TOKEN_NAME,

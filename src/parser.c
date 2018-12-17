@@ -221,8 +221,24 @@ Stmt * parse_function_declaration(Lexer * lexer)
 Stmt * parse_if_statement(Lexer * lexer)
 {
 	STMT(STMT_IF);
-	stmt->_if.expr = parse_expression(lexer);
-	stmt->_if.body = parse_scope(lexer);
+	stmt->_if.conditions = NULL;
+	stmt->_if.bodies = NULL;
+	stmt->_if.else_body = NULL;
+
+	sb_push(stmt->_if.conditions, parse_expression(lexer));
+	sb_push(stmt->_if.bodies, parse_scope(lexer));
+	
+	while (match(TOKEN_ELSE)) {
+		if (match(TOKEN_IF)) {
+			// Else if
+			sb_push(stmt->_if.conditions, parse_expression(lexer));
+			sb_push(stmt->_if.bodies, parse_scope(lexer));
+		} else {
+			// Else
+			stmt->_if.else_body = parse_scope(lexer);
+			break;
+		}
+	}
 	return stmt;
 }
 

@@ -48,6 +48,13 @@ void compile_expression(Compiler * compiler, Expr * expr)
 	}
 }
 
+void compile_body(Compiler * compiler, Stmt ** body)
+{
+	for (int i = 0; i < sb_count(body); i++) {
+		compile_statement(compiler, body[i]);
+	}
+}
+
 void compile_statement(Compiler * compiler, Stmt * stmt)
 {
 	switch (stmt->type) {
@@ -68,21 +75,36 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		P(bc_chunk_new_no_args(INSTR_RETURN));
 		break;
 	case STMT_IF: {
-		compile_expression(compiler, stmt->_if.expr);
-		P(bc_chunk_new_no_args(INSTR_NOP)); // Placeholder for later condjump
-		size_t jump_spot = L();
-		for (int i = 0; i < sb_count(stmt->_if.body); i++) {
-			compile_statement(compiler, stmt->_if.body[i]);
+		size_t * end_jumps = NULL;
+		for (int i = 0; i < sb_count(stmt->_if.conditions); i++) {
+			compile_expression(compiler, stmt->_if.conditions[i]);
+			
+			P(bc_chunk_new_no_args(INSTR_NOP)); // Failure jump placeholder
+			size_t failure_jump = L();
+			
+			compile_body(compiler, stmt->_if.bodies[i]);
+			
+			P(bc_chunk_new_no_args(INSTR_NOP)); // End jump placeholder
+			sb_push(end_jumps, L());
+			
+			P(bc_chunk_new_no_args(INSTR_NOP)); // Failure landing
+			A(failure_jump, bc_chunk_new_condjump(L() - failure_jump, false));
 		}
-		P(bc_chunk_new_no_args(INSTR_NOP)); // Landing position for condjump
-		A(jump_spot, bc_chunk_new_condjump(L() - jump_spot));
+		if (stmt->_if.else_body) {
+			compile_body(compiler, stmt->_if.else_body);
+		}
+		P(bc_chunk_new_no_args(INSTR_NOP)); // Landing spot for end jumps
+		// Fill out end jumps
+		for (int i = 0; i < sb_count(end_jumps); i++) {
+			size_t loc = end_jumps[i];
+			A(loc, bc_chunk_new_jump(L() - loc));
+		}
+		sb_free(end_jumps);
 	} break;
 	case STMT_FUNC_DECL: {
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
-		for (int i = 0; i < sb_count(stmt->func_decl.body); i++) {
-			compile_statement(&decl_compiler, stmt->func_decl.body[i]);
-		}
+		compile_body(&decl_compiler, stmt->func_decl.body);
 		Value function = value_new_function(sb_copy(stmt->func_decl.parameters),
 											decl_compiler.bytecode);
 		P(bc_chunk_new_push(function));

@@ -28,6 +28,14 @@ void deep_free_expr(Expr * expr)
 	}
 }
 
+void deep_free_body(Stmt ** body)
+{
+	for (int i = 0; i < sb_count(body); i++) {
+		deep_free(body[i]);
+	}
+	sb_free(body);
+}
+
 void deep_free(Stmt * stmt)
 {
 	switch (stmt->type) {
@@ -44,18 +52,22 @@ void deep_free(Stmt * stmt)
 		deep_free_expr(stmt->_return.expr);
 		break;
 	case STMT_IF:
-		deep_free_expr(stmt->_if.expr);
-		for (int i = 0; i < sb_count(stmt->_if.body); i++) {
-			deep_free(stmt->_if.body[i]);
+		// Free conditions
+		for (int i = 0; i < sb_count(stmt->_if.conditions); i++) {
+			deep_free_expr(stmt->_if.conditions[i]);
 		}
-		sb_free(stmt->_if.body);
+		sb_free(stmt->_if.conditions);
+		// Free bodies
+		for (int i = 0; i < sb_count(stmt->_if.bodies); i++) {
+			deep_free_body(stmt->_if.bodies[i]);
+		}
+		sb_free(stmt->_if.bodies);
+		// Free else
+		deep_free_body(stmt->_if.else_body);
 		break;
 	case STMT_FUNC_DECL:
 		sb_free(stmt->func_decl.parameters);
-		for (int i = 0; i < sb_count(stmt->func_decl.body); i++) {
-			deep_free(stmt->func_decl.body[i]);
-		}
-		sb_free(stmt->func_decl.body);
+		deep_free_body(stmt->func_decl.body);
 		break;
 	default:
 		fatal_internal("Can't free AST Statement!");

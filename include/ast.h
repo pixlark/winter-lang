@@ -77,8 +77,9 @@ typedef struct Stmt {
 			Expr * expr;
 		} _return;
 		struct {
-			Expr * expr;
-			struct Stmt ** body;
+			Expr ** conditions;
+			struct Stmt *** bodies;
+			struct Stmt ** else_body;
 		} _if;
 		struct {
 			const char * name;

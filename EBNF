@@ -32,7 +32,7 @@ print_stmt = PRINT expression ';'
 
 return_stmt = RETURN expression ';'
 
-if_stmt = IF expression scope
+if_stmt = IF expression scope {ELSE IF expression scope} [ELSE scope]
 
 func_declaration = FUNC NAME '(' [arg_list] ') scope
 

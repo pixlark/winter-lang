@@ -130,10 +130,59 @@ BC_Chunk bc_chunk_new_call(size_t arg_count)
 	return (BC_Chunk) { INSTR_CALL, .instr_call = (Instr_Call) { arg_count } };
 }
 
-BC_Chunk bc_chunk_new_condjump(int offset)
+BC_Chunk bc_chunk_new_jump(int offset)
+{
+	return (BC_Chunk) { INSTR_JUMP, .instr_jump = (Instr_Jump) { offset } };
+}
+
+BC_Chunk bc_chunk_new_condjump(int offset, bool cond)
 {
 	return (BC_Chunk) { INSTR_CONDJUMP,
-			.instr_condjump = (Instr_Condjump) { offset } };
+			.instr_condjump = (Instr_Condjump) { offset, cond } };
+}
+
+void bc_chunk_print(BC_Chunk chunk)
+{
+	const char * instr_names[] = {	
+		[INSTR_NOP] = "NOP",
+		[INSTR_NEGATE] = "NEGATE",
+		[INSTR_ADD] = "ADD",
+		[INSTR_RETURN] = "RETURN",
+		[INSTR_PRINT] = "PRINT",
+		[INSTR_POP] = "POP",
+		
+		[INSTR_PUSH] = "PUSH",
+		[INSTR_BIND] = "BIND",
+		[INSTR_GET] = "GET",
+		[INSTR_CALL] = "CALL",
+		[INSTR_JUMP] = "JUMP",
+		[INSTR_CONDJUMP] = "CONDJUMP",
+	};
+	
+	if (chunk.instr < INSTR_PUSH) {
+		printf("%s\n", instr_names[chunk.instr]);
+		return;
+	}
+	printf("%s: ", instr_names[chunk.instr]);
+	switch (chunk.instr) {
+	case INSTR_PUSH:
+		value_print(chunk.instr_push.value);
+		break;
+	case INSTR_BIND:
+	case INSTR_GET:
+		printf("%s\n", chunk.instr_bind.name);
+		break;
+	case INSTR_CALL:
+		printf("%d\n", chunk.instr_call.arg_count);
+		break;
+	case INSTR_JUMP:
+		printf("%d\n", chunk.instr_jump.jump_offset);
+		break;
+	case INSTR_CONDJUMP:
+		printf("%d if %s\n", chunk.instr_condjump.jump_offset,
+			   chunk.instr_condjump.cond ? "true" : "false");
+		break;
+	}
 }
 
 // :\ BC_Chunk
@@ -285,13 +334,17 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		sb_push(wm->call_stack, frame);
 	} break;
+	case INSTR_JUMP: {
+		Instr_Jump instr = chunk.instr_jump;
+		winter_machine_modify_ip(wm, instr.jump_offset);
+	} break;
 	case INSTR_CONDJUMP: {
 		Instr_Condjump instr = chunk.instr_condjump;
 		Value condition = pop();
 		if (condition.type != VALUE_BOOL) {
 			fatal("If condition must be bool");
 		}
-		if (!condition._bool) {
+		if (condition._bool == instr.cond) {
 			winter_machine_modify_ip(wm, instr.jump_offset);
 		}
 	} break;

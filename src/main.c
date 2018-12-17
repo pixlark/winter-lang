@@ -41,6 +41,15 @@ int main()
 
 		// Free AST
 		deep_free(statement);
+
+		#if 0
+		// DEBUG Print Bytecode
+		printf(":: Bytecode\n\n");
+		for (int i = 0; i < sb_count(compiler.bytecode); i++) {
+			bc_chunk_print(compiler.bytecode[i]);
+		}
+		printf("\n\\:\n\n");
+		#endif
 		
 		// Executing
 		winter_machine_prime(wm, compiler.bytecode,

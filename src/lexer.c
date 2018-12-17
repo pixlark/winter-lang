@@ -11,6 +11,7 @@ const char * token_type_names[] = {
 	[TOKEN_PRINT] = "print",
 	[TOKEN_RETURN] = "return",
 	[TOKEN_IF] = "if",
+	[TOKEN_ELSE] = "else",
 	[TOKEN_FUNC] = "func",
 
 	[TOKEN_NAME] = "<name>",
@@ -26,15 +27,7 @@ char * token_to_string(Token token)
 		s[1] = '\0';
 		return s;
 	}
-	switch (token.type) {
-	case TOKEN_EOF:
-	case TOKEN_NONE:
-	case TOKEN_TRUE:
-	case TOKEN_FALSE:
-	case TOKEN_PRINT:
-	case TOKEN_RETURN:
-	case TOKEN_IF:
-		return strdup(token_type_names[token.type]);
+	switch (token.type) {		
 	case TOKEN_NAME: {
 		char buffer[512];
 		sprintf(buffer, "name: '%s'", token.name);
@@ -50,6 +43,8 @@ char * token_to_string(Token token)
 		sprintf(buffer, "float: %f", token.float_literal);
 		return strdup(buffer);
 	} break;
+	default:
+		return strdup(token_type_names[token.type]);
 	}
 }
 
@@ -88,7 +83,7 @@ void lexer_advance_char(Lexer * lexer)
 const char * keywords[] = {
 	"none", "true", "false",
 	"print", "return", "if",
-	"func",
+	"else", "func",
 };
 
 size_t keyword_count = sizeof(keywords) / sizeof(const char *);
@@ -96,7 +91,7 @@ size_t keyword_count = sizeof(keywords) / sizeof(const char *);
 Token_Type keyword_tokens[] = {
 	TOKEN_NONE, TOKEN_TRUE, TOKEN_FALSE,
 	TOKEN_PRINT, TOKEN_RETURN, TOKEN_IF,
-	TOKEN_FUNC,
+	TOKEN_ELSE, TOKEN_FUNC,
 };
 
 Token lexer_next_token(Lexer * lexer)
