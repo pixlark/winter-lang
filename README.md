@@ -9,7 +9,11 @@ support both iterative and functional principles.
 
 ```
 func my_function(arg) {
-	print arg;
+	if true {
+		print arg + 1;
+	} else {
+		print 0;
+	}
 }
 
 x = my_function;
@@ -19,5 +23,5 @@ x(1500);
 produces
 
 ```
-1500
+1501
 ```
