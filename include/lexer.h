@@ -33,7 +33,7 @@ typedef struct {
 		float float_literal;
 		const char * string_literal;
 	};
-	Assoc_Source assoc_source;
+	Assoc_Source assoc;
 } Token;
 
 char * token_to_string(Token token);

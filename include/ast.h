@@ -52,6 +52,8 @@ typedef struct Expr {
 			struct Expr * right;
 		} binary;
 	};
+	bool marked;
+	Assoc_Source assoc;
 } Expr;
 
 // :\ Expr
@@ -94,6 +96,8 @@ typedef struct Stmt {
 			struct Stmt ** body;
 		} func_decl;
 	};
+	bool marked;
+	Assoc_Source assoc;
 } Stmt;
 
 // :\ Stmt

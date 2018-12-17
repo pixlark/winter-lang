@@ -149,7 +149,7 @@ Token lexer_next_token(Lexer * lexer)
 		Token token;
 		token.type = TOKEN_NAME;
 		token.name = name;
-		token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
+		token.assoc = assoc_source_new(lexer->line, col_start, col_end);
 		return token;
 	}
 
@@ -176,7 +176,7 @@ Token lexer_next_token(Lexer * lexer)
 			Token token;
 			token.type = TOKEN_FLOAT_LITERAL;
 			token.float_literal = strtod(to_convert, NULL);
-			token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
+			token.assoc = assoc_source_new(lexer->line, col_start, col_end);
 			free((char*) to_convert);
 			return token;
 		} else {
@@ -184,7 +184,7 @@ Token lexer_next_token(Lexer * lexer)
 			Token token;
 			token.type = TOKEN_INTEGER_LITERAL;
 			token.integer_literal = strtol(to_convert, NULL, 10);
-			token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
+			token.assoc = assoc_source_new(lexer->line, col_start, col_end);
 			free((char*) to_convert);
 			return token;
 		}
@@ -214,7 +214,7 @@ Token lexer_next_token(Lexer * lexer)
 		sb_push(buffer, '\0');
 		token.string_literal = buffer ? lexer_intern_string(lexer, buffer) : NULL;
 		sb_free(buffer);
-		token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
+		token.assoc = assoc_source_new(lexer->line, col_start, col_end);
 		return token;
 	}
 	
@@ -222,12 +222,12 @@ Token lexer_next_token(Lexer * lexer)
 		lexer_advance_char(lexer);										\
 		if (lexer_peek(lexer) == c2) {									\
 			lexer_advance_char(lexer);									\
-			return (Token) { tok, .assoc_source =						\
+			return (Token) { tok, .assoc =						\
 					assoc_source_new(lexer->line,						\
 									 lexer->column - 2,					\
 									 lexer->column) };					\
 		} else {														\
-			return (Token) { c1, .assoc_source =						\
+			return (Token) { c1, .assoc =						\
 					assoc_source_new(lexer->line,						\
 									 lexer->column - 1,					\
 									 lexer->column) };					\
@@ -245,7 +245,7 @@ Token lexer_next_token(Lexer * lexer)
 	case '-':
 	case ',':
 		lexer_advance_char(lexer);
-		return (Token) { next_char, .assoc_source = assoc_source_new(lexer->line,
+		return (Token) { next_char, .assoc = assoc_source_new(lexer->line,
 																	 lexer->column-1, lexer->column) };
 	case '=':
 		TWOCHARTOK('=', '=', TOKEN_EQ);

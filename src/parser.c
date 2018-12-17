@@ -5,11 +5,25 @@
 
 #define EXPR(t)									\
 	Expr * expr = malloc(sizeof(Expr));			\
-	expr->type = t;
+	expr->type = t;								\
+	expr->marked = false;
 
 #define STMT(t)									\
 	Stmt * stmt = malloc(sizeof(Stmt));			\
-	stmt->type = t;
+	stmt->type = t;								\
+	stmt->marked = false
+
+void mark_expr(Expr * expr, Assoc_Source assoc)
+{
+	expr->marked = true;
+	expr->assoc = assoc;
+}
+
+void mark_stmt(Stmt * stmt, Assoc_Source assoc)
+{
+	stmt->marked = true;
+	stmt->assoc = assoc;
+}
 
 bool __match(Lexer * lexer, Token_Type type)
 {
@@ -19,6 +33,9 @@ bool __match(Lexer * lexer, Token_Type type)
 	}
 	return false;
 }
+
+#define token() (lexer->token)
+
 #define match(x) __match(lexer, (x))
 
 bool __is(Lexer * lexer, Token_Type type)
@@ -32,7 +49,7 @@ bool __is(Lexer * lexer, Token_Type type)
 void __expect(Lexer * lexer, Token_Type type)
 {
 	if (!match(type)) {
-		fatal_assoc(lexer->token.assoc_source,
+		fatal_assoc(token().assoc,
 					"Expected %s, got %s instead",
 					token_to_string((Token) { type }),
 					token_to_string(lexer->token));
@@ -43,15 +60,13 @@ void __expect(Lexer * lexer, Token_Type type)
 void __weak_expect(Lexer * lexer, Token_Type type)
 {
 	if (!is(type)) {
-		fatal_assoc(lexer->token.assoc_source,
+		fatal_assoc(token().assoc,
 					"Expected %s, got %s instead",
 					token_to_string((Token) { type }),
 					token_to_string(lexer->token));
 	}
 }
 #define weak_expect(x) __weak_expect(lexer, (x))
-
-#define token() (lexer->token)
 
 Expr * parse_atom(Lexer * lexer)
 {
@@ -65,18 +80,21 @@ Expr * parse_atom(Lexer * lexer)
 	switch (token.type) {
 	case TOKEN_NONE: {
 		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
 		expr->atom.value = value_none();
 		advance();
 		return expr;
 	} break;
 	case TOKEN_INTEGER_LITERAL: {
 		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
 		expr->atom.value = value_new_integer(token.integer_literal);
 		advance();
 		return expr;
 	} break;
 	case TOKEN_FLOAT_LITERAL: {
 		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
 		expr->atom.value = value_new_float(token.float_literal);
 		advance();		
 		return expr;
@@ -84,18 +102,21 @@ Expr * parse_atom(Lexer * lexer)
 	case TOKEN_TRUE:
 	case TOKEN_FALSE: {
 		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
 		expr->atom.value = value_new_bool(token.type == TOKEN_TRUE);
 		advance();		
 		return expr;
 	} break;
 	case TOKEN_STRING_LITERAL: {
 		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
 		expr->atom.value = value_new_string(token.string_literal);
 		advance();
 		return expr;
 	} break;
 	case TOKEN_NAME: {
 		EXPR(EXPR_VAR);
+		mark_expr(expr, token.assoc);
 		expr->var.name = token.name;
 		advance();		
 		return expr;
@@ -125,6 +146,7 @@ Expr * parse_function_call(Lexer * lexer)
 			expect(')');
 		}
 		EXPR(EXPR_FUNCALL);
+		mark_expr(expr, left->assoc);
 		expr->funcall.func = left;
 		expr->funcall.args = args;
 		return expr;
@@ -134,13 +156,19 @@ Expr * parse_function_call(Lexer * lexer)
 
 Expr * parse_prefix(Lexer * lexer)
 {
-	if (match('-')) {
+	if (is('-')) {
+		Assoc_Source as = token().assoc;
+		expect('-');
 		EXPR(EXPR_UNARY);
+		mark_expr(expr, as);
 		expr->unary.operator = OP_NEGATE;
 		expr->unary.operand = parse_prefix(lexer);
 		return expr;
 	} else if (match('!')) {
+		Assoc_Source as = token().assoc;
+		expect('!');
 		EXPR(EXPR_UNARY);
+		mark_expr(expr, as);
 		expr->unary.operator = OP_NOT;
 		expr->unary.operand = parse_prefix(lexer);
 	} else {
@@ -160,7 +188,9 @@ Expr * parse_bool_ops(Lexer * lexer)
 {
 	Expr * left = parse_prefix(lexer);
 	if (is_bool_op(token().type)) {
+		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
+		mark_expr(expr, as);
 		switch (token().type) {
 		case TOKEN_EQ:
 			expr->binary.operator = OP_EQ;
@@ -194,7 +224,9 @@ Expr * parse_add_ops(Lexer * lexer)
 {
 	Expr * left = parse_bool_ops(lexer);
 	if (is('+') || is('-')) {
+		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
+		mark_expr(expr, as);
 		switch (token().type) {
 		case '+':
 			expr->binary.operator = OP_ADD;
@@ -221,12 +253,17 @@ Expr * parse_expression(Lexer * lexer)
 Stmt * parse_assignment(Lexer * lexer)
 {
 	STMT(STMT_ASSIGN);
+	
 	weak_expect(TOKEN_NAME);
 	stmt->assign.name = token().name;
 	advance();
+	
+	Assoc_Source as = token().assoc;
 	expect('=');
+	mark_stmt(stmt, as);
 	stmt->assign.expr = parse_expression(lexer);
 	expect(';');
+	
 	return stmt;
 }
 
@@ -256,7 +293,11 @@ Stmt ** parse_scope(Lexer * lexer)
 
 Stmt * parse_function_declaration(Lexer * lexer)
 {
+	Assoc_Source as = token().assoc;
+	expect(TOKEN_FUNC);
+	
 	STMT(STMT_FUNC_DECL);
+	mark_stmt(stmt, as);
 	weak_expect(TOKEN_NAME);
 	stmt->func_decl.name = token().name;
 	advance();
@@ -273,7 +314,11 @@ Stmt * parse_function_declaration(Lexer * lexer)
 
 Stmt * parse_if_statement(Lexer * lexer)
 {
+	Assoc_Source as = token().assoc;
+	expect(TOKEN_IF);
+	
 	STMT(STMT_IF);
+	mark_stmt(stmt, as);
 	stmt->_if.conditions = NULL;
 	stmt->_if.bodies = NULL;
 	stmt->_if.else_body = NULL;
@@ -299,22 +344,28 @@ Stmt * parse_statement(Lexer * lexer)
 {
 	if (is(TOKEN_EOF)) return NULL;
 	
-	if (match(TOKEN_PRINT)) {
+	if (is(TOKEN_PRINT)) {
 		// print
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_PRINT);
 		STMT(STMT_PRINT);
 		stmt->print.expr = parse_expression(lexer);
+		mark_stmt(stmt, as);
 		expect(';');
 		return stmt;
-	} else if (match(TOKEN_RETURN)) {
+	} else if (is(TOKEN_RETURN)) {
 		// return
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_RETURN);
 		STMT(STMT_RETURN);
 		stmt->_return.expr = parse_expression(lexer);
+		mark_stmt(stmt, as);
 		expect(';');
 		return stmt;
-	} else if (match(TOKEN_IF)) {
+	} else if (is(TOKEN_IF)) {
 		// if
 		return parse_if_statement(lexer);
-	} else if (match(TOKEN_FUNC)) {
+	} else if (is(TOKEN_FUNC)) {
 		// function declaration
 		return parse_function_declaration(lexer);
 	} else if (lexer_lookahead(lexer, 1).type == '=') {
@@ -329,6 +380,7 @@ Stmt * parse_statement(Lexer * lexer)
 		// expression
 		STMT(STMT_EXPR);
 		stmt->expr.expr = parse_expression(lexer);
+		mark_stmt(stmt, stmt->expr.expr->assoc);
 		expect(';');
 		return stmt;
 	}
