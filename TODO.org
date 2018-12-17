@@ -1,17 +1,18 @@
 * DONE String interning
 
-* DONE Extend type system
+* TODO Extend type system
 ** DONE None-type
 ** DONE Integers
 ** DONE Floats
-** DONE Bool
+** DONE Bools
+** TODO Strings
 
 * TODO Better error messages
 ** TODO Line numbers
 
 * TODO Fill out operators
 ** TODO Math operators past +/-
-** TODO Boolean operators
+** DONE Boolean operators
 
 * TODO Control Structures
 ** DONE If-statements
@@ -28,3 +29,4 @@
 * DONE Hand-write lexer/parser
 ** DONE Lexer
 ** DONE Parser
+

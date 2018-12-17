@@ -85,6 +85,8 @@ void lexer_advance_char(Lexer * lexer)
 	lexer->position++;
 }
 
+#define next() (lexer_advance_char(lexer), lexer_peek(lexer))
+
 const char * keywords[] = {
 	"none", "true", "false",
 	"print", "return", "if",
@@ -174,6 +176,31 @@ Token lexer_next_token(Lexer * lexer)
 		}
 	}
 
+	// String literals
+	if (next_char == '"') {
+		next_char = next();
+		char * buffer = NULL;
+		while (next_char != '"') {
+			// Escaped chars
+			if (next_char == '\\') {
+				lexer_advance_char(lexer);
+				sb_push(buffer, lexer_peek(lexer));
+				lexer_advance_char(lexer);
+				continue;
+			}
+			sb_push(buffer, next_char);
+			next_char = next();
+		}
+		lexer_advance_char(lexer);
+		Token token;
+		token.type = TOKEN_STRING_LITERAL;
+		// TODO(pixlark): Should this be interned in the same place as names/keywords?
+		sb_push(buffer, '\0');
+		token.string_literal = buffer ? lexer_intern_string(lexer, buffer) : NULL;
+		sb_free(buffer);
+		return token;
+	}
+	
 	#define TWOCHARTOK(c1, c2, tok)				\
 			lexer_advance_char(lexer);			\
 			if (lexer_peek(lexer) == c2) {		\
@@ -257,6 +284,7 @@ const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
 
 const char * lexer_intern_string(Lexer * lexer, const char * str)
 {
+	internal_assert(str);
 	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
 		if (strcmp(str, lexer->interned_strings[i]) == 0) {
 			return lexer->interned_strings[i];

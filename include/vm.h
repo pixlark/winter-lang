@@ -15,8 +15,14 @@ typedef enum {
 	VALUE_INTEGER,
 	VALUE_FLOAT,
 	VALUE_BOOL,
+	VALUE_STRING,
 	VALUE_FUNCTION,
 } Value_Type;
+
+typedef struct {
+	size_t len;
+	const char * contents;
+} Winter_String;
 
 typedef struct {
 	Value_Type type;
@@ -24,6 +30,7 @@ typedef struct {
 		int _integer;
 		float _float;
 		bool _bool;
+		Winter_String _string;
 		Function * _function;
 	};
 } Value;

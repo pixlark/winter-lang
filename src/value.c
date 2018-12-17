@@ -25,6 +25,12 @@ Value value_new_bool(bool b)
 	return (Value) { VALUE_BOOL, ._bool = b };
 }
 
+Value value_new_string(const char * s)
+{
+	return (Value) { VALUE_STRING, ._string =
+			(Winter_String) { s ? strlen(s) : 0, s } };
+}
+
 Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
 {
 	Function * func = malloc(sizeof(Function));
@@ -50,9 +56,14 @@ Value value_print(Value value)
 	case VALUE_BOOL:
 		printf("%s\n", value._bool ? "true" : "false");
 		break;
+	case VALUE_STRING:
+		printf("%.*s\n", value._string.len, value._string.contents);
+		break;
 	case VALUE_FUNCTION:
 		printf("<function at %p>\n", value._function);
 		break;
+	default:
+		fatal_internal("Tried to print a value with no implemented print routine");
 	}
 }
 

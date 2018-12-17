@@ -20,6 +20,7 @@ typedef enum {
 	TOKEN_NAME,
 	TOKEN_INTEGER_LITERAL,
 	TOKEN_FLOAT_LITERAL,
+	TOKEN_STRING_LITERAL,
 } Token_Type;
 
 extern const char * token_type_names[];
@@ -30,6 +31,7 @@ typedef struct {
 		const char * name;
 		int integer_literal;
 		float float_literal;
+		const char * string_literal;
 	};
 } Token;
 
@@ -48,3 +50,4 @@ Token lexer_next_token(Lexer * lexer);
 void lexer_advance(Lexer * lexer);
 Token lexer_lookahead(Lexer * lexer, size_t lookahead);
 const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end);
+const char * lexer_intern_string(Lexer * lexer, const char * str);

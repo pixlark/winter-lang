@@ -86,12 +86,18 @@ Expr * parse_atom(Lexer * lexer)
 		advance();		
 		return expr;
 	} break;
+	case TOKEN_STRING_LITERAL: {
+		EXPR(EXPR_ATOM);
+		expr->atom.value = value_new_string(token.string_literal);
+		advance();
+		return expr;
+	} break;
 	case TOKEN_NAME: {
 		EXPR(EXPR_VAR);
 		expr->var.name = token.name;
 		advance();		
 		return expr;
-	} break;				
+	} break;
 	}
 }
 
