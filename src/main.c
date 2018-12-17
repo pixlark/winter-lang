@@ -20,9 +20,22 @@ char * load_string_from_file(char * path)
 	return str;
 }
 
-int main()
-{	
+#define DEBUG false
+
+int main(int argc, char ** argv)
+{
+	#if DEBUG
 	const char * source = load_string_from_file("testfile");
+	#else
+	if (argc != 2) {
+		fatal("Provide one source file");
+	}
+	const char * source = load_string_from_file(argv[1]);
+	if (!source) {
+		fatal("'%s' does not exist", argv[1]);
+	}
+	#endif
+	
 	Lexer * lexer = lexer_alloc(source);
 
 	Winter_Machine * wm = winter_machine_alloc();
