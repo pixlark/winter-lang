@@ -286,7 +286,7 @@ void winter_machine_step(Winter_Machine * wm)
 		break;
 	case INSTR_RETURN: {
 		if (sb_count(wm->call_stack) == 0) {
-			fatal("Can't return from global scope");
+			fatal_assoc(chunk.assoc, "Can't return from global scope");
 		}
 		winter_machine_pop_call_stack(wm);
 	} break;
@@ -341,19 +341,19 @@ void winter_machine_step(Winter_Machine * wm)
 		Variable_Map * varmap = winter_machine_varmap(wm);
 		Value * var_storage = variable_map_index(varmap, instr.name);
 		if (!var_storage) {
-			fatal("%s not bound", instr.name);
+			fatal_assoc(chunk.assoc, "%s not bound", instr.name);
 		}
 		push(*var_storage);
 	} break;
 	case INSTR_CALL: {
 		Value func_val = pop();
 		if (func_val.type != VALUE_FUNCTION) {
-			fatal("Type not callable");
+			fatal_assoc(chunk.assoc, "Type not callable");
 		}
 		Function func = *(func_val._function);
 		Instr_Call instr = chunk.instr_call;
 		if (sb_count(func.parameters) != instr.arg_count) {
-			fatal("Wrong number of arguments to function");
+			fatal_assoc(chunk.assoc, "Wrong number of arguments to function");
 		}
 		Call_Frame * frame = call_frame_alloc(func.bytecode);
 		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
@@ -370,7 +370,7 @@ void winter_machine_step(Winter_Machine * wm)
 		Instr_Condjump instr = chunk.instr_condjump;
 		Value condition = pop();
 		if (condition.type != VALUE_BOOL) {
-			fatal("If condition must be bool");
+			fatal_assoc(chunk.assoc, "If condition must be bool");
 		}
 		if (condition._bool == instr.cond) {
 			winter_machine_modify_ip(wm, instr.jump_offset);

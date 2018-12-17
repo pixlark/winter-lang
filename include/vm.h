@@ -118,6 +118,7 @@ typedef struct {
 		Instr_Jump instr_jump;
 		Instr_Condjump instr_condjump;
 	};
+	Assoc_Source assoc;
 } BC_Chunk;
 
 BC_Chunk bc_chunk_new_no_args(enum Instruction instr);

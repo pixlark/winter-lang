@@ -34,6 +34,7 @@ void fatal(const char * fmt, ...)
 
 	fprintf(stderr, RED(BOLD("encountered error")) ":\n");
 	vfprintf(stderr, fmt, args);
+	printf("\n");
 
 	va_end(args);
 	exit(1);
@@ -46,7 +47,10 @@ void print_assoc(Assoc_Source assoc)
 	const char * line_start = pos;
 	while (true) {
 		if (line_start == assoc.lexer->source) break;
-		if (*line_start == '\n') break;
+		if (*line_start == '\n') {
+			line_start++;
+			break;
+		}
 		line_start--;
 	}
 	// Peek forwards until line end
@@ -57,16 +61,16 @@ void print_assoc(Assoc_Source assoc)
 		line_end++;
 	}
 	// Print line
-	printf("    " DIM("%.*s") "\n", line_end - line_start, line_start);
+	fprintf(stderr, "    " DIM("%.*s") "\n", line_end - line_start, line_start);
 	// Print underline
-	printf("    ");
+	fprintf(stderr, "    ");
 	for (int i = 0; i < (pos - line_start); i++) {
-		printf(" ");
+		fprintf(stderr, " ");
 	}
 	for (int i = 0; i < assoc.len; i++) {
-		printf(RED("^"));
+		fprintf(stderr, RED("^"));
 	}
-	printf("\n");
+	fprintf(stderr, "\n"); 
 }
 
 void fatal_assoc(Assoc_Source assoc, const char * fmt, ...)
@@ -78,7 +82,7 @@ void fatal_assoc(Assoc_Source assoc, const char * fmt, ...)
 	fprintf(stderr, ":%d\n", assoc.line);
 	print_assoc(assoc);
 	vfprintf(stderr, fmt, args);
-	printf("\n");
+	fprintf(stderr, ("\n"));
 
 	va_end(args);
 	exit(1);	

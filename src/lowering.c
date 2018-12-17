@@ -11,6 +11,7 @@ Expr * unary_of(Operator operator, Expr * expr)
 	unary->type = EXPR_UNARY;
 	unary->unary.operator = operator;
 	unary->unary.operand = expr;
+	unary->assoc = expr->assoc;
 }
 
 Expr * dup_expr(Expr * expr)
