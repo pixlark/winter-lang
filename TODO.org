@@ -1,11 +1,11 @@
 * DONE String interning
 
-* TODO Extend type system
+* DONE Extend type system
 ** DONE None-type
 ** DONE Integers
 ** DONE Floats
 ** DONE Bools
-** TODO Strings
+** DONE Strings
 
 * TODO Better error messages
 ** TODO Line numbers
