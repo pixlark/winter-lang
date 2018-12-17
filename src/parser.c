@@ -29,15 +29,34 @@ bool __is(Lexer * lexer, Token_Type type)
 
 #define advance() lexer_advance(lexer)
 
+void __expect(Lexer * lexer, Token_Type type)
+{
+	if (!match(type)) {
+		fatal("Expected %s, got %s instead",
+			  token_to_string((Token) { type }),
+			  token_to_string(lexer->token));
+	}
+}
+#define expect(x) __expect(lexer, (x))
+
+void __weak_expect(Lexer * lexer, Token_Type type)
+{
+	if (!is(type)) {
+		fatal("Expected %s, got %s instead",
+			  token_to_string((Token) { type }),
+			  token_to_string(lexer->token));
+	}
+}
+#define weak_expect(x) __weak_expect(lexer, (x))
+
+#define token() lexer->token
+
 Expr * parse_atom(Lexer * lexer)
 {
 	// Check for subexpression
 	if (match('(')) {
 		Expr * subexpr = parse_expression(lexer);
-		if (!match(')')) {
-			fatal("Expected ')', got %s instead",
-				  token_to_string(lexer->token));
-		}
+		expect(')');
 		return subexpr;
 	}
 	Token token = lexer->token;
@@ -95,10 +114,7 @@ Expr * parse_function_call(Lexer * lexer)
 			args = NULL;
 		} else {
 			args = parse_comma_expression(lexer);
-			if (!match(')')) {
-				fatal("Expected ')', got %s instead",
-					  token_to_string(lexer->token));
-			}
+			expect(')');
 		}
 		EXPR(EXPR_FUNCALL);
 		expr->funcall.func = left;
@@ -147,4 +163,100 @@ Expr * parse_expression(Lexer * lexer)
 {
 	if (is(TOKEN_EOF)) return NULL;
 	return parse_add_ops(lexer);
+}
+
+Stmt * parse_assignment(Lexer * lexer)
+{
+	STMT(STMT_ASSIGN);
+	weak_expect(TOKEN_NAME);
+	stmt->assign.name = token().name;
+	advance();
+	expect('=');
+	stmt->assign.expr = parse_expression(lexer);
+	expect(';');
+	return stmt;
+}
+
+const char ** parse_function_parameters(Lexer * lexer)
+{
+	const char ** parameters = NULL;
+	weak_expect(TOKEN_NAME);
+	sb_push(parameters, token().name);
+	advance();
+	while (match(',')) {
+		weak_expect(TOKEN_NAME);
+		sb_push(parameters, token().name);
+		advance();
+	}
+	return parameters;
+}
+
+Stmt ** parse_scope(Lexer * lexer)
+{
+	expect('{');
+	Stmt ** body = NULL;
+	while (!match('}')) {
+		sb_push(body, parse_statement(lexer));
+	}
+	return body;
+}
+
+Stmt * parse_function_declaration(Lexer * lexer)
+{
+	STMT(STMT_FUNC_DECL);
+	weak_expect(TOKEN_NAME);
+	stmt->func_decl.name = token().name;
+	advance();
+	expect('(');
+	if (match(')')) {
+		stmt->func_decl.parameters = NULL;
+	} else {
+		stmt->func_decl.parameters = parse_function_parameters(lexer);
+		expect(')');
+	}
+	stmt->func_decl.body = parse_scope(lexer);
+	return stmt;
+}
+
+Stmt * parse_if_statement(Lexer * lexer)
+{
+	STMT(STMT_IF);
+	stmt->_if.expr = parse_expression(lexer);
+	stmt->_if.body = parse_scope(lexer);
+	return stmt;
+}
+
+Stmt * parse_statement(Lexer * lexer)
+{
+	if (is(TOKEN_EOF)) return NULL;
+	
+	if (match(TOKEN_PRINT)) {
+		// print
+		STMT(STMT_PRINT);
+		stmt->print.expr = parse_expression(lexer);
+		expect(';');
+		return stmt;
+	} else if (match(TOKEN_RETURN)) {
+		// return
+		STMT(STMT_RETURN);
+		stmt->_return.expr = parse_expression(lexer);
+		expect(';');
+		return stmt;
+	} else if (match(TOKEN_IF)) {
+		// if
+		return parse_if_statement(lexer);
+	} else if (match(TOKEN_FUNC)) {
+		// function declaration
+		return parse_function_declaration(lexer);
+	} else if (lexer_lookahead(lexer, 1).type == '=') {
+		// TODO(pixlark): Kluge. But how else do you do this??
+		// assignment
+		return parse_assignment(lexer);
+	} else {
+		// expression
+		STMT(STMT_EXPR);
+		stmt->expr.expr = parse_expression(lexer);
+		expect(';');
+		return stmt;
+	}
 }

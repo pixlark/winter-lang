@@ -10,15 +10,16 @@
 #include "parser.tab.h"
 
 const char * test_source =
-	"x() + 5";
+	"func my_func(a, b, c) { x = a + b + c; print x; }";
 
 int main()
 {
 	Lexer * lexer = lexer_alloc(test_source);
+	
 	while (true) {
-		Expr * expr = parse_expression(lexer);
-		printf("%p\n", expr);
-		if (!expr) break;
+		Stmt * stmt = parse_statement(lexer);
+		printf("%p\n", stmt);
+		if (!stmt) break;
 	}
 	
 	return 0;

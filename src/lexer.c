@@ -11,6 +11,7 @@ const char * token_type_names[] = {
 	[TOKEN_PRINT] = "print",
 	[TOKEN_RETURN] = "return",
 	[TOKEN_IF] = "if",
+	[TOKEN_FUNC] = "func",
 
 	[TOKEN_NAME] = "<name>",
 	[TOKEN_INTEGER_LITERAL] = "<int>",
@@ -86,6 +87,7 @@ void lexer_advance_char(Lexer * lexer)
 const char * keywords[] = {
 	"none", "true", "false",
 	"print", "return", "if",
+	"func",
 };
 
 size_t keyword_count = sizeof(keywords) / sizeof(const char *);
@@ -93,6 +95,7 @@ size_t keyword_count = sizeof(keywords) / sizeof(const char *);
 Token_Type keyword_tokens[] = {
 	TOKEN_NONE, TOKEN_TRUE, TOKEN_FALSE,
 	TOKEN_PRINT, TOKEN_RETURN, TOKEN_IF,
+	TOKEN_FUNC,
 };
 
 Token lexer_next_token(Lexer * lexer)
@@ -182,6 +185,7 @@ Token lexer_next_token(Lexer * lexer)
 	case '+':
 	case '-':
 	case '=':
+	case ',':
 		lexer_advance_char(lexer);
 		return (Token) { next_char };
 	default:
@@ -192,4 +196,21 @@ Token lexer_next_token(Lexer * lexer)
 void lexer_advance(Lexer * lexer)
 {
 	lexer->token = lexer_next_token(lexer);
+}
+
+Token lexer_lookahead(Lexer * lexer, size_t lookahead)
+{
+	// TODO(pixlark): There's probably a fancier way to do this that
+	// doesn't require any re-lexing. Let's figure that out later...
+	// TODO(pixlark): Also we really need to get string interning
+	// working so that this doesn't have memory leaks...
+	size_t current_position = lexer->position;
+	Token current_token = lexer->token;
+	for (int i = 0; i < lookahead; i++) {
+		lexer_advance(lexer);
+	}
+	Token peeked_token = lexer->token;
+	lexer->position = current_position;
+	lexer->token = current_token;
+	return peeked_token;
 }

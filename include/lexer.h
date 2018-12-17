@@ -9,6 +9,7 @@ typedef enum {
 	TOKEN_PRINT,
 	TOKEN_RETURN,
 	TOKEN_IF,
+	TOKEN_FUNC,
 	
 	TOKEN_NAME,
 	TOKEN_INTEGER_LITERAL,
@@ -38,3 +39,4 @@ typedef struct {
 Lexer * lexer_alloc(const char * source);
 Token lexer_next_token(Lexer * lexer);
 void lexer_advance(Lexer * lexer);
+Token lexer_lookahead(Lexer * lexer, size_t lookahead);
