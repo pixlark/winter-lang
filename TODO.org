@@ -9,8 +9,12 @@
 * TODO Better error messages
 ** TODO Line numbers
 
+* TODO Fill out operators
+** TODO Math operators past +/-
+** TODO Boolean operators
+
 * TODO Control Structures
-** TODO If-statements
+** DONE If-statements
 *** DONE If
 *** TODO If-else and else
 ** TODO While-loops
