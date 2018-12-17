@@ -1,0 +1,98 @@
+#!/usr/bin/python3
+
+import os
+from subprocess import run, PIPE
+
+def without_suffix(filename):
+	dot = filename.rfind('.')
+	return filename[:dot]
+
+def get_suffix(filename):
+	dot = filename.rfind('.')
+	return filename[dot+1:]
+
+def as_source(filename):
+	return without_suffix(filename) + '.w'
+
+def as_output(filename):
+	return without_suffix(filename) + '.output'
+
+prefix = os.getcwd() + '/tests/'
+
+files = os.listdir(prefix)
+source_files = list(filter(lambda x: get_suffix(x) == 'w', files))
+
+expected_output = []
+
+RESET = '\033[0m'
+BOLD  = '\033[1m'
+DIM   = '\033[2m'
+RED   = '\033[31m'
+GREEN = '\033[32m'
+
+def wrap(string, *modifiers):
+	return ''.join(modifiers) + string + RESET
+
+def lines(s):
+	collect = []
+	for c in s:
+		if c == '\n':
+			yield ''.join(collect)
+			collect = []
+			continue
+		collect.append(c)
+
+def print_with_indent(string):
+	for line in lines(string):
+		print("  ", line)
+
+def print_line_message(message, line_length, sep):
+	pre = 2
+	collect = []
+	collect.extend([sep] * pre)
+	collect.append(' ')
+	collect.extend(list(message))
+	last_length = line_length - len(message) - pre
+	collect.extend([sep] * last_length)
+	print(wrap(''.join(collect), DIM))
+
+def print_line(line_length, sep):
+	print(wrap(sep * line_length, DIM))
+		
+def test_runtime_failed(filename, stderr):
+	message = 'Test \'{0}\' errored!'.format(filename)
+	print(wrap(message, RED, BOLD))
+	sep = '.'
+	print_line_message('Error message: ', len(message), '.')
+	print_with_indent(stderr)
+	print_line(len(message), '.')
+
+def test_failed(filename, output):
+	message = 'Test \'{0}\' failed!'.format(filename)
+	print(wrap(message, RED, BOLD))
+	sep = '.'
+	print_line_message('Output: ', len(message), '.')
+	print_with_indent(output)
+	print_line(len(message), '.')
+
+def test_passed(filename):
+	print(wrap('Test \'{0}\' passed...'.format(filename), GREEN, BOLD))
+
+for filename in source_files:
+	if as_output(filename) not in files:
+		print('No matching output file for {}'.format(filename))
+	with open(prefix + as_output(filename), 'rb') as outfile:
+		expected_output.append(outfile.read())
+
+for i, filename in enumerate(source_files):
+	status = run(["./bin/winter", prefix + filename],
+				 stdout=PIPE, stderr=PIPE)
+	if status.returncode:
+		test_runtime_failed(filename, status.stderr.decode())
+		continue
+
+	expected = expected_output[i]
+	if status.stdout == expected:
+		test_passed(filename)
+	else:
+		test_failed(filename, status.stdout.decode())
