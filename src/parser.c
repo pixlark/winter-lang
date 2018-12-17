@@ -49,7 +49,7 @@ void __weak_expect(Lexer * lexer, Token_Type type)
 }
 #define weak_expect(x) __weak_expect(lexer, (x))
 
-#define token() lexer->token
+#define token() (lexer->token)
 
 Expr * parse_atom(Lexer * lexer)
 {
@@ -136,21 +136,57 @@ Expr * parse_prefix(Lexer * lexer)
 	}
 }
 
-Expr * parse_add_ops(Lexer * lexer)
+bool is_bool_op(Token_Type t)
+{
+	return
+		t == TOKEN_EQ || t == TOKEN_NE ||
+		t == '>' || t == '<' ||
+		t == TOKEN_GTE || t == TOKEN_LTE;
+}
+
+Expr * parse_bool_ops(Lexer * lexer)
 {
 	Expr * left = parse_prefix(lexer);
+	if (is_bool_op(token().type)) {
+		EXPR(EXPR_BINARY);
+		switch (token().type) {
+		case TOKEN_EQ:
+			break;
+		case TOKEN_NE:
+			break;
+		case '>':
+			break;
+		case '<':
+			break;
+		case TOKEN_GTE:
+			break;
+		case TOKEN_LTE:
+			break;
+		}
+		advance();
+		expr->binary.operator = OP_ADD;
+		expr->binary.left = left;
+		expr->binary.right = parse_bool_ops(lexer);
+		return expr;
+	} else {
+		return left;
+	}
+}
+
+Expr * parse_add_ops(Lexer * lexer)
+{
+	Expr * left = parse_bool_ops(lexer);
 	if (is('+') || is('-')) {
 		EXPR(EXPR_BINARY);
-		switch (lexer->token.type) {
+		switch (token().type) {
 		case '+':
 			expr->binary.operator = OP_ADD;
-			advance();
 			break;
 		case '-':
 			expr->binary.operator = OP_SUBTRACT;
-			advance();
 			break;
 		}
+		advance();
 		expr->binary.left = left;
 		expr->binary.right = parse_add_ops(lexer);
 		return expr;

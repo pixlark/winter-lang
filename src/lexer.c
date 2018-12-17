@@ -14,6 +14,11 @@ const char * token_type_names[] = {
 	[TOKEN_ELSE] = "else",
 	[TOKEN_FUNC] = "func",
 
+	[TOKEN_EQ] = "==",
+	[TOKEN_NE] = "!=",
+	[TOKEN_GTE] = ">=",
+	[TOKEN_LTE] = "<=",
+
 	[TOKEN_NAME] = "<name>",
 	[TOKEN_INTEGER_LITERAL] = "<int>",
 	[TOKEN_FLOAT_LITERAL] = "<float>",
@@ -168,6 +173,16 @@ Token lexer_next_token(Lexer * lexer)
 			return token;
 		}
 	}
+
+	#define TWOCHARTOK(c1, c2, tok)				\
+			lexer_advance_char(lexer);			\
+			if (lexer_peek(lexer) == c2) {		\
+				lexer_advance_char(lexer);		\
+				return (Token) { tok };			\
+			} else {							\
+				return (Token) { c1 };			\
+			}									\
+			break;
 	
 	switch (next_char) {
 		// Reserved chars
@@ -178,13 +193,22 @@ Token lexer_next_token(Lexer * lexer)
 	case ';':
 	case '+':
 	case '-':
-	case '=':
 	case ',':
 		lexer_advance_char(lexer);
 		return (Token) { next_char };
+	case '=':
+		TWOCHARTOK('=', '=', TOKEN_EQ);
+	case '!':
+		TWOCHARTOK('!', '=', TOKEN_NE);
+	case '>':
+		TWOCHARTOK('>', '=', TOKEN_GTE);
+	case '<':
+		TWOCHARTOK('<', '=', TOKEN_LTE);
 	default:
 		fatal("Unexpected character '%c'", next_char);
 	}
+
+	#undef TWOCHARTOK
 }
 
 void lexer_advance(Lexer * lexer)
