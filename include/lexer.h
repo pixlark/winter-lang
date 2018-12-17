@@ -33,6 +33,7 @@ typedef struct {
 		float float_literal;
 		const char * string_literal;
 	};
+	Assoc_Source assoc_source;
 } Token;
 
 char * token_to_string(Token token);
@@ -41,6 +42,8 @@ typedef struct {
 	const char * source;
 	size_t source_len;
 	size_t position;
+	size_t line;
+	size_t column;
 	Token token;
 	const char ** interned_strings;
 } Lexer;

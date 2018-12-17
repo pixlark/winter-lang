@@ -32,9 +32,10 @@ bool __is(Lexer * lexer, Token_Type type)
 void __expect(Lexer * lexer, Token_Type type)
 {
 	if (!match(type)) {
-		fatal("Expected %s, got %s instead",
-			  token_to_string((Token) { type }),
-			  token_to_string(lexer->token));
+		fatal_assoc(lexer->token.assoc_source,
+					"Expected %s, got %s instead",
+					token_to_string((Token) { type }),
+					token_to_string(lexer->token));
 	}
 }
 #define expect(x) __expect(lexer, (x))
@@ -42,9 +43,10 @@ void __expect(Lexer * lexer, Token_Type type)
 void __weak_expect(Lexer * lexer, Token_Type type)
 {
 	if (!is(type)) {
-		fatal("Expected %s, got %s instead",
-			  token_to_string((Token) { type }),
-			  token_to_string(lexer->token));
+		fatal_assoc(lexer->token.assoc_source,
+					"Expected %s, got %s instead",
+					token_to_string((Token) { type }),
+					token_to_string(lexer->token));
 	}
 }
 #define weak_expect(x) __weak_expect(lexer, (x))

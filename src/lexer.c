@@ -59,6 +59,8 @@ Lexer * lexer_alloc(const char * source)
 	lexer->source = source;
 	lexer->source_len = strlen(source);
 	lexer->position = 0;
+	lexer->line = 1;
+	lexer->column = 0;
 	lexer->interned_strings = NULL;
 	lexer_advance(lexer);
 	return lexer;
@@ -83,6 +85,7 @@ char lexer_peek(Lexer * lexer)
 void lexer_advance_char(Lexer * lexer)
 {
 	lexer->position++;
+	lexer->column++;
 }
 
 #define next() (lexer_advance_char(lexer), lexer_peek(lexer))
@@ -111,6 +114,10 @@ Token lexer_next_token(Lexer * lexer)
 
 	// Whitespace
 	if (isspace(next_char)) {
+		if (next_char == '\n') {
+			lexer->line++;
+			lexer->column = 0;
+		}
 		lexer_advance_char(lexer);
 		goto reset;
 	}
@@ -118,6 +125,7 @@ Token lexer_next_token(Lexer * lexer)
 	// Names
 	if (next_char == '_' || isalpha(next_char)) {
 		size_t start = lexer->position;
+		size_t col_start = lexer->column;
 		while (true) {
 			if (!(next_char == '_' || isalnum(next_char))) {
 				break;
@@ -126,6 +134,7 @@ Token lexer_next_token(Lexer * lexer)
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
+		size_t col_end = lexer->column;
 		const char * name = lexer_intern_range(lexer, start, end);
 		// Check against keywords
 		for (int i = 0; i < keyword_count; i++) {
@@ -140,6 +149,7 @@ Token lexer_next_token(Lexer * lexer)
 		Token token;
 		token.type = TOKEN_NAME;
 		token.name = name;
+		token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
 		return token;
 	}
 
@@ -148,6 +158,7 @@ Token lexer_next_token(Lexer * lexer)
 	// Integer/Float literals
 	if (isdigit(next_char) || next_char == '.') {
 		size_t start = lexer->position;
+		size_t col_start = lexer->column;
 		bool has_decimal_point = false;
 		while (true) {
 			if (next_char == '.') has_decimal_point = true;
@@ -158,12 +169,14 @@ Token lexer_next_token(Lexer * lexer)
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
+		size_t col_end = lexer->column;
 		const char * to_convert = lexer_intern_range(lexer, start, end);
 		if (has_decimal_point) {
 			// Float literal
 			Token token;
 			token.type = TOKEN_FLOAT_LITERAL;
 			token.float_literal = strtod(to_convert, NULL);
+			token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
 			free((char*) to_convert);
 			return token;
 		} else {
@@ -171,6 +184,7 @@ Token lexer_next_token(Lexer * lexer)
 			Token token;
 			token.type = TOKEN_INTEGER_LITERAL;
 			token.integer_literal = strtol(to_convert, NULL, 10);
+			token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
 			free((char*) to_convert);
 			return token;
 		}
@@ -178,6 +192,7 @@ Token lexer_next_token(Lexer * lexer)
 
 	// String literals
 	if (next_char == '"') {
+		size_t col_start = lexer->column;
 		next_char = next();
 		char * buffer = NULL;
 		while (next_char != '"') {
@@ -192,24 +207,32 @@ Token lexer_next_token(Lexer * lexer)
 			next_char = next();
 		}
 		lexer_advance_char(lexer);
+		size_t col_end = lexer->column;
 		Token token;
 		token.type = TOKEN_STRING_LITERAL;
 		// TODO(pixlark): Should this be interned in the same place as names/keywords?
 		sb_push(buffer, '\0');
 		token.string_literal = buffer ? lexer_intern_string(lexer, buffer) : NULL;
 		sb_free(buffer);
+		token.assoc_source = assoc_source_new(lexer->line, col_start, col_end);
 		return token;
 	}
 	
-	#define TWOCHARTOK(c1, c2, tok)				\
-			lexer_advance_char(lexer);			\
-			if (lexer_peek(lexer) == c2) {		\
-				lexer_advance_char(lexer);		\
-				return (Token) { tok };			\
-			} else {							\
-				return (Token) { c1 };			\
-			}									\
-			break;
+	#define TWOCHARTOK(c1, c2, tok)										\
+		lexer_advance_char(lexer);										\
+		if (lexer_peek(lexer) == c2) {									\
+			lexer_advance_char(lexer);									\
+			return (Token) { tok, .assoc_source =						\
+					assoc_source_new(lexer->line,						\
+									 lexer->column - 2,					\
+									 lexer->column) };					\
+		} else {														\
+			return (Token) { c1, .assoc_source =						\
+					assoc_source_new(lexer->line,						\
+									 lexer->column - 1,					\
+									 lexer->column) };					\
+		}																\
+		break;
 	
 	switch (next_char) {
 		// Reserved chars
@@ -222,7 +245,8 @@ Token lexer_next_token(Lexer * lexer)
 	case '-':
 	case ',':
 		lexer_advance_char(lexer);
-		return (Token) { next_char };
+		return (Token) { next_char, .assoc_source = assoc_source_new(lexer->line,
+																	 lexer->column-1, lexer->column) };
 	case '=':
 		TWOCHARTOK('=', '=', TOKEN_EQ);
 	case '!':

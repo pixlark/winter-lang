@@ -2,6 +2,15 @@
 
 #include "common.h"
 
+Assoc_Source assoc_source_new(size_t line,
+							  size_t start,
+							  size_t end)
+{
+	return (Assoc_Source) {
+		line, start, end,
+	};
+}
+
 #define RESET         "\e[0m"
 #define SET_BOLD      "\e[1m"
 #define SET_DIM       "\e[2m"
@@ -36,6 +45,28 @@ void fatal(const char * fmt, ...)
 
 	va_end(args);
 	exit(1);
+}
+
+void fatal_assoc(Assoc_Source assoc, const char * fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+
+	fprintf(stderr, RED(BOLD("encountered error")) ":\n");
+	fprintf(stderr, DIM("Line %d\n"), assoc.line);
+	vfprintf(stderr, fmt, args);
+	
+	// Bit of a kluge, perhaps there's a better way to deal with
+	// bison's newlines
+	{
+		size_t len = strlen(fmt);
+		if (fmt[len-1] != '\n') {
+			fprintf(stderr, "\n");
+		}
+	}
+
+	va_end(args);
+	exit(1);	
 }
 
 void fatal_internal(const char * fmt, ...)

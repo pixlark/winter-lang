@@ -30,3 +30,5 @@
 ** DONE Lexer
 ** DONE Parser
 
+* TODO Bugs
+** TODO A single ';' segfaults
