@@ -131,6 +131,10 @@ Expr * parse_prefix(Lexer * lexer)
 		expr->unary.operator = OP_NEGATE;
 		expr->unary.operand = parse_prefix(lexer);
 		return expr;
+	} else if (match('!')) {
+		EXPR(EXPR_UNARY);
+		expr->unary.operator = OP_NOT;
+		expr->unary.operand = parse_prefix(lexer);
 	} else {
 		return parse_function_call(lexer);
 	}
@@ -151,20 +155,25 @@ Expr * parse_bool_ops(Lexer * lexer)
 		EXPR(EXPR_BINARY);
 		switch (token().type) {
 		case TOKEN_EQ:
+			expr->binary.operator = OP_EQ;
 			break;
 		case TOKEN_NE:
+			expr->binary.operator = OP_NE;
 			break;
 		case '>':
+			expr->binary.operator = OP_GT;
 			break;
 		case '<':
+			expr->binary.operator = OP_LT;
 			break;
 		case TOKEN_GTE:
+			expr->binary.operator = OP_GTE;
 			break;
 		case TOKEN_LTE:
+			expr->binary.operator = OP_LTE;
 			break;
 		}
 		advance();
-		expr->binary.operator = OP_ADD;
 		expr->binary.left = left;
 		expr->binary.right = parse_bool_ops(lexer);
 		return expr;

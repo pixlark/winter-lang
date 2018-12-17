@@ -15,6 +15,18 @@ void compile_operator(Compiler * compiler, Operator operator)
 	case OP_ADD:
 		P(bc_chunk_new_no_args(INSTR_ADD));
 		break;
+	case OP_NOT:
+		P(bc_chunk_new_no_args(INSTR_NOT));
+		break;
+	case OP_EQ:
+		P(bc_chunk_new_no_args(INSTR_EQ));
+		break;
+	case OP_GT:
+		P(bc_chunk_new_no_args(INSTR_GT));
+		break;
+	case OP_LT:
+		P(bc_chunk_new_no_args(INSTR_LT));
+		break;
 	default:
 		fatal_internal("A non-compileable operator reached the compilation phase.");
 	}

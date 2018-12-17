@@ -8,6 +8,13 @@ typedef enum {
 	OP_NEGATE,
 	OP_ADD,
 	OP_SUBTRACT,
+	OP_NOT,
+	OP_EQ,
+	OP_NE,
+	OP_GT,
+	OP_LT,
+	OP_GTE,
+	OP_LTE,
 } Operator;
 
 // :\ Operator

@@ -1,1 +1,5 @@
-print 6 != 2;
+x = 10;
+if x > 5 {
+	print true;
+}
+

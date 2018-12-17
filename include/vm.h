@@ -76,11 +76,16 @@ typedef struct {
 enum Instruction {
 	// No args
 	INSTR_NOP,
-	INSTR_NEGATE,
-	INSTR_ADD,
 	INSTR_RETURN,
 	INSTR_PRINT,
 	INSTR_POP,
+	// Operations
+	INSTR_NEGATE,
+	INSTR_ADD,
+	INSTR_NOT,
+	INSTR_EQ,
+	INSTR_GT,
+	INSTR_LT,
 	// Args
 	INSTR_PUSH,
 	INSTR_BIND,

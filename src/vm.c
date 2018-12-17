@@ -145,11 +145,16 @@ void bc_chunk_print(BC_Chunk chunk)
 {
 	const char * instr_names[] = {	
 		[INSTR_NOP] = "NOP",
-		[INSTR_NEGATE] = "NEGATE",
-		[INSTR_ADD] = "ADD",
 		[INSTR_RETURN] = "RETURN",
 		[INSTR_PRINT] = "PRINT",
 		[INSTR_POP] = "POP",
+
+		[INSTR_NEGATE] = "NEGATE",
+		[INSTR_ADD] = "ADD",
+		[INSTR_NOT] = "NOT",
+		[INSTR_EQ] = "EQ",
+		[INSTR_GT] = "GT",
+		[INSTR_LT] = "LT",
 		
 		[INSTR_PUSH] = "PUSH",
 		[INSTR_BIND] = "BIND",
@@ -276,25 +281,54 @@ void winter_machine_step(Winter_Machine * wm)
 	BC_Chunk chunk = winter_machine_advance_bytecode(wm);
 	
 	switch (chunk.instr) {
+		// No args
 	case INSTR_NOP:
 		break;
-	case INSTR_NEGATE: {
-		push(value_negate(pop()));
-	} break;
-	case INSTR_ADD: {
-		Value b = pop();
-		Value a = pop();
-		push(value_add(a, b));
-	} break;
-	case INSTR_PUSH: {
-		Instr_Push instr = chunk.instr_push;
-		sb_push(wm->eval_stack, instr.value);
-	} break;
 	case INSTR_RETURN: {
 		if (sb_count(wm->call_stack) == 0) {
 			fatal("Can't return from global scope");
 		}
 		winter_machine_pop_call_stack(wm);
+	} break;
+	case INSTR_PRINT: {
+		value_print(pop());
+	} break;
+	case INSTR_POP:
+		pop();
+		break;		
+
+		// Operations
+	case INSTR_NEGATE:
+		push(value_negate(pop()));
+		break;
+	case INSTR_ADD: {
+		Value b = pop();
+		Value a = pop();
+		push(value_add(a, b));
+	} break;
+	case INSTR_NOT:
+		push(value_not(pop()));
+		break;
+	case INSTR_EQ: {
+		Value b = pop();
+		Value a = pop();
+		push(value_equal(a, b));
+	} break;
+	case INSTR_GT: {
+		Value b = pop();
+		Value a = pop();
+		push(value_greater_than(a, b));
+	} break;
+	case INSTR_LT: {
+		Value b = pop();
+		Value a = pop();
+		push(value_less_than(a, b));
+	} break;
+
+		// Args
+	case INSTR_PUSH: {
+		Instr_Push instr = chunk.instr_push;
+		sb_push(wm->eval_stack, instr.value);
 	} break;
 	case INSTR_BIND: {
 		Instr_Bind instr = chunk.instr_bind;
@@ -311,12 +345,6 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		push(*var_storage);
 	} break;
-	case INSTR_PRINT: {
-		value_print(pop());
-	} break;
-	case INSTR_POP:
-		pop();
-		break;
 	case INSTR_CALL: {
 		Value func_val = pop();
 		if (func_val.type != VALUE_FUNCTION) {

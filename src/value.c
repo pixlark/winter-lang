@@ -35,22 +35,6 @@ Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
 	};
 }
 
-bool value_equal(Value a, Value b)
-{
-	if (a.type == b.type) {
-		switch (a.type) {
-		case VALUE_INTEGER:
-			return a._integer == b._integer;
-		case VALUE_BOOL:
-			return a._bool == b._bool;
-		default:
-			fatal_internal("Type is not comparable");
-		}
-	} else {
-		fatal_internal("Can't compare differing types");
-	}
-}
-
 Value value_print(Value value)
 {
 	switch (value.type) {
@@ -72,6 +56,15 @@ Value value_print(Value value)
 	}
 }
 
+// TODO(pixlark): These errors should instead propagate up and be handled by the VM
+#define fatal_given_type() fatal("Not valid on given type");
+#define check_same_type()												\
+	do {																\
+		if (a.type != b.type) {											\
+			fatal("Operation must be used on two of the same type");	\
+		}																\
+	} while (false)
+
 Value value_negate(Value a)
 {
 	switch (a.type) {
@@ -82,15 +75,13 @@ Value value_negate(Value a)
 		return value_new_float(-a._float);
 		break;
 	default:
-		fatal("Negate not valid on given type");
+		fatal_given_type();
 	}
 }
 
 Value value_add(Value a, Value b)
 {
-	if (a.type != b.type) {
-		fatal("Add must be used on two of the same type");
-	}
+	check_same_type();
 	switch (a.type) {
 	case VALUE_INTEGER:
 		return value_new_integer(a._integer + b._integer);
@@ -99,8 +90,63 @@ Value value_add(Value a, Value b)
 		return value_new_float(a._float + b._float);
 		break;
 	default:
-		fatal("Add not valid on given types");
+		fatal_given_type();
 	}
 }
+
+Value value_not(Value a)
+{
+	if (a.type != VALUE_BOOL) {
+		fatal("Operation valid only for bools");
+	}
+	return value_new_bool(!a._bool);
+}
+
+Value value_equal(Value a, Value b)
+{
+	check_same_type();
+	switch (a.type) {
+	case VALUE_INTEGER:
+		return value_new_bool(a._integer == b._integer);
+	case VALUE_FLOAT:
+		return value_new_bool(a._float == b._float);
+	case VALUE_BOOL:
+		return value_new_bool(a._bool == b._bool);
+	default:
+		fatal_given_type();
+	}
+}
+
+
+Value value_greater_than(Value a, Value b)
+{
+	check_same_type();
+	switch (a.type) {
+	case VALUE_INTEGER:
+		return value_new_bool(a._integer > b._integer);
+		break;
+	case VALUE_FLOAT:
+		return value_new_bool(a._float > b._float);
+		break;
+	default:
+		fatal_given_type();
+	}
+}
+
+Value value_less_than(Value a, Value b)
+{
+	check_same_type();
+	switch (a.type) {
+	case VALUE_INTEGER:
+		return value_new_bool(a._integer < b._integer);
+		break;
+	case VALUE_FLOAT:
+		return value_new_bool(a._float < b._float);
+		break;
+	default:
+		fatal_given_type();
+	}
+}
+
 
 // :\ Value
