@@ -59,6 +59,7 @@ Lexer * lexer_alloc(const char * source)
 	lexer->source = source;
 	lexer->source_len = strlen(source);
 	lexer->position = 0;
+	lexer->interned_strings = NULL;
 	lexer_advance(lexer);
 	return lexer;
 }
@@ -123,8 +124,7 @@ Token lexer_next_token(Lexer * lexer)
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
-		const char * name =
-			strdup_from_range(lexer->source, start, end);
+		const char * name = lexer_intern_range(lexer, start, end);
 		// Check against keywords
 		for (int i = 0; i < keyword_count; i++) {
 			if (strcmp(name, keywords[i]) == 0) {
@@ -156,8 +156,7 @@ Token lexer_next_token(Lexer * lexer)
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
-		const char * to_convert =
-			strdup_from_range(lexer->source, start, end);
+		const char * to_convert = lexer_intern_range(lexer, start, end);
 		if (has_decimal_point) {
 			// Float literal
 			Token token;
@@ -213,4 +212,37 @@ Token lexer_lookahead(Lexer * lexer, size_t lookahead)
 	lexer->position = current_position;
 	lexer->token = current_token;
 	return peeked_token;
+}
+
+const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
+{
+	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
+		const char * str = lexer->interned_strings[i];
+		bool matches = true;
+		for (int j = start; j < end; j++) {
+			if (lexer->source[j] != str[j - start]) {
+				matches = false;
+				break;
+			}
+		}
+		if (matches) {
+			return str;
+		}
+	}
+	// Not already interned
+	char * intern = malloc(end - start + 1);
+	intern[end - start] = '\0';
+	strncpy(intern, lexer->source + start, end - start);
+	sb_push(lexer->interned_strings, intern);
+}
+
+const char * lexer_intern_string(Lexer * lexer, const char * str)
+{
+	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
+		if (strcmp(str, lexer->interned_strings[i]) == 0) {
+			return lexer->interned_strings[i];
+		}
+	}
+	// Not already interned
+	sb_push(lexer->interned_strings, strdup(str));
 }

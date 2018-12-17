@@ -1,4 +1,4 @@
-* TODO String interning
+* DONE String interning
 
 * DONE Extend type system
 ** DONE None-type
@@ -21,6 +21,6 @@
 ** DONE Function arguments
 ** DONE Return values
 
-* TODO Hand-write lexer/parser
-** TODO Lexer
-** TODO Parser
+* DONE Hand-write lexer/parser
+** DONE Lexer
+** DONE Parser

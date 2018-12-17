@@ -34,9 +34,11 @@ typedef struct {
 	size_t source_len;
 	size_t position;
 	Token token;
+	const char ** interned_strings;
 } Lexer;
 
 Lexer * lexer_alloc(const char * source);
 Token lexer_next_token(Lexer * lexer);
 void lexer_advance(Lexer * lexer);
 Token lexer_lookahead(Lexer * lexer, size_t lookahead);
+const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end);

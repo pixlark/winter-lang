@@ -1,13 +1,5 @@
-func test() {
-	x = 5;
-	if (true) {
-		print x;
-	}
-	if (true) {
-		print 10;
-	}
-}
-
-x = test;
-
-x();
+x = 10;
+y = 10;
+x = 15;
+y = 15;
+print x + y;

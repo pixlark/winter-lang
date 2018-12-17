@@ -249,7 +249,11 @@ Stmt * parse_statement(Lexer * lexer)
 		// function declaration
 		return parse_function_declaration(lexer);
 	} else if (lexer_lookahead(lexer, 1).type == '=') {
-		// TODO(pixlark): Kluge. But how else do you do this??
+		// TODO(pixlark): Kluge.
+		/* Once we have l-expressions as a detailed thing, with
+		   indexing and all that, how will we know that this is an
+		   assignment??
+		   -Paul T. Sun Dec 16 23:12:45 2018 */
 		// assignment
 		return parse_assignment(lexer);
 	} else {

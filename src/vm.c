@@ -19,8 +19,8 @@ Variable_Map variable_map_new()
 Value * variable_map_index(Variable_Map * map, const char * name)
 {
 	for (int i = 0; i < map->size; i++) {
-		// TODO(pixlark): String interning to make this way faster
-		if (strcmp(name, map->names[i]) == 0) {
+		// We can do this because names are interned in the lexer
+		if (name == map->names[i]) {
 			return map->values[i];
 		}
 	}

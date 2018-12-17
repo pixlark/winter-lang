@@ -33,7 +33,7 @@ int main()
 		
 		// Lowering
 		lower_statement(statement);
-
+		
 		// Compilation
 		Compiler compiler;
 		compiler.bytecode = NULL;
