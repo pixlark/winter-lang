@@ -118,7 +118,8 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
 		compile_body(&decl_compiler, stmt->func_decl.body);
-		Value function = value_new_function(sb_copy(stmt->func_decl.parameters),
+		Value function = value_new_function(stmt->func_decl.name,
+											sb_copy(stmt->func_decl.parameters),
 											decl_compiler.bytecode);
 		P(bc_chunk_new_push(function), stmt->assoc);
 		P(bc_chunk_new_bind(stmt->func_decl.name), stmt->assoc);

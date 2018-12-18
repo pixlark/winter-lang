@@ -14,3 +14,13 @@ func outer(a) {
 
 f = outer(1);
 f(1);
+
+func triangle(x) {
+	 if x == 1 {
+	     return 1;
+     } else {
+         return x + triangle(x - 1);
+     }
+}
+
+print triangle(5);

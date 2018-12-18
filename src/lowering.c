@@ -68,6 +68,16 @@ void lower_binary(Expr * expr)
 void lower_operations_expr(Expr * expr)
 {
 	switch (expr->type) {
+	case EXPR_ATOM:
+		break;
+	case EXPR_VAR:
+		break;
+	case EXPR_FUNCALL:
+		lower_operations_expr(expr->funcall.func);
+		for (int i = 0; i < sb_count(expr->funcall.args); i++) {
+			lower_operations_expr(expr->funcall.args[i]);
+		}
+		break;
 	case EXPR_UNARY:
 		lower_operations_expr(expr->unary.operand);
 		break;
@@ -76,6 +86,8 @@ void lower_operations_expr(Expr * expr)
 		lower_operations_expr(expr->binary.right);
 		lower_binary(expr);
 		break;
+	default:
+		fatal_internal("An unlowerable expression reached lower_operations_expr");
 	}
 }
 

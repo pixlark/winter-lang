@@ -174,7 +174,12 @@ void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode);
 
 // : Function
 
+// A function value has an associated name :- this has nothing to do
+// necessarily with the name it's bound to, it's simply the name that
+// it's given when it's first declared using func.
+// An anonymous function simply has NULL in the name field.
 typedef struct Function {
+	const char * name;
 	const char ** parameters; // sb
 	BC_Chunk * bytecode;
 } Function;

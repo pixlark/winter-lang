@@ -335,9 +335,14 @@ void winter_machine_step(Winter_Machine * wm)
 			fatal_assoc(chunk.assoc, "Wrong number of arguments to function");
 		}
 		Call_Frame * frame = call_frame_alloc(func.bytecode);
+		// Push arguments into varmap
 		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
 			Value arg = pop();
 			variable_map_update(&(frame->var_map), func.parameters[i], arg);
+		}
+		// If the function is non-anonymous, push function itself into varmap (recursion)
+		if (func.name) {
+			variable_map_update(&(frame->var_map), func.name, func_val);
 		}
 		sb_push(wm->call_stack, frame);
 	} break;

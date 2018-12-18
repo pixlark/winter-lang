@@ -31,9 +31,10 @@ Value value_new_string(const char * s)
 			(Winter_String) { s ? strlen(s) : 0, s } };
 }
 
-Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
+Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode)
 {
 	Function * func = malloc(sizeof(Function));
+	func->name = name;
 	func->parameters = parameters;
 	func->bytecode = bytecode;
 	return (Value) {
