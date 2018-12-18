@@ -20,13 +20,8 @@ char * load_string_from_file(char * path)
 	return str;
 }
 
-#define DEBUG false
-
 int main(int argc, char ** argv)
 {
-	#if DEBUG
-	const char * source = load_string_from_file("testfile");
-	#else
 	if (argc != 2) {
 		fatal("Provide one source file");
 	}
@@ -34,7 +29,6 @@ int main(int argc, char ** argv)
 	if (!source) {
 		fatal("'%s' does not exist", argv[1]);
 	}
-	#endif
 	
 	Lexer * lexer = lexer_alloc(source);
 
@@ -65,8 +59,7 @@ int main(int argc, char ** argv)
 		#endif
 		
 		// Executing
-		winter_machine_prime(wm, compiler.bytecode,
-							 sb_count(compiler.bytecode));
+		winter_machine_prime(wm, compiler.bytecode);
 		wm->running = true;
 		while (wm->running) {
 			winter_machine_step(wm);

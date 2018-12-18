@@ -181,11 +181,13 @@ void bc_chunk_print(BC_Chunk chunk)
 Winter_Machine * winter_machine_alloc()
 {
 	Winter_Machine * wm = malloc(sizeof(Winter_Machine));
+	/*
 	wm->global_var_map = variable_map_new();
 	wm->bytecode = NULL;
-	wm->ip = 0;
+	wm->ip = 0;*/
 	wm->eval_stack = NULL;
 	wm->call_stack = NULL;
+	sb_push(wm->call_stack, call_frame_alloc(NULL));
 	wm->running = false;
 	return wm;
 }
@@ -205,45 +207,34 @@ void winter_machine_push(Winter_Machine * wm, Value value)
 
 Variable_Map * winter_machine_varmap(Winter_Machine * wm)
 {
-	if (sb_count(wm->call_stack) == 0) {
-		return &(wm->global_var_map);
-	} else {
-		return &(sb_last(wm->call_stack)->var_map);
-	}
+	internal_assert(sb_count(wm->call_stack) > 0);
+	return &(sb_last(wm->call_stack)->var_map);
 }
 
 BC_Chunk winter_machine_advance_bytecode(Winter_Machine * wm)
 {
-	if (sb_count(wm->call_stack) == 0) {
-		return wm->bytecode[wm->ip++];
-	} else {
-		Call_Frame * frame = sb_last(wm->call_stack);
-		return frame->bytecode[frame->ip++];
-	}
+	internal_assert(sb_count(wm->call_stack) > 0);
+	Call_Frame * frame = sb_last(wm->call_stack);
+	return frame->bytecode[frame->ip++];
 }
 
 bool winter_machine_reached_end(Winter_Machine * wm)
 {
-	if (sb_count(wm->call_stack) == 0) {
-		return wm->ip >= wm->bytecode_len;
-	} else {
-		Call_Frame * frame = sb_last(wm->call_stack);
-		return frame->ip >= sb_count(frame->bytecode);
-	}
+	internal_assert(sb_count(wm->call_stack) > 0);
+	Call_Frame * frame = sb_last(wm->call_stack);
+	return frame->ip >= sb_count(frame->bytecode);
 }
 
 void winter_machine_modify_ip(Winter_Machine * wm, int offset)
 {
-	if (sb_count(wm->call_stack) == 0) {
-		wm->ip += offset;
-	} else {
-		Call_Frame * frame = sb_last(wm->call_stack);
-		frame->ip += offset;
-	}
+	internal_assert(sb_count(wm->call_stack) > 0);
+	Call_Frame * frame = sb_last(wm->call_stack);
+	frame->ip += offset;
 }
 
 void winter_machine_pop_call_stack(Winter_Machine * wm)
 {
+	internal_assert(sb_count(wm->call_stack) > 0);
 	Call_Frame * frame = sb_pop(wm->call_stack);
 	call_frame_free(frame);
 }
@@ -251,9 +242,14 @@ void winter_machine_pop_call_stack(Winter_Machine * wm)
 void winter_machine_step(Winter_Machine * wm)
 {
 	if (winter_machine_reached_end(wm)) {
-		if (sb_count(wm->call_stack) == 0) wm->running = false;
-		else {
-			// Inferred return, return and push None to the eval stack
+		internal_assert(sb_count(wm->call_stack) > 0);
+		if (sb_count(wm->call_stack) == 1) {
+			// Not in function
+			// Reached end of provided statement
+			wm->running = false;
+		} else {
+			// In function
+			// Inferred return, return and push none to the eval stack
 			push(value_none());
 			winter_machine_pop_call_stack(wm);
 		}
@@ -261,7 +257,6 @@ void winter_machine_step(Winter_Machine * wm)
 
 	if (!wm->running) return;
 
-	assert(wm->bytecode);
 	BC_Chunk chunk = winter_machine_advance_bytecode(wm);
 	
 	switch (chunk.instr) {
@@ -365,11 +360,12 @@ void winter_machine_step(Winter_Machine * wm)
 	}
 }
 
-void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len)
+void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode)
 {
-	wm->bytecode = bytecode;
-	wm->bytecode_len = len;
-	wm->ip = 0;
+	internal_assert(sb_count(wm->call_stack) == 1);
+	Call_Frame * base_frame = sb_last(wm->call_stack);
+	base_frame->bytecode = bytecode;
+	base_frame->ip = 0;
 	wm->running = true;
 }
 

@@ -154,10 +154,11 @@ Call_Frame * call_frame_alloc(BC_Chunk * bytecode);
 // The central virtual machine that runs Winter bytecode
 
 typedef struct {
+	/*
 	Variable_Map global_var_map;
 	BC_Chunk * bytecode;
 	size_t bytecode_len;
-	size_t ip;
+	size_t ip;*/
 
 	Call_Frame ** call_stack;
 	Value * eval_stack;
@@ -167,7 +168,7 @@ typedef struct {
 
 Winter_Machine * winter_machine_alloc();
 void winter_machine_step(Winter_Machine * wm);
-void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len);
+void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode);
 
 // :\ Winter_Machine
 
