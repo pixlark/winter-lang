@@ -1,3 +1,4 @@
+print none;
 print "";
 print "hello";
 print 15;

@@ -7,8 +7,8 @@
 ** DONE Bools
 ** DONE Strings
 
-* TODO Better error messages
-** TODO Line numbers
+* DONE Better error messages
+** DONE Line numbers
 
 * TODO Fill out operators
 ** TODO Math operators past +/-
@@ -17,7 +17,7 @@
 * TODO Control Structures
 ** DONE If-statements
 *** DONE If
-*** TODO If-else and else
+*** DONE If-else and else
 ** TODO While-loops
 ** TODO For-loops
 
@@ -30,5 +30,5 @@
 ** DONE Lexer
 ** DONE Parser
 
-* TODO Bugs
-** TODO A single ';' segfaults
+* DONE Bugs
+** DONE A single ';' segfaults

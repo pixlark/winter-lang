@@ -74,7 +74,12 @@ void call_frame_free(Call_Frame * frame)
 	// What do we need to deallocate? Anything which can't be used by
 	// the program anymore...
 
-	// 1. Functions that have fallen out of scope should become deallocated
+	/* Because functions are first-class, we have to treat them like
+	   any other kind of reference object, which means that we can't
+	   clean up their data deterministically like this. The eventual
+	   garbage collector will have to deal with it instead.
+	   -Paul T. Mon Dec 17 19:37:57 2018 */
+	/*
 	for (int i = 0; i < frame->var_map.size; i++) {
 		Value * storage = frame->var_map.values[i];
 		if (storage->type == VALUE_FUNCTION) {
@@ -82,7 +87,7 @@ void call_frame_free(Call_Frame * frame)
 			sb_free(storage->_function->parameters);
 			free(storage->_function);
 		}
-	}
+		}*/
 	
 	// 2. Variables that have fallen out of scope should have their space deallocated
 	for (int i = 0; i < frame->var_map.size; i++) {

@@ -79,24 +79,48 @@ void lower_operations_expr(Expr * expr)
 	}
 }
 
-void lower_operations(Stmt * stmt)
+// :\ Operation Lowering
+
+void lower_expression(Expr * expr)
 {
-	switch (stmt->type) {
-	case STMT_EXPR:
-		lower_operations_expr(stmt->expr.expr);
-		break;
-	case STMT_ASSIGN:
-		lower_operations_expr(stmt->assign.expr);
-		break;
-	case STMT_PRINT:
-		lower_operations_expr(stmt->print.expr);
-		break;
+	lower_operations_expr(expr);
+}
+
+void lower_body(Stmt ** body)
+{
+	for (int i = 0; i < sb_count(body); i++) {
+		lower_statement(body[i]);
 	}
 }
 
-// :\ Operation Lowering
-
 void lower_statement(Stmt * stmt)
 {
-	lower_operations(stmt);
+	switch (stmt->type) {
+	case STMT_EXPR:
+		lower_expression(stmt->expr.expr);
+		break;
+	case STMT_ASSIGN:
+		lower_expression(stmt->assign.expr);
+		break;
+	case STMT_PRINT:
+		lower_expression(stmt->print.expr);
+		break;
+	case STMT_RETURN:
+		lower_expression(stmt->_return.expr);
+		break;
+	case STMT_IF:
+		for (int i = 0; i < sb_count(stmt->_if.conditions); i++) {
+			lower_expression(stmt->_if.conditions[i]);
+		}
+		for (int i = 0; i < sb_count(stmt->_if.bodies); i++) {
+			lower_body(stmt->_if.bodies[i]);
+		}
+		if (stmt->_if.else_body) lower_body(stmt->_if.else_body);
+		break;
+	case STMT_FUNC_DECL:
+		lower_body(stmt->func_decl.body);
+		break;
+	default:
+		fatal_internal("An unlowerable statement reached lower_statement");
+	}
 }
