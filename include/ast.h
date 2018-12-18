@@ -8,6 +8,8 @@ typedef enum {
 	OP_NEGATE,
 	OP_ADD,
 	OP_SUBTRACT,
+	OP_MULTIPLY,
+	OP_DIVIDE,
 	OP_NOT,
 	OP_EQ,
 	OP_NE,

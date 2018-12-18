@@ -16,6 +16,12 @@ void compile_operator(Compiler * compiler, Operator operator, Assoc_Source as)
 	case OP_ADD:
 		P(bc_chunk_new_no_args(INSTR_ADD), as);
 		break;
+	case OP_MULTIPLY:
+		P(bc_chunk_new_no_args(INSTR_MULT), as);
+		break;
+	case OP_DIVIDE:
+		P(bc_chunk_new_no_args(INSTR_DIV), as);
+		break;
 	case OP_NOT:
 		P(bc_chunk_new_no_args(INSTR_NOT), as);
 		break;

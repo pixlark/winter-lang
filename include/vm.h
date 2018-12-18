@@ -96,6 +96,8 @@ enum Instruction {
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
+	INSTR_MULT,
+	INSTR_DIV,
 	INSTR_NOT,
 	INSTR_EQ,
 	INSTR_GT,

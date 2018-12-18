@@ -106,6 +106,37 @@ Value value_add(Value a, Value b)
 	}
 }
 
+Value value_multiply(Value a, Value b)
+{
+	check_same_type();
+	switch (a.type) {
+	case VALUE_INTEGER:
+		return value_new_integer(a._integer * b._integer);
+		break;
+	case VALUE_FLOAT:
+		return value_new_float(a._float * b._float);
+		break;
+	default:
+		fatal_given_type();
+	}	
+}
+
+Value value_divide(Value a, Value b)
+{
+	check_same_type();
+	switch (a.type) {
+	case VALUE_INTEGER:
+		return value_new_float((float) a._integer /
+							   (float) b._integer);
+		break;
+	case VALUE_FLOAT:
+		return value_new_float(a._float / b._float);
+		break;
+	default:
+		fatal_given_type();
+	}	
+}
+
 Value value_not(Value a)
 {
 	if (a.type != VALUE_BOOL) {
@@ -128,7 +159,6 @@ Value value_equal(Value a, Value b)
 		fatal_given_type();
 	}
 }
-
 
 Value value_greater_than(Value a, Value b)
 {

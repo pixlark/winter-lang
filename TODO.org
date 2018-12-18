@@ -11,8 +11,14 @@
 ** DONE Line numbers
 
 * TODO Fill out operators
-** TODO Math operators past +/-
-** DONE Boolean operators
+** DONE Math operators past +/-
+** TODO Boolean operators
+*** DONE Comparison
+*** TODO Gates
+
+* TODO Casting
+** TODO Explicit casting
+** TODO Coerced casting
 
 * TODO Control Structures
 ** DONE If-statements

@@ -13,6 +13,8 @@ Value value_print(Value value);
 
 Value value_negate(Value a);
 Value value_add(Value a, Value b);
+Value value_multiply(Value a, Value b);
+Value value_divide(Value a, Value b);
 Value value_not(Value a);
 Value value_equal(Value a, Value b);
 Value value_greater_than(Value a, Value b);

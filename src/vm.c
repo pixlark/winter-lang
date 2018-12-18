@@ -312,6 +312,16 @@ void winter_machine_step(Winter_Machine * wm)
 		Value a = pop();
 		push(value_add(a, b));
 	} break;
+	case INSTR_MULT: {
+		Value b = pop();
+		Value a = pop();
+		push(value_multiply(a, b));
+	} break;
+	case INSTR_DIV: {
+		Value b = pop();
+		Value a = pop();
+		push(value_divide(a, b));
+	} break;
 	case INSTR_NOT:
 		push(value_not(pop()));
 		break;

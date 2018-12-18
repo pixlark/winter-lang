@@ -258,6 +258,8 @@ Token lexer_next_token(Lexer * lexer)
 	case ';':
 	case '+':
 	case '-':
+	case '*':
+	case '/':
 	case ',':
 		lexer_advance_char(lexer);
 		return (Token) { next_char, .assoc = assoc_source_new(lexer, lexer->line,

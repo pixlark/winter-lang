@@ -226,9 +226,33 @@ Expr * parse_bool_ops(Lexer * lexer)
 	}
 }
 
-Expr * parse_add_ops(Lexer * lexer)
+Expr * parse_mul_ops(Lexer * lexer)
 {
 	Expr * left = parse_bool_ops(lexer);
+	if (is('*') || is('/')) {
+		Assoc_Source as = token().assoc;
+		EXPR(EXPR_BINARY);
+		mark_expr(expr, as);
+		switch (token().type) {
+		case '*':
+			expr->binary.operator = OP_MULTIPLY;
+			break;
+		case '/':
+			expr->binary.operator = OP_DIVIDE;
+			break;
+		}
+		advance();
+		expr->binary.left = left;
+		expr->binary.right = parse_mul_ops(lexer);
+		return expr;
+	} else {
+		return left;
+	}
+}
+
+Expr * parse_add_ops(Lexer * lexer)
+{
+	Expr * left = parse_mul_ops(lexer);
 	if (is('+') || is('-')) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
