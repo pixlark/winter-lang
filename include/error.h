@@ -8,8 +8,10 @@
 
 Assoc_Source assoc_source_new(Lexer * lexer,
 							  size_t line,
-							  size_t len,
-							  size_t position);
+							  size_t position,
+							  size_t len);
+
+Assoc_Source assoc_source_eof(Lexer * lexer);
 
 void fatal(const char * fmt, ...);
 void fatal_assoc(Assoc_Source assoc, const char * fmt, ...);

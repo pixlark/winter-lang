@@ -8,7 +8,14 @@ Assoc_Source assoc_source_new(Lexer * lexer,
 							  size_t len)
 {
 	return (Assoc_Source) {
-		lexer, line, position, len
+		lexer, line, position, len, false
+	};
+}
+
+Assoc_Source assoc_source_eof(Lexer * lexer)
+{
+	return (Assoc_Source) {
+		lexer, 0, 0, 0, true
 	};
 }
 
@@ -53,23 +60,35 @@ void print_assoc(Assoc_Source assoc)
 		}
 		line_start--;
 	}
-	// Peek forwards until line end
-	const char * line_end = pos;
-	while (true) {
-		if ((line_end - assoc.lexer->source) == assoc.lexer->source_len - 1) break;
-		if (*line_end == '\n') break;
-		line_end++;
-	}
-	// Print line
-	fprintf(stderr, "    " DIM("%.*s") "\n", line_end - line_start, line_start);
-	// Print underline
-	fprintf(stderr, "    ");
-	for (int i = 0; i < (pos - line_start); i++) {
-		fprintf(stderr, " ");
-	}
-	for (int i = 0; i < assoc.len; i++) {
+	if (assoc.eof) {
+		// Print line
+		fprintf(stderr, "    " DIM("%s") "\n", line_start);
+		// Print underline
+		fprintf(stderr, "    ");
+		for (int i = 0; i < (pos - line_start) + 1; i++) {
+			fprintf(stderr, " ");
+		}
 		fprintf(stderr, RED("^"));
+	} else {
+		// Peek forwards until line end
+		const char * line_end = pos;
+		while (true) {
+			if ((line_end - assoc.lexer->source) >= assoc.lexer->source_len - 1) break;
+			if (*line_end == '\n') break;
+			line_end++;
+		}
+		// Print line
+		fprintf(stderr, "    " DIM("%.*s") "\n", line_end - line_start, line_start);
+		// Print underline
+		fprintf(stderr, "    ");
+		for (int i = 0; i < (pos - line_start); i++) {
+			fprintf(stderr, " ");
+		}
+		for (int i = 0; i < assoc.len; i++) {
+			fprintf(stderr, RED("^"));
+		}
 	}
+
 	fprintf(stderr, "\n"); 
 }
 

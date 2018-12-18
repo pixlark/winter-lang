@@ -120,7 +120,10 @@ Token lexer_next_token(Lexer * lexer)
 {
  reset:
 	if (lexer->position >= lexer->source_len) {
-		return (Token) { TOKEN_EOF };
+		Assoc_Source assoc = assoc_source_new(lexer, lexer->line,
+											  lexer->position - 1, 0);
+		assoc.eof = true;
+		return (Token) { TOKEN_EOF, .assoc = assoc };
 	}
 	char next_char = lexer_peek(lexer);
 

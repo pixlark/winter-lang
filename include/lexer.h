@@ -7,6 +7,7 @@ typedef struct {
 	size_t line;
 	size_t position;
 	size_t len;
+	bool eof;
 } Assoc_Source;
 
 typedef enum {
