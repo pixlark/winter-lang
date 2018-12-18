@@ -17,13 +17,6 @@ def as_source(filename):
 def as_output(filename):
 	return without_suffix(filename) + '.output'
 
-prefix = os.getcwd() + '/tests/'
-
-files = os.listdir(prefix)
-source_files = list(filter(lambda x: get_suffix(x) == 'w', files))
-
-expected_output = []
-
 RESET = '\033[0m'
 BOLD  = '\033[1m'
 DIM   = '\033[2m'
@@ -44,7 +37,7 @@ def lines(s):
 
 def print_with_indent(string):
 	for line in lines(string):
-		print("  ", line)
+		print('  ', line)
 
 def print_line_message(message, line_length, sep):
 	pre = 2
@@ -52,7 +45,8 @@ def print_line_message(message, line_length, sep):
 	collect.extend([sep] * pre)
 	collect.append(' ')
 	collect.extend(list(message))
-	last_length = line_length - len(message) - pre
+	collect.append(' ')
+	last_length = line_length - len(message) - pre - 2
 	collect.extend([sep] * last_length)
 	print(wrap(''.join(collect), DIM))
 
@@ -61,38 +55,63 @@ def print_line(line_length, sep):
 		
 def test_runtime_failed(filename, stderr):
 	message = 'Test \'{0}\' errored!'.format(filename)
-	print(wrap(message, RED, BOLD))
+	print(wrap(message, RED))
 	sep = '.'
-	print_line_message('Error message: ', len(message), '.')
+	print_line_message('Error message:', len(message), '.')
 	print_with_indent(stderr)
 	print_line(len(message), '.')
 
 def test_failed(filename, output):
 	message = 'Test \'{0}\' failed!'.format(filename)
-	print(wrap(message, RED, BOLD))
+	print(wrap(message, RED))
 	sep = '.'
-	print_line_message('Output: ', len(message), '.')
+	print_line_message('Output:', len(message), '.')
 	print_with_indent(output)
 	print_line(len(message), '.')
 
 def test_passed(filename):
-	print(wrap('Test \'{0}\' passed...'.format(filename), GREEN, BOLD))
+	print(wrap('Test \'{0}\' passed...'.format(filename), GREEN))
 
-for filename in source_files:
-	if as_output(filename) not in files:
-		print('No matching output file for {}'.format(filename))
-	with open(prefix + as_output(filename), 'rb') as outfile:
-		expected_output.append(outfile.read())
+def main():
+	# Get test files
+	prefix = os.getcwd() + '/tests/'
+	files = os.listdir(prefix)
 
-for i, filename in enumerate(source_files):
-	status = run(["./bin/winter", prefix + filename],
-				 stdout=PIPE, stderr=PIPE)
-	if status.returncode:
-		test_runtime_failed(filename, status.stderr.decode())
-		continue
+	# Read in expected output for every source file
+	source_files = list(filter(lambda x: get_suffix(x) == 'w', files))
+	expected_output = []
+	for filename in source_files:
+		if as_output(filename) not in files:
+			print('No matching output file for {}'.format(filename))
+		with open(prefix + as_output(filename), 'rb') as outfile:
+			expected_output.append(outfile.read())
 
-	expected = expected_output[i]
-	if status.stdout == expected:
-		test_passed(filename)
-	else:
-		test_failed(filename, status.stdout.decode())
+
+	# Sort alphabetically
+	source_files, expected_output = tuple(zip(*sorted(zip(source_files,
+														  expected_output))))
+
+	# Run each source file and determine whether it passed
+	number_passed = 0
+	for i, filename in enumerate(source_files):
+		status = run(['./bin/winter', prefix + filename],
+					 stdout=PIPE, stderr=PIPE)
+		if status.returncode:
+			test_runtime_failed(filename, status.stderr.decode())
+			continue
+
+		expected = expected_output[i]
+		if status.stdout == expected:
+			test_passed(filename)
+			number_passed += 1
+		else:
+			test_failed(filename, status.stdout.decode())
+
+	# Print total number that passed
+	final_color = GREEN if number_passed == len(source_files) else RED
+	print(wrap('{0}/{1} tests passed'.format(number_passed,
+											 len(source_files)),
+			   final_color, BOLD))
+
+if __name__ == '__main__':
+	main()
