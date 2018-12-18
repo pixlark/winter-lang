@@ -212,19 +212,6 @@ void winter_machine_push(Winter_Machine * wm, Value value)
 #define pop() winter_machine_pop(wm)
 #define push(x) winter_machine_push(wm, x)
 
-Variable_Map * winter_machine_varmap(Winter_Machine * wm)
-{
-	internal_assert(sb_count(wm->call_stack) > 0);
-	return &(sb_last(wm->call_stack)->var_map);
-}
-
-BC_Chunk winter_machine_advance_bytecode(Winter_Machine * wm)
-{
-	internal_assert(sb_count(wm->call_stack) > 0);
-	Call_Frame * frame = sb_last(wm->call_stack);
-	return frame->bytecode[frame->ip++];
-}
-
 bool winter_machine_reached_end(Winter_Machine * wm)
 {
 	internal_assert(sb_count(wm->call_stack) > 0);
@@ -232,25 +219,23 @@ bool winter_machine_reached_end(Winter_Machine * wm)
 	return frame->ip >= sb_count(frame->bytecode);
 }
 
-size_t winter_machine_ip(Winter_Machine * wm)
-{
-	internal_assert(sb_count(wm->call_stack) > 0);
-	Call_Frame * frame = sb_last(wm->call_stack);
-	return frame->ip;
-}
-
-void winter_machine_modify_ip(Winter_Machine * wm, int offset)
-{
-	internal_assert(sb_count(wm->call_stack) > 0);
-	Call_Frame * frame = sb_last(wm->call_stack);
-	frame->ip += offset;
-}
-
 void winter_machine_pop_call_stack(Winter_Machine * wm)
 {
 	internal_assert(sb_count(wm->call_stack) > 0);
 	Call_Frame * frame = sb_pop(wm->call_stack);
 	call_frame_free(frame);
+}
+
+Call_Frame * winter_machine_global_frame(Winter_Machine * wm)
+{
+	internal_assert(sb_count(wm->call_stack) > 0);
+	return wm->call_stack[0];
+}
+
+Call_Frame * winter_machine_frame(Winter_Machine * wm)
+{
+	internal_assert(sb_count(wm->call_stack) > 0);
+	return sb_last(wm->call_stack);
 }
 
 void winter_machine_step(Winter_Machine * wm)
@@ -271,7 +256,11 @@ void winter_machine_step(Winter_Machine * wm)
 
 	if (!wm->running) return;
 
-	BC_Chunk chunk = winter_machine_advance_bytecode(wm);
+	BC_Chunk chunk;
+	{
+		Call_Frame * this_frame = winter_machine_frame(wm);
+		chunk = this_frame->bytecode[this_frame->ip++];
+	}
 	
 	switch (chunk.instr) {
 		// No args
@@ -290,8 +279,7 @@ void winter_machine_step(Winter_Machine * wm)
 		pop();
 		break;
 	case INSTR_LOOP_END: {
-		internal_assert(sb_count(wm->call_stack) > 0);
-		Call_Frame * frame = sb_last(wm->call_stack);
+		Call_Frame * frame = winter_machine_frame(wm);
 		if (sb_count(frame->loop_stack) == 0) {
 			fatal_internal("LOOP_END instruction executed outside of loop");
 		}
@@ -299,7 +287,7 @@ void winter_machine_step(Winter_Machine * wm)
 		frame->ip = loop.start;
 	} break;
 	case INSTR_BREAK: {
-		Call_Frame * frame = sb_last(wm->call_stack);
+		Call_Frame * frame = winter_machine_frame(wm);
 		if (sb_count(frame->loop_stack) == 0) {
 			fatal_assoc(chunk.assoc, "Can't use break in non-loop");
 		}
@@ -307,7 +295,7 @@ void winter_machine_step(Winter_Machine * wm)
 		frame->ip = loop.end;
 	} break;
 	case INSTR_CONTINUE: {
-		Call_Frame * frame = sb_last(wm->call_stack);
+		Call_Frame * frame = winter_machine_frame(wm);
 		if (sb_count(frame->loop_stack) == 0) {
 			fatal_assoc(chunk.assoc, "Can't use continue in non-loop");
 		}
@@ -350,17 +338,17 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_BIND: {
 		Instr_Bind instr = chunk.instr_bind;
-		Variable_Map * varmap = winter_machine_varmap(wm);
+		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
 		Value value = pop();
 		variable_map_update(varmap, instr.name, value);
 	} break;
 	case INSTR_GET: {
 		Instr_Get instr = chunk.instr_get;
-		Variable_Map * varmap = winter_machine_varmap(wm);
+		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
 		Value * var_storage = variable_map_index(varmap, instr.name);
 		if (!var_storage) {
 			// Resort to looking in global scope
-			Variable_Map * global_varmap = &(wm->call_stack[0]->var_map);
+			Variable_Map * global_varmap = &(winter_machine_global_frame(wm)->var_map);
 			var_storage = variable_map_index(global_varmap, instr.name);
 			if (!var_storage) {
 				fatal_assoc(chunk.assoc, "%s not bound", instr.name);
@@ -392,7 +380,7 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_JUMP: {
 		Instr_Jump instr = chunk.instr_jump;
-		winter_machine_modify_ip(wm, instr.jump_offset);
+		winter_machine_frame(wm)->ip += instr.jump_offset;
 	} break;
 	case INSTR_CONDJUMP: {
 		Instr_Condjump instr = chunk.instr_condjump;
@@ -401,17 +389,13 @@ void winter_machine_step(Winter_Machine * wm)
 			fatal_assoc(chunk.assoc, "If condition must be bool");
 		}
 		if (condition._bool == instr.cond) {
-			winter_machine_modify_ip(wm, instr.jump_offset);
+			winter_machine_frame(wm)->ip += instr.jump_offset;
 		}
 	} break;
 	case INSTR_SET_LOOP: {
 		Instr_Set_Loop instr = chunk.instr_set_loop;
-		Loop new_loop = (Loop) { winter_machine_ip(wm),
-								 winter_machine_ip(wm) + instr.end_offset };
-		// TODO(pixlark): Redo all these convenience functions with a
-		// simple macro/function that grabs top frame
-		internal_assert(sb_count(wm->call_stack) > 0);
-		Call_Frame * frame = sb_last(wm->call_stack);
+		Call_Frame * frame = winter_machine_frame(wm);
+		Loop new_loop = (Loop) { frame->ip, frame->ip + instr.end_offset };
 		sb_push(frame->loop_stack, new_loop);
 	} break;
 	default:
