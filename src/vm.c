@@ -41,21 +41,6 @@ void variable_map_update(Variable_Map * map, const char * name, Value value)
 	}
 }
 
-bool variable_map_test()
-{
-	Variable_Map map = variable_map_new();
-	
-	Value val;
-	val.type = VALUE_INTEGER;
-	val._integer = 10;
-	
-	variable_map_update(&map, "test", val);
-
-	Value * val_p = variable_map_index(&map, "test");
-	assert(val_p->type == VALUE_INTEGER);
-	assert(val_p->_integer == 10);
-}
-
 // :\ Variable_Map
 
 // : Call_Frame
@@ -96,12 +81,6 @@ void call_frame_free(Call_Frame * frame)
 
 	// 3. The frame itself should be deallocated
 	free(frame);
-}
-
-void call_frame_test()
-{
-	Call_Frame * frame = call_frame_alloc(NULL);
-	assert(frame->var_map.size == 0);
 }
 
 // :\ Call_Frame
@@ -394,50 +373,4 @@ void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode, size_t len)
 	wm->running = true;
 }
 
-void winter_machine_test()
-{
-	Winter_Machine * wm = winter_machine_alloc();
-
-	Value function;
-	{
-		const char ** parameters = NULL;
-		sb_push(parameters, "a");
-		sb_push(parameters, "b");
-		
-		BC_Chunk * bytecode = NULL;
-		#define pb(x) sb_push(bytecode, x)
-		pb(bc_chunk_new_push(value_new_integer(101)));
-		pb(bc_chunk_new_no_args(INSTR_PRINT));
-		pb(bc_chunk_new_no_args(INSTR_RETURN));
-		#undef pb
-		function = value_new_function(parameters, bytecode);
-	}
-	
-	#define pb(x) sb_push(bytecode, x)
-	BC_Chunk * bytecode = NULL;
-	pb(bc_chunk_new_no_args(INSTR_NOP));
-	pb(bc_chunk_new_push(value_new_integer(15)));
-	pb(bc_chunk_new_push(value_new_integer(4)));
-	pb(bc_chunk_new_no_args(INSTR_ADD));
-	pb(bc_chunk_new_no_args(INSTR_NEGATE));
-	pb(bc_chunk_new_bind("my_var"));
-	pb(bc_chunk_new_get("my_var"));
-	pb(bc_chunk_new_no_args(INSTR_PRINT));
-	pb(bc_chunk_new_push(function));
-	pb(bc_chunk_new_no_args(INSTR_CALL));
-	#undef pb
-
-	winter_machine_prime(wm, bytecode, sb_count(bytecode));
-	while (wm->running) {
-		winter_machine_step(wm);
-	}
-}
-
 // :\ Winter_Machine
-
-void vm_test()
-{
-	variable_map_test();
-	call_frame_test();
-	winter_machine_test();
-}

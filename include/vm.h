@@ -179,5 +179,3 @@ typedef struct Function {
 } Function;
 
 // :\ Function
-
-void vm_test();
