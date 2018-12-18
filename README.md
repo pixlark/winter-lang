@@ -27,7 +27,7 @@ func fibonacci(n) {
 	}
 }
 
-fibonacci(10)
+fibonacci(10);
 ```
 
 produces
