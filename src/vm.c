@@ -359,7 +359,12 @@ void winter_machine_step(Winter_Machine * wm)
 		Variable_Map * varmap = winter_machine_varmap(wm);
 		Value * var_storage = variable_map_index(varmap, instr.name);
 		if (!var_storage) {
-			fatal_assoc(chunk.assoc, "%s not bound", instr.name);
+			// Resort to looking in global scope
+			Variable_Map * global_varmap = &(wm->call_stack[0]->var_map);
+			var_storage = variable_map_index(global_varmap, instr.name);
+			if (!var_storage) {
+				fatal_assoc(chunk.assoc, "%s not bound", instr.name);
+			}
 		}
 		push(*var_storage);
 	} break;
