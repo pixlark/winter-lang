@@ -170,7 +170,7 @@ Expr * parse_prefix(Lexer * lexer)
 		expr->unary.operator = OP_NEGATE;
 		expr->unary.operand = parse_prefix(lexer);
 		return expr;
-	} else if (match('!')) {
+	} else if (is('!')) {
 		Assoc_Source as = token().assoc;
 		expect('!');
 		EXPR(EXPR_UNARY);

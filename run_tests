@@ -34,6 +34,7 @@ def lines(s):
 			collect = []
 			continue
 		collect.append(c)
+	yield ''.join(collect)
 
 def print_with_indent(string):
 	for line in lines(string):

@@ -32,3 +32,10 @@
 
 * DONE Bugs
 ** DONE A single ';' segfaults
+
+* TODO Tests
+** DONE Blank file
+** DONE Functions
+** DONE If-else if-else
+** DONE print
+** TODO operators
