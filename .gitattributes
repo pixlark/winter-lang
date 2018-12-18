@@ -1,2 +1,3 @@
 # Github Linguist
 *.h linguist-language=C
+*.w linguist-language=Winter
