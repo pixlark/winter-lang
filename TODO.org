@@ -18,8 +18,10 @@
 ** DONE If-statements
 *** DONE If
 *** DONE If-else and else
-** TODO While-loops
-** TODO For-loops
+** TODO Loops
+*** DONE Loops
+*** TODO While-loops
+*** TODO For-loops
 
 * DONE Functions
 ** DONE First-class functions
@@ -33,13 +35,16 @@
 * DONE Bugs
 ** DONE A single ';' segfaults
 
-* TODO Varmap propogation (look in enclosing scopes)
-# Note: Eventually we want to capture variables in varmaps rather than
-# backpropagate, because this enables closures.
+* TODO Closures
 
-* TODO Tests
+* TODO Dynamically allocated types
+** TODO Arrays
+** TODO Garbage Collection for arrays/functions
+
+* DONE Tests
 ** DONE Blank file
 ** DONE Functions
 ** DONE If-else if-else
 ** DONE print
-** TODO operators
+** DONE operators
+

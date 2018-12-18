@@ -1,0 +1,8 @@
+a = 10;
+
+func my_func() {
+	return a;
+}
+
+a = 5;
+print my_func();

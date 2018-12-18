@@ -47,14 +47,43 @@ void fatal(const char * fmt, ...)
 	exit(1);
 }
 
+void print_line(const char * start, const char * end)
+{
+	if (!end) {
+		end = start + strlen(start);
+	}
+	for (const char * p = start; p < end; p++) {
+		char c = *p;
+		if (c == '\t') {
+			fprintf(stderr, "    ");
+		} else {
+			fprintf(stderr, DIM("%c"), c);
+		}
+	}
+	fprintf(stderr, "\n");
+}
+
+void print_underline(size_t len, size_t position)
+{
+	for (int i = 0; i < position; i++) {
+		fprintf(stderr, " ");
+	}
+	for (int i = 0; i < len; i++) {
+		fprintf(stderr, RED("^"));
+	}
+}
+
 void print_assoc(Assoc_Source assoc)
 {
 	const char * pos = assoc.lexer->source + assoc.position;
 	// Peek back until line start
+	size_t tabs = 0;
 	const char * line_start = pos;
 	while (true) {
 		if (line_start == assoc.lexer->source) break;
-		if (*line_start == '\n') {
+		if (*line_start == '\t') {
+			tabs++;
+		} else if (*line_start == '\n') {
 			line_start++;
 			break;
 		}
@@ -62,13 +91,12 @@ void print_assoc(Assoc_Source assoc)
 	}
 	if (assoc.eof) {
 		// Print line
-		fprintf(stderr, "    " DIM("%s") "\n", line_start);
+		fprintf(stderr, "    ");
+		//DIM("%s") "\n", line_start);
+		print_line(line_start, NULL);
 		// Print underline
 		fprintf(stderr, "    ");
-		for (int i = 0; i < (pos - line_start) + 1; i++) {
-			fprintf(stderr, " ");
-		}
-		fprintf(stderr, RED("^"));
+		print_underline(1, (pos - line_start) + 1);
 	} else {
 		// Peek forwards until line end
 		const char * line_end = pos;
@@ -78,15 +106,13 @@ void print_assoc(Assoc_Source assoc)
 			line_end++;
 		}
 		// Print line
-		fprintf(stderr, "    " DIM("%.*s") "\n", line_end - line_start, line_start);
+		fprintf(stderr, "    ");
+		//fprintf(stderr, "    " DIM("%.*s") "\n", line_end - line_start, line_start);
+		print_line(line_start, line_end);
 		// Print underline
 		fprintf(stderr, "    ");
-		for (int i = 0; i < (pos - line_start); i++) {
-			fprintf(stderr, " ");
-		}
-		for (int i = 0; i < assoc.len; i++) {
-			fprintf(stderr, RED("^"));
-		}
+		size_t underline_pos = (pos - line_start - tabs) + (tabs * 4);
+		print_underline(assoc.len, underline_pos);
 	}
 
 	fprintf(stderr, "\n"); 
