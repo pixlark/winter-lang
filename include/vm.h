@@ -80,12 +80,19 @@ typedef struct {
 	bool cond;
 } Instr_Condjump;
 
+typedef struct {
+	int end_offset;
+} Instr_Set_Loop;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
 	INSTR_RETURN,
 	INSTR_PRINT,
 	INSTR_POP,
+	INSTR_LOOP_END,
+	INSTR_BREAK,
+	INSTR_CONTINUE,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
@@ -100,6 +107,7 @@ enum Instruction {
 	INSTR_CALL,
 	INSTR_JUMP,
 	INSTR_CONDJUMP,
+	INSTR_SET_LOOP,
 };
 
 // :\ Instruction
@@ -117,6 +125,7 @@ typedef struct {
 		Instr_Call instr_call;
 		Instr_Jump instr_jump;
 		Instr_Condjump instr_condjump;
+		Instr_Set_Loop instr_set_loop;
 	};
 	Assoc_Source assoc;
 } BC_Chunk;
@@ -128,6 +137,7 @@ BC_Chunk bc_chunk_new_get(const char * name);
 BC_Chunk bc_chunk_new_call(size_t arg_count);
 BC_Chunk bc_chunk_new_jump(int offset);
 BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
+BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
 
 void bc_chunk_print(BC_Chunk chunk);
 
@@ -140,9 +150,15 @@ void bc_chunk_print(BC_Chunk chunk);
 // in that function.
 
 typedef struct {
+	size_t start;
+	size_t end;
+} Loop;
+
+typedef struct {
 	Variable_Map var_map;
 	BC_Chunk * bytecode;
 	size_t ip;
+	Loop * loop_stack;
 } Call_Frame;
 
 Call_Frame * call_frame_alloc(BC_Chunk * bytecode);

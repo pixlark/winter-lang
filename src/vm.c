@@ -51,6 +51,7 @@ Call_Frame * call_frame_alloc(BC_Chunk * bytecode)
 	frame->var_map = variable_map_new();
 	frame->bytecode = bytecode;
 	frame->ip = 0;
+	frame->loop_stack = NULL;
 	return frame;
 }
 
@@ -123,6 +124,12 @@ BC_Chunk bc_chunk_new_condjump(int offset, bool cond)
 {
 	return (BC_Chunk) { INSTR_CONDJUMP,
 			.instr_condjump = (Instr_Condjump) { offset, cond } };
+}
+
+BC_Chunk bc_chunk_new_set_loop(size_t end_offset)
+{
+	return (BC_Chunk) { INSTR_SET_LOOP,
+			.instr_set_loop = (Instr_Set_Loop) { end_offset } };
 }
 
 void bc_chunk_print(BC_Chunk chunk)
@@ -225,6 +232,13 @@ bool winter_machine_reached_end(Winter_Machine * wm)
 	return frame->ip >= sb_count(frame->bytecode);
 }
 
+size_t winter_machine_ip(Winter_Machine * wm)
+{
+	internal_assert(sb_count(wm->call_stack) > 0);
+	Call_Frame * frame = sb_last(wm->call_stack);
+	return frame->ip;
+}
+
 void winter_machine_modify_ip(Winter_Machine * wm, int offset)
 {
 	internal_assert(sb_count(wm->call_stack) > 0);
@@ -274,7 +288,32 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_POP:
 		pop();
-		break;		
+		break;
+	case INSTR_LOOP_END: {
+		internal_assert(sb_count(wm->call_stack) > 0);
+		Call_Frame * frame = sb_last(wm->call_stack);
+		if (sb_count(frame->loop_stack) == 0) {
+			fatal_internal("LOOP_END instruction executed outside of loop");
+		}
+		Loop loop = sb_last(frame->loop_stack);
+		frame->ip = loop.start;
+	} break;
+	case INSTR_BREAK: {
+		Call_Frame * frame = sb_last(wm->call_stack);
+		if (sb_count(frame->loop_stack) == 0) {
+			fatal_assoc(chunk.assoc, "Can't use break in non-loop");
+		}
+		Loop loop = sb_last(frame->loop_stack);
+		frame->ip = loop.end;
+	} break;
+	case INSTR_CONTINUE: {
+		Call_Frame * frame = sb_last(wm->call_stack);
+		if (sb_count(frame->loop_stack) == 0) {
+			fatal_assoc(chunk.assoc, "Can't use continue in non-loop");
+		}
+		Loop loop = sb_last(frame->loop_stack);
+		frame->ip = loop.start;
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:
@@ -359,6 +398,16 @@ void winter_machine_step(Winter_Machine * wm)
 		if (condition._bool == instr.cond) {
 			winter_machine_modify_ip(wm, instr.jump_offset);
 		}
+	} break;
+	case INSTR_SET_LOOP: {
+		Instr_Set_Loop instr = chunk.instr_set_loop;
+		Loop new_loop = (Loop) { winter_machine_ip(wm),
+								 winter_machine_ip(wm) + instr.end_offset };
+		// TODO(pixlark): Redo all these convenience functions with a
+		// simple macro/function that grabs top frame
+		internal_assert(sb_count(wm->call_stack) > 0);
+		Call_Frame * frame = sb_last(wm->call_stack);
+		sb_push(frame->loop_stack, new_loop);
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

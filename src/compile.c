@@ -114,6 +114,20 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		}
 		sb_free(end_jumps);
 	} break;
+	case STMT_LOOP: {
+		PNOP(); // SET_LOOP placeholder
+		size_t loc = L();
+		compile_body(compiler, stmt->loop.body);
+		P(bc_chunk_new_no_args(INSTR_LOOP_END), stmt->assoc);
+		PNOP(); // Landing spot for loop end
+		A(loc, bc_chunk_new_set_loop(L()), stmt->assoc);
+	} break;
+	case STMT_BREAK:
+		P(bc_chunk_new_no_args(INSTR_BREAK), stmt->assoc);
+		break;
+	case STMT_CONTINUE:
+		P(bc_chunk_new_no_args(INSTR_CONTINUE), stmt->assoc);
+		break;
 	case STMT_FUNC_DECL: {
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
@@ -124,5 +138,7 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		P(bc_chunk_new_push(function), stmt->assoc);
 		P(bc_chunk_new_bind(stmt->func_decl.name), stmt->assoc);
 	} break;
+	default:
+		fatal_internal("A non-compileable statement reached the compilation phase");
 	}
 }

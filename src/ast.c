@@ -65,6 +65,12 @@ void deep_free(Stmt * stmt)
 		// Free else
 		deep_free_body(stmt->_if.else_body);
 		break;
+	case STMT_LOOP:
+		deep_free_body(stmt->loop.body);
+		break;
+	case STMT_BREAK:
+	case STMT_CONTINUE:
+		break;
 	case STMT_FUNC_DECL:
 		sb_free(stmt->func_decl.parameters);
 		deep_free_body(stmt->func_decl.body);

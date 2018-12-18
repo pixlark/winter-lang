@@ -84,9 +84,9 @@ def main():
 	for filename in source_files:
 		if as_output(filename) not in files:
 			print('No matching output file for {}'.format(filename))
+			exit(1)
 		with open(prefix + as_output(filename), 'rb') as outfile:
 			expected_output.append(outfile.read())
-
 
 	# Sort alphabetically
 	source_files, expected_output = tuple(zip(*sorted(zip(source_files,

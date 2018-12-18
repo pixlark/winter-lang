@@ -66,6 +66,9 @@ typedef enum {
 	STMT_PRINT,
 	STMT_RETURN,
 	STMT_IF,
+	STMT_LOOP,
+	STMT_BREAK,
+	STMT_CONTINUE,
 	STMT_FUNC_DECL,
 } Stmt_Type;
 
@@ -90,6 +93,9 @@ typedef struct Stmt {
 			struct Stmt *** bodies;
 			struct Stmt ** else_body;
 		} _if;
+		struct {
+			struct Stmt ** body;
+		} loop;
 		struct {
 			const char * name;
 			const char ** parameters;

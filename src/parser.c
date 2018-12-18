@@ -354,8 +354,8 @@ Stmt * parse_statement(Lexer * lexer)
 		Assoc_Source as = token().assoc;
 		expect(TOKEN_PRINT);
 		STMT(STMT_PRINT);
-		stmt->print.expr = parse_expression(lexer);
 		mark_stmt(stmt, as);
+		stmt->print.expr = parse_expression(lexer);
 		expect(';');
 		return stmt;
 	} else if (is(TOKEN_RETURN)) {
@@ -363,8 +363,8 @@ Stmt * parse_statement(Lexer * lexer)
 		Assoc_Source as = token().assoc;
 		expect(TOKEN_RETURN);
 		STMT(STMT_RETURN);
-		stmt->_return.expr = parse_expression(lexer);
 		mark_stmt(stmt, as);
+		stmt->_return.expr = parse_expression(lexer);
 		expect(';');
 		return stmt;
 	} else if (is(TOKEN_IF)) {
@@ -373,6 +373,27 @@ Stmt * parse_statement(Lexer * lexer)
 	} else if (is(TOKEN_FUNC)) {
 		// function declaration
 		return parse_function_declaration(lexer);
+	} else if (is(TOKEN_LOOP)) {
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_LOOP);
+		STMT(STMT_LOOP);
+		mark_stmt(stmt, as);
+		stmt->loop.body = parse_scope(lexer);
+		return stmt;
+	} else if (is(TOKEN_BREAK)) {
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_BREAK);
+		STMT(STMT_BREAK);
+		mark_stmt(stmt, as);
+		expect(';');
+		return stmt;
+	} else if (is(TOKEN_CONTINUE)) {
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_CONTINUE);
+		STMT(STMT_CONTINUE);
+		mark_stmt(stmt, as);
+		expect(';');
+		return stmt;
 	} else if (lexer_lookahead(lexer, 1).type == '=') {
 		// TODO(pixlark): Kluge.
 		/* Once we have l-expressions as a detailed thing, with

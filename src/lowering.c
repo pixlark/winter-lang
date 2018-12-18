@@ -129,6 +129,12 @@ void lower_statement(Stmt * stmt)
 		}
 		if (stmt->_if.else_body) lower_body(stmt->_if.else_body);
 		break;
+	case STMT_LOOP:
+		lower_body(stmt->loop.body);
+		break;
+	case STMT_BREAK:
+	case STMT_CONTINUE:
+		break;
 	case STMT_FUNC_DECL:
 		lower_body(stmt->func_decl.body);
 		break;
