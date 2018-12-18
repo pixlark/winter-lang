@@ -8,20 +8,39 @@ support both iterative and functional principles.
 ### Some example code
 
 ```
-func my_function(arg) {
-	if true {
-		print arg + 1;
-	} else {
-		print 0;
+func fibonacci(n) {
+	a = 0;
+	b = 1;
+	
+	i = 0;
+	loop {
+		i = i + 1;
+		if i > n {
+			break;
+		}
+		
+		print a;
+		
+		temp = b;
+		b = a + b;
+		a = temp;
 	}
 }
 
-x = my_function;
-x(1500);
+fibonacci(10)
 ```
 
 produces
 
 ```
-1501
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
 ```
