@@ -145,6 +145,24 @@ Value value_not(Value a)
 	return value_new_bool(!a._bool);
 }
 
+Value value_and(Value a, Value b)
+{
+	check_same_type();
+	if (a.type != VALUE_BOOL) {
+		fatal("Operation valid only for bools");
+	}
+	return value_new_bool(a._bool && b._bool);
+}
+
+Value value_or(Value a, Value b)
+{
+	check_same_type();
+	if (a.type != VALUE_BOOL) {
+		fatal("Operation valid only for bools");
+	}
+	return value_new_bool(a._bool || b._bool);
+}
+
 Value value_equal(Value a, Value b)
 {
 	check_same_type();

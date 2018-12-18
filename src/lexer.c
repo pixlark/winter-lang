@@ -17,6 +17,8 @@ const char * token_type_names[] = {
 	[TOKEN_BREAK] = "break",
 	[TOKEN_CONTINUE] = "continue",
 
+	[TOKEN_OR] = "or",
+	[TOKEN_AND] = "and",
 	[TOKEN_EQ] = "==",
 	[TOKEN_NE] = "!=",
 	[TOKEN_GTE] = ">=",
@@ -109,7 +111,8 @@ const char * keywords[] = {
 	"none", "true", "false",
 	"print", "return", "if",
 	"else", "func", "loop",
-	"break", "continue"
+	"break", "continue", "or",
+	"and",
 };
 
 size_t keyword_count = sizeof(keywords) / sizeof(const char *);
@@ -118,7 +121,8 @@ Token_Type keyword_tokens[] = {
 	TOKEN_NONE, TOKEN_TRUE, TOKEN_FALSE,
 	TOKEN_PRINT, TOKEN_RETURN, TOKEN_IF,
 	TOKEN_ELSE, TOKEN_FUNC, TOKEN_LOOP,
-	TOKEN_BREAK, TOKEN_CONTINUE
+	TOKEN_BREAK, TOKEN_CONTINUE, TOKEN_OR,
+	TOKEN_AND,
 };
 
 Token lexer_next_token(Lexer * lexer)

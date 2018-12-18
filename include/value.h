@@ -16,6 +16,8 @@ Value value_add(Value a, Value b);
 Value value_multiply(Value a, Value b);
 Value value_divide(Value a, Value b);
 Value value_not(Value a);
+Value value_and(Value a, Value b);
+Value value_or(Value a, Value b);
 Value value_equal(Value a, Value b);
 Value value_greater_than(Value a, Value b);
 Value value_less_than(Value a, Value b);

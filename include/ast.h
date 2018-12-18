@@ -17,6 +17,8 @@ typedef enum {
 	OP_LT,
 	OP_GTE,
 	OP_LTE,
+	OP_AND,
+	OP_OR,
 } Operator;
 
 // :\ Operator

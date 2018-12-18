@@ -20,6 +20,8 @@
 ** TODO Explicit casting
 ** TODO Coerced casting
 
+* TODO Asserts
+
 * TODO Control Structures
 ** DONE If-statements
 *** DONE If
@@ -38,9 +40,6 @@
 ** DONE Lexer
 ** DONE Parser
 
-* DONE Bugs
-** DONE A single ';' segfaults
-
 * TODO Closures
 
 * TODO Dynamically allocated types
@@ -54,3 +53,6 @@
 ** DONE print
 ** DONE operators
 
+* TODO Rewrite expression parser to do operator precedence without so many function levels
+
+* TODO Get assoc error from value.c somehow

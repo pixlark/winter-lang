@@ -34,6 +34,12 @@ void compile_operator(Compiler * compiler, Operator operator, Assoc_Source as)
 	case OP_LT:
 		P(bc_chunk_new_no_args(INSTR_LT), as);
 		break;
+	case OP_AND:
+		P(bc_chunk_new_no_args(INSTR_AND), as);
+		break;
+	case OP_OR:
+		P(bc_chunk_new_no_args(INSTR_OR), as);
+		break;
 	default:
 		fatal_internal("A non-compileable operator reached the compilation phase.");
 	}

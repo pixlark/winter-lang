@@ -102,6 +102,8 @@ enum Instruction {
 	INSTR_EQ,
 	INSTR_GT,
 	INSTR_LT,
+	INSTR_AND,
+	INSTR_OR,
 	// Args
 	INSTR_PUSH,
 	INSTR_BIND,

@@ -340,7 +340,16 @@ void winter_machine_step(Winter_Machine * wm)
 		Value a = pop();
 		push(value_less_than(a, b));
 	} break;
-
+	case INSTR_AND: {
+		Value b = pop();
+		Value a = pop();
+		push(value_and(a, b));		
+	} break;
+	case INSTR_OR: {
+		Value b = pop();
+		Value a = pop();
+		push(value_or(a, b));
+	} break;
 		// Args
 	case INSTR_PUSH: {
 		Instr_Push instr = chunk.instr_push;
