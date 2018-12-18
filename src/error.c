@@ -73,7 +73,7 @@ void print_assoc(Assoc_Source assoc)
 		// Peek forwards until line end
 		const char * line_end = pos;
 		while (true) {
-			if ((line_end - assoc.lexer->source) >= assoc.lexer->source_len - 1) break;
+			if ((line_end - assoc.lexer->source) >= assoc.lexer->source_len) break;
 			if (*line_end == '\n') break;
 			line_end++;
 		}
