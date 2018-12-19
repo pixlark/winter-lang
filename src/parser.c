@@ -200,8 +200,14 @@ Expr * parse_cast(Lexer * lexer)
 		case TOKEN_FLOAT:
 			expr->cast.type = VALUE_FLOAT;
 			break;
+		case TOKEN_BOOL:
+			expr->cast.type = VALUE_BOOL;
+			break;
 		case TOKEN_STRING:
 			expr->cast.type = VALUE_STRING;
+			break;
+		case TOKEN_FUNCTION:
+			expr->cast.type = VALUE_FUNCTION;
 			break;
 		default:
 			fatal_assoc(token().assoc,

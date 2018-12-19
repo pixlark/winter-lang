@@ -1,1 +1,1 @@
-print 5 as bool;
+print 1 as bool as int;

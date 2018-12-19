@@ -216,8 +216,10 @@ Value value_cast_integer(Value a, Value_Type type, Assoc_Source assoc)
 		return a;
 	case VALUE_FLOAT:
 		return value_new_float((float) a._integer);
+	case VALUE_BOOL:
+		return value_new_bool(a._integer);
 	default:
-		fatal_assoc(assoc, "Can't cast to given type");
+		fatal_assoc(assoc, "Can't cast integer to given type");
 	}
 }
 
@@ -229,7 +231,19 @@ Value value_cast_float(Value a, Value_Type type, Assoc_Source assoc)
 	case VALUE_FLOAT:
 		return a;
 	default:
-		fatal_assoc(assoc, "Can't cast to given type");
+		fatal_assoc(assoc, "Can't cast float to given type");
+	}
+}
+
+Value value_cast_bool(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_INTEGER:
+		return value_new_integer(a._bool ? 1 : 0);
+	case VALUE_BOOL:
+		return a;
+	default:
+		fatal_assoc(assoc, "Can't cast bool to given type");
 	}
 }
 
@@ -244,6 +258,7 @@ bool string_can_be_int(Winter_String s)
 	return true;
 }
 
+// TODO(pixlark): Cast to float
 Value value_cast_string(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
@@ -253,12 +268,20 @@ Value value_cast_string(Value a, Value_Type type, Assoc_Source assoc)
 		}
 		return value_new_integer(atoi(a._string.contents));
 	} break;
-	case VALUE_FLOAT:
-		break;
 	case VALUE_STRING:
 		return a;
 	default:
-		fatal_assoc(assoc, "Can't cast to given type");
+		fatal_assoc(assoc, "Can't cast string to given type");
+	}
+}
+
+Value value_cast_function(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_FUNCTION:
+		return a;
+	default:
+		fatal_assoc(assoc, "Can't cast function to given type");
 	}
 }
 
@@ -269,8 +292,12 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 		return value_cast_integer(a, type, assoc);
 	case VALUE_FLOAT:
 		return value_cast_float(a, type, assoc);
+	case VALUE_BOOL:
+		return value_cast_bool(a, type, assoc);
 	case VALUE_STRING:
 		return value_cast_string(a, type, assoc);
+	case VALUE_FUNCTION:
+		return value_cast_function(a, type, assoc);
 	default:
 		fatal_internal("Not all switch cases covered in value_cast");
 	}

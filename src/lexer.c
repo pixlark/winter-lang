@@ -20,7 +20,9 @@ const char * token_type_names[] = {
 	[TOKEN_AS] = "as",
 	[TOKEN_INT] = "int",
 	[TOKEN_FLOAT] = "float",
+	[TOKEN_BOOL] = "bool",
 	[TOKEN_STRING] = "string",
+	[TOKEN_FUNCTION] = "function",
 	
 	[TOKEN_OR] = "or",
 	[TOKEN_AND] = "and",
@@ -119,7 +121,8 @@ const char * keywords[] = {
 	"else",  "func",     "loop",
 	"break", "continue", "or",
 	"and",   "as",       "int",
-	"float", "string"
+	"float", "bool",     "string",
+	"function",
 };
 
 size_t keyword_count = sizeof(keywords) / sizeof(const char *);
@@ -130,7 +133,8 @@ Token_Type keyword_tokens[] = {
 	TOKEN_ELSE,  TOKEN_FUNC,     TOKEN_LOOP,
 	TOKEN_BREAK, TOKEN_CONTINUE, TOKEN_OR,
 	TOKEN_AND,   TOKEN_AS,       TOKEN_INT,
-	TOKEN_FLOAT, TOKEN_STRING,
+	TOKEN_FLOAT, TOKEN_BOOL,     TOKEN_STRING,
+	TOKEN_FUNCTION,
 };
 
 Token lexer_next_token(Lexer * lexer)
