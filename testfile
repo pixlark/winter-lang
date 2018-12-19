@@ -1,1 +1,3 @@
-print true and true;
+func my_function() {
+	print return;
+}

@@ -17,6 +17,11 @@ const char * token_type_names[] = {
 	[TOKEN_BREAK] = "break",
 	[TOKEN_CONTINUE] = "continue",
 
+	[TOKEN_AS] = "as",
+	[TOKEN_INT] = "int",
+	[TOKEN_FLOAT] = "float",
+	[TOKEN_STRING] = "string",
+	
 	[TOKEN_OR] = "or",
 	[TOKEN_AND] = "and",
 	[TOKEN_EQ] = "==",
@@ -27,6 +32,7 @@ const char * token_type_names[] = {
 	[TOKEN_NAME] = "<name>",
 	[TOKEN_INTEGER_LITERAL] = "<int>",
 	[TOKEN_FLOAT_LITERAL] = "<float>",
+	[TOKEN_STRING_LITERAL] = "<string>",
 };
 
 char * token_type_to_string(Token_Type type)
@@ -108,21 +114,23 @@ void lexer_advance_char(Lexer * lexer)
 #define next() (lexer_advance_char(lexer), lexer_peek(lexer))
 
 const char * keywords[] = {
-	"none", "true", "false",
-	"print", "return", "if",
-	"else", "func", "loop",
+	"none",  "true",     "false",
+	"print", "return",   "if",
+	"else",  "func",     "loop",
 	"break", "continue", "or",
-	"and",
+	"and",   "as",       "int",
+	"float", "string"
 };
 
 size_t keyword_count = sizeof(keywords) / sizeof(const char *);
 
 Token_Type keyword_tokens[] = {
-	TOKEN_NONE, TOKEN_TRUE, TOKEN_FALSE,
-	TOKEN_PRINT, TOKEN_RETURN, TOKEN_IF,
-	TOKEN_ELSE, TOKEN_FUNC, TOKEN_LOOP,
+	TOKEN_NONE,  TOKEN_TRUE,     TOKEN_FALSE,
+	TOKEN_PRINT, TOKEN_RETURN,   TOKEN_IF,
+	TOKEN_ELSE,  TOKEN_FUNC,     TOKEN_LOOP,
 	TOKEN_BREAK, TOKEN_CONTINUE, TOKEN_OR,
-	TOKEN_AND,
+	TOKEN_AND,   TOKEN_AS,       TOKEN_INT,
+	TOKEN_FLOAT, TOKEN_STRING,
 };
 
 Token lexer_next_token(Lexer * lexer)

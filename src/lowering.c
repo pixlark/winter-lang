@@ -86,6 +86,9 @@ void lower_operations_expr(Expr * expr)
 		lower_operations_expr(expr->binary.right);
 		lower_binary(expr);
 		break;
+	case EXPR_CAST:
+		lower_operations_expr(expr->cast.expr);
+		break;
 	default:
 		fatal_internal("An unlowerable expression reached lower_operations_expr");
 	}

@@ -70,6 +70,12 @@ void compile_expression(Compiler * compiler, Expr * expr)
 		compile_expression(compiler, expr->binary.right);
 		compile_operator(compiler, expr->binary.operator, expr->assoc);
 	} break;
+	case EXPR_CAST: {
+		compile_expression(compiler, expr->cast.expr);
+		P(bc_chunk_new_cast(expr->cast.type), expr->assoc);
+	} break;
+	default:
+		fatal_internal("A non-compileable expression reached the compilation phase.");
 	}
 }
 

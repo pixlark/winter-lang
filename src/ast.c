@@ -22,6 +22,9 @@ void deep_free_expr(Expr * expr)
 		deep_free_expr(expr->binary.left);
 		deep_free_expr(expr->binary.right);
 		break;
+	case EXPR_CAST:
+		deep_free_expr(expr->cast.expr);
+		break;
 	default:
 		fatal_internal("Can't free AST Expression!");
 		break;

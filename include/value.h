@@ -21,3 +21,4 @@ Value value_or(Value a, Value b);
 Value value_equal(Value a, Value b);
 Value value_greater_than(Value a, Value b);
 Value value_less_than(Value a, Value b);
+Value value_cast(Value a, Value_Type type);

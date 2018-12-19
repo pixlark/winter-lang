@@ -12,12 +12,12 @@
 
 * TODO Fill out operators
 ** DONE Math operators past +/-
-** TODO Boolean operators
+** DONE Boolean operators
 *** DONE Comparison
-*** TODO Gates
+*** DONE Gates
 
 * TODO Casting
-** TODO Explicit casting
+** DONE Explicit casting
 ** TODO Coerced casting
 
 * TODO Asserts
@@ -56,3 +56,7 @@
 * TODO Rewrite expression parser to do operator precedence without so many function levels
 
 * TODO Get assoc error from value.c somehow
+
+* TODO Valgrind it up
+
+* TODO String->Float casting

@@ -84,6 +84,10 @@ typedef struct {
 	int end_offset;
 } Instr_Set_Loop;
 
+typedef struct {
+	Value_Type type;
+} Instr_Cast;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
@@ -112,6 +116,7 @@ enum Instruction {
 	INSTR_JUMP,
 	INSTR_CONDJUMP,
 	INSTR_SET_LOOP,
+	INSTR_CAST,
 };
 
 // :\ Instruction
@@ -130,6 +135,7 @@ typedef struct {
 		Instr_Jump instr_jump;
 		Instr_Condjump instr_condjump;
 		Instr_Set_Loop instr_set_loop;
+		Instr_Cast instr_cast;
 	};
 	Assoc_Source assoc;
 } BC_Chunk;
@@ -142,6 +148,7 @@ BC_Chunk bc_chunk_new_call(size_t arg_count);
 BC_Chunk bc_chunk_new_jump(int offset);
 BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
 BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
+BC_Chunk bc_chunk_new_cast(Value_Type type);
 
 void bc_chunk_print(BC_Chunk chunk);
 

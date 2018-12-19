@@ -183,10 +183,43 @@ Expr * parse_prefix(Lexer * lexer)
 	}
 }
 
+// Precedence level 1.5
+Expr * parse_cast(Lexer * lexer)
+{
+	Expr * left = parse_prefix(lexer);
+	if (is(TOKEN_AS)) {
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_AS);
+		EXPR(EXPR_CAST);
+		mark_expr(expr, as);
+		expr->cast.expr = left;
+		switch (token().type) {
+		case TOKEN_INT:
+			expr->cast.type = VALUE_INTEGER;
+			break;
+		case TOKEN_FLOAT:
+			expr->cast.type = VALUE_FLOAT;
+			break;
+		case TOKEN_STRING:
+			expr->cast.type = VALUE_STRING;
+			break;
+		default:
+			fatal_assoc(token().assoc,
+						"Expected type, got %s instead",
+						token_to_string(lexer->token));
+			break;
+		}
+		advance();
+		return expr;
+	} else {
+		return left;
+	}
+}
+
 // Precedence level 2
 Expr * parse_mul_ops(Lexer * lexer)
 {
-	Expr * left = parse_prefix(lexer);
+	Expr * left = parse_cast(lexer);
 	if (is('*') || is('/')) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);

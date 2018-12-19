@@ -132,6 +132,11 @@ BC_Chunk bc_chunk_new_set_loop(size_t end_offset)
 			.instr_set_loop = (Instr_Set_Loop) { end_offset } };
 }
 
+BC_Chunk bc_chunk_new_cast(Value_Type type)
+{
+	return (BC_Chunk) { INSTR_CAST, .instr_cast = (Instr_Cast) { type } };
+}
+
 void bc_chunk_print(BC_Chunk chunk)
 {
 	const char * instr_names[] = {	
@@ -201,6 +206,7 @@ Winter_Machine * winter_machine_alloc()
 
 Value winter_machine_pop(Winter_Machine * wm)
 {
+	internal_assert(sb_count(wm->eval_stack) > 0);
 	return sb_pop(wm->eval_stack);
 }
 
@@ -416,6 +422,11 @@ void winter_machine_step(Winter_Machine * wm)
 		Call_Frame * frame = winter_machine_frame(wm);
 		Loop new_loop = (Loop) { frame->ip, frame->ip + instr.end_offset };
 		sb_push(frame->loop_stack, new_loop);
+	} break;
+	case INSTR_CAST: {
+		Instr_Cast instr = chunk.instr_cast;
+		Value to_cast = pop();
+		push(value_cast(to_cast, instr.type));
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");
