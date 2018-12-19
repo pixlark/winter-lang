@@ -187,7 +187,7 @@ Expr * parse_prefix(Lexer * lexer)
 Expr * parse_cast(Lexer * lexer)
 {
 	Expr * left = parse_prefix(lexer);
-	if (is(TOKEN_AS)) {
+	while (is(TOKEN_AS)) {
 		Assoc_Source as = token().assoc;
 		expect(TOKEN_AS);
 		EXPR(EXPR_CAST);
@@ -216,10 +216,9 @@ Expr * parse_cast(Lexer * lexer)
 			break;
 		}
 		advance();
-		return expr;
-	} else {
-		return left;
+		left = expr;
 	}
+	return left;
 }
 
 // Precedence level 2
