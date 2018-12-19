@@ -311,50 +311,50 @@ void winter_machine_step(Winter_Machine * wm)
 
 		// Operations
 	case INSTR_NEGATE:
-		push(value_negate(pop()));
+		push(value_negate(pop(), chunk.assoc));
 		break;
 	case INSTR_ADD: {
 		Value b = pop();
 		Value a = pop();
-		push(value_add(a, b));
+		push(value_add(a, b, chunk.assoc));
 	} break;
 	case INSTR_MULT: {
 		Value b = pop();
 		Value a = pop();
-		push(value_multiply(a, b));
+		push(value_multiply(a, b, chunk.assoc));
 	} break;
 	case INSTR_DIV: {
 		Value b = pop();
 		Value a = pop();
-		push(value_divide(a, b));
+		push(value_divide(a, b, chunk.assoc));
 	} break;
 	case INSTR_NOT:
-		push(value_not(pop()));
+		push(value_not(pop(), chunk.assoc));
 		break;
 	case INSTR_EQ: {
 		Value b = pop();
 		Value a = pop();
-		push(value_equal(a, b));
+		push(value_equal(a, b, chunk.assoc));
 	} break;
 	case INSTR_GT: {
 		Value b = pop();
 		Value a = pop();
-		push(value_greater_than(a, b));
+		push(value_greater_than(a, b, chunk.assoc));
 	} break;
 	case INSTR_LT: {
 		Value b = pop();
 		Value a = pop();
-		push(value_less_than(a, b));
+		push(value_less_than(a, b, chunk.assoc));
 	} break;
 	case INSTR_AND: {
 		Value b = pop();
 		Value a = pop();
-		push(value_and(a, b));		
+		push(value_and(a, b, chunk.assoc));		
 	} break;
 	case INSTR_OR: {
 		Value b = pop();
 		Value a = pop();
-		push(value_or(a, b));
+		push(value_or(a, b, chunk.assoc));
 	} break;
 		// Args
 	case INSTR_PUSH: {
@@ -426,7 +426,7 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_CAST: {
 		Instr_Cast instr = chunk.instr_cast;
 		Value to_cast = pop();
-		push(value_cast(to_cast, instr.type));
+		push(value_cast(to_cast, instr.type, chunk.assoc));
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

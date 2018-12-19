@@ -1,3 +1,1 @@
-func my_function() {
-	print return;
-}
+print 5 as bool;

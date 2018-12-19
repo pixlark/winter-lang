@@ -70,16 +70,15 @@ Value value_print(Value value)
 	}
 }
 
-// TODO(pixlark): These errors should instead propagate up and be handled by the VM
-#define fatal_given_type() fatal("Not valid on given type");
+#define fatal_given_type() fatal_assoc(assoc, "Not valid on given type");
 #define check_same_type()												\
 	do {																\
 		if (a.type != b.type) {											\
-			fatal("Operation must be used on two of the same type");	\
+			fatal_assoc(assoc, "Operation must be used on two of the same type"); \
 		}																\
 	} while (false)
 
-Value value_negate(Value a)
+Value value_negate(Value a, Assoc_Source assoc)
 {
 	switch (a.type) {
 	case VALUE_INTEGER:
@@ -93,7 +92,7 @@ Value value_negate(Value a)
 	}
 }
 
-Value value_add(Value a, Value b)
+Value value_add(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	switch (a.type) {
@@ -108,7 +107,7 @@ Value value_add(Value a, Value b)
 	}
 }
 
-Value value_multiply(Value a, Value b)
+Value value_multiply(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	switch (a.type) {
@@ -123,7 +122,7 @@ Value value_multiply(Value a, Value b)
 	}	
 }
 
-Value value_divide(Value a, Value b)
+Value value_divide(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	switch (a.type) {
@@ -139,33 +138,33 @@ Value value_divide(Value a, Value b)
 	}	
 }
 
-Value value_not(Value a)
+Value value_not(Value a, Assoc_Source assoc)
 {
 	if (a.type != VALUE_BOOL) {
-		fatal("Operation valid only for bools");
+		fatal_assoc(assoc, "Operation valid only for bools");
 	}
 	return value_new_bool(!a._bool);
 }
 
-Value value_and(Value a, Value b)
+Value value_and(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	if (a.type != VALUE_BOOL) {
-		fatal("Operation valid only for bools");
+		fatal_assoc(assoc, "Operation valid only for bools");
 	}
 	return value_new_bool(a._bool && b._bool);
 }
 
-Value value_or(Value a, Value b)
+Value value_or(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	if (a.type != VALUE_BOOL) {
-		fatal("Operation valid only for bools");
+		fatal_assoc(assoc, "Operation valid only for bools");
 	}
 	return value_new_bool(a._bool || b._bool);
 }
 
-Value value_equal(Value a, Value b)
+Value value_equal(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	switch (a.type) {
@@ -180,7 +179,7 @@ Value value_equal(Value a, Value b)
 	}
 }
 
-Value value_greater_than(Value a, Value b)
+Value value_greater_than(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	switch (a.type) {
@@ -195,7 +194,7 @@ Value value_greater_than(Value a, Value b)
 	}
 }
 
-Value value_less_than(Value a, Value b)
+Value value_less_than(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
 	switch (a.type) {
@@ -210,7 +209,7 @@ Value value_less_than(Value a, Value b)
 	}
 }
 
-Value value_cast_integer(Value a, Value_Type type)
+Value value_cast_integer(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
 	case VALUE_INTEGER:
@@ -218,11 +217,11 @@ Value value_cast_integer(Value a, Value_Type type)
 	case VALUE_FLOAT:
 		return value_new_float((float) a._integer);
 	default:
-		fatal("Can't cast to given type");
+		fatal_assoc(assoc, "Can't cast to given type");
 	}
 }
 
-Value value_cast_float(Value a, Value_Type type)
+Value value_cast_float(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
 	case VALUE_INTEGER:
@@ -230,7 +229,7 @@ Value value_cast_float(Value a, Value_Type type)
 	case VALUE_FLOAT:
 		return a;
 	default:
-		fatal("Can't cast to given type");
+		fatal_assoc(assoc, "Can't cast to given type");
 	}
 }
 
@@ -245,12 +244,12 @@ bool string_can_be_int(Winter_String s)
 	return true;
 }
 
-Value value_cast_string(Value a, Value_Type type)
+Value value_cast_string(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
 	case VALUE_INTEGER: {
 		if (!string_can_be_int(a._string)) {
-			fatal("String not in integer form");
+			fatal_assoc(assoc, "String not in integer form");
 		}
 		return value_new_integer(atoi(a._string.contents));
 	} break;
@@ -259,21 +258,21 @@ Value value_cast_string(Value a, Value_Type type)
 	case VALUE_STRING:
 		return a;
 	default:
-		fatal("Can't cast to given type");
+		fatal_assoc(assoc, "Can't cast to given type");
 	}
 }
 
-Value value_cast(Value a, Value_Type type)
+Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (a.type) {
 	case VALUE_INTEGER:
-		return value_cast_integer(a, type);
+		return value_cast_integer(a, type, assoc);
 	case VALUE_FLOAT:
-		return value_cast_float(a, type);
+		return value_cast_float(a, type, assoc);
 	case VALUE_STRING:
-		return value_cast_string(a, type);
+		return value_cast_string(a, type, assoc);
 	default:
-		fatal("Not all switch cases covered in value_cast");
+		fatal_internal("Not all switch cases covered in value_cast");
 	}
 }
 
