@@ -7,3 +7,5 @@ print 5 >= 5;
 print 3.2 < 16.0;
 print 16.0 <= 3.2;
 print !false;
+print 3 - 2 + 1;
+print 3 + 5 * 2;

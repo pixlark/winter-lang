@@ -226,7 +226,7 @@ Expr * parse_cast(Lexer * lexer)
 Expr * parse_mul_ops(Lexer * lexer)
 {
 	Expr * left = parse_cast(lexer);
-	if (is('*') || is('/')) {
+	while (is('*') || is('/')) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
 		mark_expr(expr, as);
@@ -240,18 +240,17 @@ Expr * parse_mul_ops(Lexer * lexer)
 		}
 		advance();
 		expr->binary.left = left;
-		expr->binary.right = parse_mul_ops(lexer);
-		return expr;
-	} else {
-		return left;
+		expr->binary.right = parse_cast(lexer);
+		left = expr;
 	}
+	return left;
 }
 
 // Precedence level 3
 Expr * parse_add_ops(Lexer * lexer)
 {
 	Expr * left = parse_mul_ops(lexer);
-	if (is('+') || is('-')) {
+	while (is('+') || is('-')) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
 		mark_expr(expr, as);
@@ -265,11 +264,10 @@ Expr * parse_add_ops(Lexer * lexer)
 		}
 		advance();
 		expr->binary.left = left;
-		expr->binary.right = parse_add_ops(lexer);
-		return expr;
-	} else {
-		return left;
+		expr->binary.right = parse_mul_ops(lexer);
+		left = expr;
 	}
+	return left;
 }
 
 bool is_comp_op(Token_Type t)
@@ -283,7 +281,7 @@ bool is_comp_op(Token_Type t)
 Expr * parse_comp_ops(Lexer * lexer)
 {
 	Expr * left = parse_add_ops(lexer);
-	if (is_comp_op(token().type)) {
+	while (is_comp_op(token().type)) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
 		mark_expr(expr, as);
@@ -303,18 +301,17 @@ Expr * parse_comp_ops(Lexer * lexer)
 		}
 		advance();
 		expr->binary.left = left;
-		expr->binary.right = parse_comp_ops(lexer);
-		return expr;
-	} else {
-		return left;
+		expr->binary.right = parse_add_ops(lexer);
+		left = expr;
 	}
+	return left;
 }
 
 // Precedence level 5
 Expr * parse_eq_ops(Lexer * lexer)
 {
 	Expr * left = parse_comp_ops(lexer);
-	if (is(TOKEN_EQ) || is(TOKEN_NE)) {
+	while (is(TOKEN_EQ) || is(TOKEN_NE)) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
 		mark_expr(expr, as);
@@ -328,44 +325,44 @@ Expr * parse_eq_ops(Lexer * lexer)
 		}
 		advance();
 		expr->binary.left = left;
-		expr->binary.right = parse_eq_ops(lexer);
-	} else {
-		return left;
+		expr->binary.right = parse_comp_ops(lexer);
+		left = expr;
 	}
+	return left;
 }
 
 // Precedence level 6
 Expr * parse_and(Lexer * lexer)
 {
 	Expr * left = parse_eq_ops(lexer);
-	if (is(TOKEN_AND)) {
+	while (is(TOKEN_AND)) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
 		mark_expr(expr, as);
 		advance();
 		expr->binary.operator = OP_AND;
 		expr->binary.left = left;
-		expr->binary.right = parse_and(lexer);
-	} else {
-		return left;
+		expr->binary.right = parse_eq_ops(lexer);
+		left = expr;
 	}
+	return left;
 }
 
 // Precedence level 7
 Expr * parse_or(Lexer * lexer)
 {
 	Expr * left = parse_and(lexer);
-	if (is(TOKEN_OR)) {
+	while (is(TOKEN_OR)) {
 		Assoc_Source as = token().assoc;
 		EXPR(EXPR_BINARY);
 		mark_expr(expr, as);
 		advance();
 		expr->binary.operator = OP_OR;
 		expr->binary.left = left;
-		expr->binary.right = parse_or(lexer);
-	} else {
-		return left;
+		expr->binary.right = parse_and(lexer);
+		left = expr;
 	}
+	return left;
 }
 
 Expr * parse_expression(Lexer * lexer)
