@@ -3,6 +3,8 @@
 
 #include <ctype.h>
 
+const char * lexer_dup_range(Lexer * lexer, size_t start, size_t end); // lazy
+
 const char * token_type_names[] = {
 	[TOKEN_EOF] = "EOF",
 	[TOKEN_NONE] = "none",
@@ -176,7 +178,6 @@ Token lexer_next_token(Lexer * lexer)
 				Token token;
 				token.type = keyword_tokens[i];
 				token.assoc = assoc_source_new(lexer, lexer->line, start, end - start);
-				free((char*) name);
 				return token;
 			}
 		}
@@ -203,7 +204,7 @@ Token lexer_next_token(Lexer * lexer)
 			next_char = lexer_peek(lexer);
 		}
 		size_t end = lexer->position;
-		const char * to_convert = lexer_intern_range(lexer, start, end);
+		const char * to_convert = lexer_dup_range(lexer, start, end);
 		if (has_decimal_point) {
 			// Float literal
 			Token token;
@@ -317,10 +318,12 @@ Token lexer_lookahead(Lexer * lexer, size_t lookahead)
 	return peeked_token;
 }
 
-const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
+int lexer_intern_fetch(Lexer * lexer, size_t start, size_t end)
 {
 	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
 		const char * str = lexer->interned_strings[i];
+		if (strlen(str) != end - start) continue; // Assert same length
+		
 		bool matches = true;
 		for (int j = start; j < end; j++) {
 			if (lexer->source[j] != str[j - start]) {
@@ -329,14 +332,30 @@ const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
 			}
 		}
 		if (matches) {
-			return str;
+			return i;
 		}
 	}
-	// Not already interned
+	return -1;
+}
+
+const char * lexer_dup_range(Lexer * lexer, size_t start, size_t end)
+{
 	char * intern = malloc(end - start + 1);
 	intern[end - start] = '\0';
 	strncpy(intern, lexer->source + start, end - start);
+	return intern;
+}
+
+const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
+{
+	int index = lexer_intern_fetch(lexer, start, end);
+	if (index != -1) {
+		return lexer->interned_strings[index];
+	}
+	// Not already interned
+	const char * intern = lexer_dup_range(lexer, start, end);
 	sb_push(lexer->interned_strings, intern);
+	return intern;
 }
 
 const char * lexer_intern_string(Lexer * lexer, const char * str)

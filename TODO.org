@@ -57,6 +57,6 @@
 
 * TODO Miscellaneous
 ** TODO Rewrite expression parser to do operator precedence without so many function levels
-** TODO Get assoc error from value.c somehow
+** DONE Get assoc error from value.c somehow
 ** TODO Valgrind it up
 ** TODO String->Float casting
