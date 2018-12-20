@@ -10,7 +10,7 @@
 * DONE Better error messages
 ** DONE Line numbers
 
-* TODO Fill out operators
+* DONE Fill out operators
 ** DONE Math operators past +/-
 ** DONE Boolean operators
 *** DONE Comparison
@@ -40,7 +40,7 @@
 ** DONE Lexer
 ** DONE Parser
 
-* TODO Closures
+* DONE Closures
 
 * TODO Dynamically allocated types
 ** TODO Arrays
@@ -58,5 +58,7 @@
 * TODO Miscellaneous
 ** TODO Rewrite expression parser to do operator precedence without so many function levels
 ** DONE Get assoc error from value.c somehow
-** TODO Valgrind it up
+** DONE Valgrind it up
 ** TODO String->Float casting
+
+* TODO Internal compiler errors should include file/line

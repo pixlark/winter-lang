@@ -39,6 +39,7 @@ Value value_new_function(const char * name, const char ** parameters, BC_Chunk *
 	func->name = name;
 	func->parameters = parameters;
 	func->bytecode = bytecode;
+	func->closure = variable_map_new();
 	return (Value) {
 		VALUE_FUNCTION, ._function = func
 	};

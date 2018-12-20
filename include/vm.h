@@ -47,6 +47,10 @@ typedef struct {
 	Value ** values;
 } Variable_Map;
 
+Variable_Map variable_map_new();
+Value * variable_map_index(Variable_Map * map, const char * name);
+void variable_map_update(Variable_Map * map, const char * name, Value value);
+
 // :\ Variable_Map
 
 // : Instruction
@@ -97,6 +101,7 @@ enum Instruction {
 	INSTR_LOOP_END,
 	INSTR_BREAK,
 	INSTR_CONTINUE,
+	INSTR_CLOSURE,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
@@ -208,6 +213,7 @@ void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode);
 typedef struct Function {
 	const char * name;
 	const char ** parameters; // sb
+	Variable_Map closure;
 	BC_Chunk * bytecode;
 } Function;
 

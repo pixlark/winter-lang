@@ -41,6 +41,16 @@ void variable_map_update(Variable_Map * map, const char * name, Value value)
 	}
 }
 
+// note: NOT a deep copy
+Variable_Map variable_map_copy(Variable_Map map)
+{
+	Variable_Map nmap = variable_map_new();
+	nmap.size = map.size;
+	nmap.names = sb_copy(map.names);
+	nmap.values = sb_copy(map.values);
+	return nmap;
+}
+
 // :\ Variable_Map
 
 // : Call_Frame
@@ -60,6 +70,8 @@ void call_frame_free(Call_Frame * frame)
 	// What do we need to deallocate? Anything which can't be used by
 	// the program anymore...
 
+	// Ok, we can't do any of this until we have a garbage collector
+	
 	/* Because functions are first-class, we have to treat them like
 	   any other kind of reference object, which means that we can't
 	   clean up their data deterministically like this. The eventual
@@ -74,11 +86,12 @@ void call_frame_free(Call_Frame * frame)
 			free(storage->_function);
 		}
 		}*/
-	
+
+	/*
 	// 2. Variables that have fallen out of scope should have their space deallocated
 	for (int i = 0; i < frame->var_map.size; i++) {
 		free(frame->var_map.values[i]);
-	}
+		}*/
 
 	// 3. The frame itself should be deallocated
 	free(frame);
@@ -137,6 +150,7 @@ BC_Chunk bc_chunk_new_cast(Value_Type type)
 	return (BC_Chunk) { INSTR_CAST, .instr_cast = (Instr_Cast) { type } };
 }
 
+#if 0
 void bc_chunk_print(BC_Chunk chunk)
 {
 	const char * instr_names[] = {	
@@ -185,6 +199,7 @@ void bc_chunk_print(BC_Chunk chunk)
 		break;
 	}
 }
+#endif
 
 // :\ BC_Chunk
 
@@ -308,6 +323,15 @@ void winter_machine_step(Winter_Machine * wm)
 		Loop loop = sb_last(frame->loop_stack);
 		frame->ip = loop.start;
 	} break;
+	case INSTR_CLOSURE: {
+		Value value = pop();
+		if (value.type != VALUE_FUNCTION) {
+			fatal_internal("Tried to close on something that's not a function");
+		}
+		Function * function = value._function;
+		function->closure = variable_map_copy(winter_machine_frame(wm)->var_map);
+		push(value);
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:
@@ -392,6 +416,8 @@ void winter_machine_step(Winter_Machine * wm)
 			fatal_assoc(chunk.assoc, "Wrong number of arguments to function");
 		}
 		Call_Frame * frame = call_frame_alloc(func.bytecode);
+		// Start off varmap with closure
+		frame->var_map = variable_map_copy(func.closure);
 		// Push arguments into varmap
 		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
 			Value arg = pop();

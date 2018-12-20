@@ -154,6 +154,7 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 											sb_copy(stmt->func_decl.parameters),
 											decl_compiler.bytecode);
 		P(bc_chunk_new_push(function), stmt->assoc);
+		P(bc_chunk_new_no_args(INSTR_CLOSURE), stmt->assoc);
 		P(bc_chunk_new_bind(stmt->func_decl.name), stmt->assoc);
 	} break;
 	default:
