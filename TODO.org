@@ -1,3 +1,5 @@
+* TODO Garbage Collection
+
 * DONE String interning
 
 * DONE Extend type system

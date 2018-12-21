@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "common.h"
 #include "compile.h"
+#include "gc.h"
 #include "lexer.h"
 #include "lowering.h"
 #include "parser.h"
@@ -22,6 +23,8 @@ char * load_string_from_file(char * path)
 
 int main(int argc, char ** argv)
 {
+	global_init(); // Initialize garbage collector
+	
 	if (argc != 2) {
 		fatal("Provide one source file");
 	}
