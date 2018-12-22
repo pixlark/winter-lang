@@ -342,7 +342,8 @@ void winter_machine_step(Winter_Machine * wm)
 		} else {
 			// In function
 			// Inferred return, return and push none to the eval stack
-			push(value_none());			
+			push(value_none());
+			winter_machine_return_refcounts(wm);
 			winter_machine_pop_call_stack(wm);
 		}
 	}
