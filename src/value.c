@@ -66,7 +66,10 @@ Value value_print(Value value)
 		break;
 	case VALUE_FUNCTION:
 		//printf("<function at %p>\n", value._function);
-		printf("<function at %p; refcount %d>\n", value._function, gc_get_refcount(value._function));
+		printf("<function at %p; refcount %d; name %s>\n",
+			   value._function,
+			   gc_get_refcount(value._function),
+			   value._function->name);
 		break;
 	default:
 		fatal_internal("Tried to print a value with no implemented print routine");

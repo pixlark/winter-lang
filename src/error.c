@@ -154,3 +154,15 @@ void _internal_assert(bool cond, const char * file, size_t line)
 		exit(1);
 	}
 }
+
+void dbprintf(const char * fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+
+	#if DEBUG_PRINTS
+	vprintf(fmt, args);
+	#endif
+
+	va_end(args);
+}

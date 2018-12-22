@@ -55,9 +55,11 @@ Variable_Map variable_map_copy(Variable_Map map)
 
 void variable_map_print(Variable_Map map)
 {
+	#if DEBUG_PRINTS
 	for (int i = 0; i < sb_count(map.values); i++) {
 		value_print(*map.values[i]);
 	}
+	#endif
 }
 
 // :\ Variable_Map
@@ -159,6 +161,12 @@ BC_Chunk bc_chunk_new_cast(Value_Type type)
 	return (BC_Chunk) { INSTR_CAST, .instr_cast = (Instr_Cast) { type } };
 }
 
+BC_Chunk bc_chunk_new_create_function(const char * name, const char ** parameters, BC_Chunk * bytecode)
+{
+	Instr_Create_Function instr = (Instr_Create_Function) { name, parameters, bytecode };
+	return (BC_Chunk) { INSTR_CREATE_FUNCTION, .instr_create_function = instr };
+}
+
 void bc_chunk_print(BC_Chunk chunk)
 {
 	const char * instr_names[] = {	
@@ -190,8 +198,11 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_CONDJUMP] = "CONDJUMP",
 		[INSTR_SET_LOOP] = "SET_LOOP",
 		[INSTR_CAST] = "CAST",
+
+		[INSTR_CREATE_FUNCTION] = "CREATE_FUNCTION",
 	};
-	
+
+	#if DEBUG_PRINTS
 	printf("%s: ", instr_names[chunk.instr]);
 	switch (chunk.instr) {
 	case INSTR_PUSH:
@@ -215,15 +226,16 @@ void bc_chunk_print(BC_Chunk chunk)
 		printf("\r%s    \n", instr_names[chunk.instr]);
 		break;
 	}
+	#endif
 }
 
 // :\ BC_Chunk
 
 // : Value Refcount
 
-void value_modify_refcount(Value * value, int change)
+void value_modify_refcount(Value value, int change)
 {
-	switch (value->type) {
+	switch (value.type) {
 	case VALUE_NONE:
 		break;
 	case VALUE_INTEGER:
@@ -235,7 +247,7 @@ void value_modify_refcount(Value * value, int change)
 	case VALUE_STRING:
 		break;
 	case VALUE_FUNCTION:
-		gc_modify_refcount(value->_function, change);
+		gc_modify_refcount(value._function, change);
 		break;
 	default:
 		fatal_internal("Switch statement in value_modify_refcount not complete");
@@ -260,14 +272,14 @@ Winter_Machine * winter_machine_alloc()
 Value winter_machine_pop(Winter_Machine * wm)
 {
 	internal_assert(sb_count(wm->eval_stack) > 0);
-	value_modify_refcount(&sb_last(wm->eval_stack), -1);
+	value_modify_refcount(sb_last(wm->eval_stack), -1);
 	return sb_pop(wm->eval_stack);
 }
 
 void winter_machine_push(Winter_Machine * wm, Value value)
 {
 	sb_push(wm->eval_stack, value);
-	value_modify_refcount(&sb_last(wm->eval_stack), +1);
+	value_modify_refcount(sb_last(wm->eval_stack), +1);
 }
 
 #define pop() winter_machine_pop(wm)
@@ -301,14 +313,25 @@ Call_Frame * winter_machine_frame(Winter_Machine * wm)
 
 void winter_machine_print_eval_stack(Winter_Machine * wm)
 {
+	#if DEBUG_PRINTS
 	for (int i = sb_count(wm->eval_stack) - 1; i >= 0; i--) {
 		value_print(wm->eval_stack[i]);
+	}
+	#endif
+}
+
+void winter_machine_return_refcounts(Winter_Machine * wm)
+{
+	// Decrease reference count for every variable in varmap
+	Call_Frame * frame = winter_machine_frame(wm);
+	for (int i = 0; i < frame->var_map.size; i++) {
+		value_modify_refcount(*frame->var_map.values[i], -1);
 	}
 }
 
 void winter_machine_step(Winter_Machine * wm)
 {
-	printf("\n");
+	dbprintf("\n");
 	
 	if (winter_machine_reached_end(wm)) {
 		internal_assert(sb_count(wm->call_stack) > 0);
@@ -319,7 +342,7 @@ void winter_machine_step(Winter_Machine * wm)
 		} else {
 			// In function
 			// Inferred return, return and push none to the eval stack
-			push(value_none());
+			push(value_none());			
 			winter_machine_pop_call_stack(wm);
 		}
 	}
@@ -333,8 +356,8 @@ void winter_machine_step(Winter_Machine * wm)
 	}
 
 	bc_chunk_print(chunk);
-	printf("...\n");
-	//printf("! ! ! Executing line %d\n", chunk.assoc.line);
+	dbprintf("...\n");
+	//dbprintf("! ! ! Executing line %d\n", chunk.assoc.line);
 	
 	switch (chunk.instr) {
 		// No args
@@ -344,6 +367,7 @@ void winter_machine_step(Winter_Machine * wm)
 		if (sb_count(wm->call_stack) == 0) {
 			fatal_assoc(chunk.assoc, "Can't return from global scope");
 		}
+		winter_machine_return_refcounts(wm);
 		winter_machine_pop_call_stack(wm);
 	} break;
 	case INSTR_PRINT: {
@@ -442,8 +466,8 @@ void winter_machine_step(Winter_Machine * wm)
 		Instr_Bind instr = chunk.instr_bind;
 		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
 		Value value = pop();
-		Value * storage = variable_map_update(varmap, instr.name, value);
-		value_modify_refcount(storage, 1);
+		value_modify_refcount(value, 1);
+		variable_map_update(varmap, instr.name, value);
 	} break;
 	case INSTR_GET: {
 		Instr_Get instr = chunk.instr_get;
@@ -477,9 +501,9 @@ void winter_machine_step(Winter_Machine * wm)
 			Value arg = pop();
 			variable_map_update(&(frame->var_map), func.parameters[i], arg);
 		}
-		// If the function is non-anonymous, push function itself into varmap (recursion)
-		if (func.name) {
-			variable_map_update(&(frame->var_map), func.name, func_val);
+		// Bump refcount for all variables in new varmap
+		for (int i = 0; i < frame->var_map.size; i++) {
+			value_modify_refcount(*frame->var_map.values[i], 1);
 		}
 		sb_push(wm->call_stack, frame);
 	} break;
@@ -508,26 +532,33 @@ void winter_machine_step(Winter_Machine * wm)
 		Value to_cast = pop();
 		push(value_cast(to_cast, instr.type, chunk.assoc));
 	} break;
+		// Creation of dynamically allocated values
+	case INSTR_CREATE_FUNCTION: {
+		Instr_Create_Function instr = chunk.instr_create_function;
+		Value func = value_new_function(instr.name, instr.parameters, instr.bytecode);
+		push(func);
+	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");
 	}
-	
-	printf("-- Eval Stack --\n");
+
+	dbprintf("Frame %d\n", sb_count(wm->call_stack) - 1);
+	dbprintf("-- Eval Stack --\n");
 	winter_machine_print_eval_stack(wm);
 	
-	printf("-- Var Map --\n");
+	dbprintf("-- Var Map --\n");
 	variable_map_print(sb_last(wm->call_stack)->var_map);
 	
 	// Garbage collection
 	if (wm->cycles_since_collection >= 0) {
-		printf("-- Collecting --\n");
+		dbprintf("-- Collecting --\n");
 		global_collect();
 		wm->cycles_since_collection = 0;
 	} else {
 		wm->cycles_since_collection += 1;
 	}
 
-	printf("\n");
+	dbprintf("\n");
 }
 
 void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode)

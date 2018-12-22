@@ -60,6 +60,8 @@ Value * variable_map_update(Variable_Map * map, const char * name, Value value);
 // struct in the BC_Chunk union, or has no arguments, in which case
 // there is no associated struct.
 
+typedef struct BC_Chunk BC_Chunk;
+
 typedef struct {
 	Value value;
 } Instr_Push;
@@ -93,6 +95,12 @@ typedef struct {
 	Value_Type type;
 } Instr_Cast;
 
+typedef struct {
+	const char * name;
+	const char ** parameters;
+	BC_Chunk * bytecode;	
+} Instr_Create_Function;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
@@ -123,6 +131,8 @@ enum Instruction {
 	INSTR_CONDJUMP,
 	INSTR_SET_LOOP,
 	INSTR_CAST,
+	// Creation of dynamically allocated values
+	INSTR_CREATE_FUNCTION,
 };
 
 // :\ Instruction
@@ -131,7 +141,7 @@ enum Instruction {
 
 // A chunk of bytecode representing a single instruction
 
-typedef struct {
+struct BC_Chunk {
 	enum Instruction instr;
 	union {
 		Instr_Push instr_push;
@@ -142,9 +152,10 @@ typedef struct {
 		Instr_Condjump instr_condjump;
 		Instr_Set_Loop instr_set_loop;
 		Instr_Cast instr_cast;
+		Instr_Create_Function instr_create_function;
 	};
 	Assoc_Source assoc;
-} BC_Chunk;
+};
 
 BC_Chunk bc_chunk_new_no_args(enum Instruction instr);
 BC_Chunk bc_chunk_new_push(Value value);
@@ -155,6 +166,7 @@ BC_Chunk bc_chunk_new_jump(int offset);
 BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
 BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
 BC_Chunk bc_chunk_new_cast(Value_Type type);
+BC_Chunk bc_chunk_new_create_function(const char * name, const char ** parameters, BC_Chunk * bytecode);
 
 void bc_chunk_print(BC_Chunk chunk);
 

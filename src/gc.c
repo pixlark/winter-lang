@@ -48,11 +48,11 @@ void gc_collect(GC * gc)
 	// Free all refcount zero or less
 	for (int i = 0; i < sb_count(gc->allocations); i++) {
 		int32_t refcount = gc_get_refcount_internal(gc->allocations[i]);
-		printf("%p refcount: %d\n", gc->allocations[i], refcount);
+		dbprintf("%p refcount: %d\n", gc->allocations[i], refcount);
 		if (refcount > 0) {
 			sb_push(new_allocations, gc->allocations[i]);
 		} else {
-			printf("Freeing %p (external: %p)\n", gc->allocations[i], (uint8_t*) gc->allocations[i] + ALIGNMENT);
+			dbprintf("Freeing %p (external: %p)\n", gc->allocations[i], (uint8_t*) gc->allocations[i] + ALIGNMENT);
 			free(gc->allocations[i]);
 		}
 	}

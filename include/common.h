@@ -8,3 +8,5 @@
 
 #include "stretchy_buffer.h"
 #include "error.h"
+
+#define DEBUG_PRINTS false

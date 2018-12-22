@@ -1,0 +1,1441 @@
+
+CREATE_FUNCTION: CREATE_FUNCTION    
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb1598; refcount 1; name outer>
+-- Var Map --
+-- Collecting --
+0x5567cabb1590 refcount: 1
+
+
+CLOSURE: CLOSURE    
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb1598; refcount 1; name outer>
+-- Var Map --
+-- Collecting --
+0x5567cabb1590 refcount: 1
+
+
+BIND: outer
+...
+Frame 0
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+
+
+
+PUSH: 1
+...
+Frame 0
+-- Eval Stack --
+1
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+
+
+GET: outer
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb1598; refcount 2; name outer>
+1
+-- Var Map --
+<function at 0x5567cabb1598; refcount 2; name outer>
+-- Collecting --
+0x5567cabb1590 refcount: 2
+
+
+CALL: 1
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+
+
+CREATE_FUNCTION: CREATE_FUNCTION    
+...
+Frame 1
+-- Eval Stack --
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Var Map --
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+CLOSURE: CLOSURE    
+...
+Frame 1
+-- Eval Stack --
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Var Map --
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+BIND: inner_1
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+CREATE_FUNCTION: CREATE_FUNCTION    
+...
+Frame 1
+-- Eval Stack --
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+CLOSURE: CLOSURE    
+...
+Frame 1
+-- Eval Stack --
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+BIND: inner_2
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+GET: a
+...
+Frame 1
+-- Eval Stack --
+1
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+PUSH: 0
+...
+Frame 1
+-- Eval Stack --
+0
+1
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+GT: GT    
+...
+Frame 1
+-- Eval Stack --
+true
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+CONDJUMP: 4 if false
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 1
+
+
+GET: inner_1
+...
+Frame 1
+-- Eval Stack --
+<function at 0x5567cabb2048; refcount 2; name inner_1>
+-- Var Map --
+1
+<function at 0x5567cabb2048; refcount 2; name inner_1>
+<function at 0x5567cabb20e8; refcount 1; name inner_2>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 2
+0x5567cabb20e0 refcount: 1
+
+
+RETURN: RETURN    
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb20e0 refcount: 0
+Freeing 0x5567cabb20e0 (external: 0x5567cabb20e8)
+
+
+BIND: f
+...
+Frame 0
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+
+PUSH: 1
+...
+Frame 0
+-- Eval Stack --
+1
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+GET: f
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb2048; refcount 2; name inner_1>
+1
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 2; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 2
+
+
+CALL: 1
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+1
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+GET: x
+...
+Frame 1
+-- Eval Stack --
+1
+-- Var Map --
+1
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+PUSH: 1
+...
+Frame 1
+-- Eval Stack --
+1
+1
+-- Var Map --
+1
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 1
+-- Eval Stack --
+2
+-- Var Map --
+1
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+PRINT: PRINT    
+...
+2
+Frame 1
+-- Eval Stack --
+-- Var Map --
+1
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+POP: POP    
+...
+Frame 0
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+
+
+
+CREATE_FUNCTION: CREATE_FUNCTION    
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 1; name triangle>
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+CLOSURE: CLOSURE    
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 1; name triangle>
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+BIND: triangle
+...
+Frame 0
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb48d8; refcount 1; name triangle>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+
+PUSH: 5
+...
+Frame 0
+-- Eval Stack --
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb48d8; refcount 1; name triangle>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: triangle
+...
+Frame 0
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 2; name triangle>
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+<function at 0x5567cabb48d8; refcount 2; name triangle>
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 2
+
+
+CALL: 1
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 1
+-- Eval Stack --
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 1
+-- Eval Stack --
+1
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+EQ: EQ    
+...
+Frame 1
+-- Eval Stack --
+false
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+CONDJUMP: 4 if false
+...
+Frame 1
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 1
+-- Eval Stack --
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 1
+-- Eval Stack --
+5
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 1
+-- Eval Stack --
+1
+5
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+NEGATE: NEGATE    
+...
+Frame 1
+-- Eval Stack --
+-1
+5
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 1
+-- Eval Stack --
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: triangle
+...
+Frame 1
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 2; name triangle>
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+5
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 2
+
+
+CALL: 1
+...
+Frame 2
+-- Eval Stack --
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 2
+-- Eval Stack --
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 2
+-- Eval Stack --
+1
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+EQ: EQ    
+...
+Frame 2
+-- Eval Stack --
+false
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+CONDJUMP: 4 if false
+...
+Frame 2
+-- Eval Stack --
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 2
+-- Eval Stack --
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 2
+-- Eval Stack --
+4
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 2
+-- Eval Stack --
+1
+4
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+NEGATE: NEGATE    
+...
+Frame 2
+-- Eval Stack --
+-1
+4
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 2
+-- Eval Stack --
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: triangle
+...
+Frame 2
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 2; name triangle>
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+4
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 2
+
+
+CALL: 1
+...
+Frame 3
+-- Eval Stack --
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 3
+-- Eval Stack --
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 3
+-- Eval Stack --
+1
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+EQ: EQ    
+...
+Frame 3
+-- Eval Stack --
+false
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+CONDJUMP: 4 if false
+...
+Frame 3
+-- Eval Stack --
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 3
+-- Eval Stack --
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 3
+-- Eval Stack --
+3
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 3
+-- Eval Stack --
+1
+3
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+NEGATE: NEGATE    
+...
+Frame 3
+-- Eval Stack --
+-1
+3
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 3
+-- Eval Stack --
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: triangle
+...
+Frame 3
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 2; name triangle>
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+3
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 2
+
+
+CALL: 1
+...
+Frame 4
+-- Eval Stack --
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 4
+-- Eval Stack --
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 4
+-- Eval Stack --
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+EQ: EQ    
+...
+Frame 4
+-- Eval Stack --
+false
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+CONDJUMP: 4 if false
+...
+Frame 4
+-- Eval Stack --
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 4
+-- Eval Stack --
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 4
+-- Eval Stack --
+2
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 4
+-- Eval Stack --
+1
+2
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+NEGATE: NEGATE    
+...
+Frame 4
+-- Eval Stack --
+-1
+2
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 4
+-- Eval Stack --
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: triangle
+...
+Frame 4
+-- Eval Stack --
+<function at 0x5567cabb48d8; refcount 2; name triangle>
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 2
+
+
+CALL: 1
+...
+Frame 5
+-- Eval Stack --
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+GET: x
+...
+Frame 5
+-- Eval Stack --
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 5
+-- Eval Stack --
+1
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+EQ: EQ    
+...
+Frame 5
+-- Eval Stack --
+true
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+CONDJUMP: 4 if false
+...
+Frame 5
+-- Eval Stack --
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+PUSH: 1
+...
+Frame 5
+-- Eval Stack --
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 1; name outer>
+<function at 0x5567cabb2048; refcount 1; name inner_1>
+1
+-- Collecting --
+0x5567cabb1590 refcount: 1
+0x5567cabb2040 refcount: 1
+0x5567cabb48d0 refcount: 1
+
+
+RETURN: RETURN    
+...
+Frame 4
+-- Eval Stack --
+1
+2
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount 0; name outer>
+<function at 0x5567cabb2048; refcount 0; name inner_1>
+2
+-- Collecting --
+0x5567cabb1590 refcount: 0
+Freeing 0x5567cabb1590 (external: 0x5567cabb1598)
+0x5567cabb2040 refcount: 0
+Freeing 0x5567cabb2040 (external: 0x5567cabb2048)
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 4
+-- Eval Stack --
+3
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691760; name outer>
+<function at 0x5567cabb2048; refcount -893708928; name inner_1>
+2
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+RETURN: RETURN    
+...
+Frame 3
+-- Eval Stack --
+3
+3
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691761; name outer>
+<function at 0x5567cabb2048; refcount -893708929; name inner_1>
+3
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 3
+-- Eval Stack --
+6
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691761; name outer>
+<function at 0x5567cabb2048; refcount -893708929; name inner_1>
+3
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+RETURN: RETURN    
+...
+Frame 2
+-- Eval Stack --
+6
+4
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691762; name outer>
+<function at 0x5567cabb2048; refcount -893708930; name inner_1>
+4
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 2
+-- Eval Stack --
+10
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691762; name outer>
+<function at 0x5567cabb2048; refcount -893708930; name inner_1>
+4
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+RETURN: RETURN    
+...
+Frame 1
+-- Eval Stack --
+10
+5
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691763; name outer>
+<function at 0x5567cabb2048; refcount -893708931; name inner_1>
+5
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+ADD: ADD    
+...
+Frame 1
+-- Eval Stack --
+15
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691763; name outer>
+<function at 0x5567cabb2048; refcount -893708931; name inner_1>
+5
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+RETURN: RETURN    
+...
+Frame 0
+-- Eval Stack --
+15
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691764; name outer>
+<function at 0x5567cabb2048; refcount -893708932; name inner_1>
+<function at 0x5567cabb48d8; refcount 1; name triangle>
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
+PRINT: PRINT    
+...
+15
+Frame 0
+-- Eval Stack --
+-- Var Map --
+<function at 0x5567cabb1598; refcount -893691764; name outer>
+<function at 0x5567cabb2048; refcount -893708932; name inner_1>
+<function at 0x5567cabb48d8; refcount 1; name triangle>
+-- Collecting --
+0x5567cabb48d0 refcount: 1
+
+
