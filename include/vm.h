@@ -50,7 +50,7 @@ typedef struct {
 
 Variable_Map variable_map_new();
 Value * variable_map_index(Variable_Map * map, const char * name);
-void variable_map_update(Variable_Map * map, const char * name, Value value);
+Value * variable_map_update(Variable_Map * map, const char * name, Value value);
 
 // :\ Variable_Map
 

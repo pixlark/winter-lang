@@ -18,43 +18,38 @@ size_t gc_allocations(GC * gc)
 
 void * gc_alloc(GC * gc, size_t size)
 {
-	uint8_t * allocation = malloc(size + ALIGNMENT);
-	sb_push(gc->allocations, allocation);
-	return (void*) (allocation + ALIGNMENT); // Hide mark bit
+	int32_t * allocation = malloc(size + ALIGNMENT);
+	*allocation = 0; // Zero refcount by default
+	sb_push(gc->allocations, (void*) allocation);
+	return (void*) ((char*) allocation + ALIGNMENT); // Hide reference count
 }
 
-void gc_unmark_all(GC * gc)
+// On external-facing pointer
+void gc_modify_refcount(void * ptr, int change)
 {
-	for (int i = 0; i < sb_count(gc->allocations); i++) {
-		((uint8_t*) gc->allocations[i])[0] = 0;
-	}
+	int32_t * refcount = (int32_t*) ((char*) ptr - ALIGNMENT);
+	*refcount += change;
 }
 
-void gc_mark_external(void * external_ptr)
+int32_t gc_get_refcount(void * ptr)
 {
-	// Turn external into internal
-	uint8_t * internal_ptr = (uint8_t*) external_ptr - ALIGNMENT;
-	// Mark
-	internal_ptr[0] = 1;
+	return *((int32_t*) ((char*) ptr - ALIGNMENT));
 }
 
-bool is_marked(void * ptr)
+// On internal-facing pointer
+int32_t gc_get_refcount_internal(void * ptr)
 {
-	uint8_t * u8_ptr = (uint8_t*) ptr;
-	return u8_ptr[0];
-}
-
-bool is_marked_external(void * ptr)
-{
-	return is_marked((uint8_t*) ptr - ALIGNMENT);
+	return *((int32_t*) ptr);
 }
 
 void gc_collect(GC * gc)
 {
 	void ** new_allocations = NULL;
-	// Free all unmarked allocations
+	// Free all refcount zero or less
 	for (int i = 0; i < sb_count(gc->allocations); i++) {
-		if (is_marked(gc->allocations[i])) {
+		int32_t refcount = gc_get_refcount_internal(gc->allocations[i]);
+		printf("%p refcount: %d\n", gc->allocations[i], refcount);
+		if (refcount > 0) {
 			sb_push(new_allocations, gc->allocations[i]);
 		} else {
 			printf("Freeing %p (external: %p)\n", gc->allocations[i], (uint8_t*) gc->allocations[i] + ALIGNMENT);
@@ -72,6 +67,7 @@ void gc_collect(GC * gc)
 #include "vm.h"
 #include "value.h"
 
+#if 0
 void mark_var_map(Variable_Map var_map);
 void mark_value(Value value);
 
@@ -122,22 +118,6 @@ void mark_var_map(Variable_Map var_map)
 		mark_value(*var_map.values[i]);
 	}
 }
-
-void winter_machine_garbage_collect(Winter_Machine * wm)
-{
-	//printf("--- Collecting ---\n");
-	global_unmark_all();
-	// Mark all variables on the eval stack
-	for (int i = 0; i < sb_count(wm->eval_stack); i++) {
-		Value value = wm->eval_stack[i];
-		mark_value(value);
-	}
-	// Mark all bound variables
-	for (int i = 0; i < sb_count(wm->call_stack); i++) {
-		Call_Frame * frame = wm->call_stack[i];
-		mark_var_map(frame->var_map);
-	}
-	global_collect();
-}
+#endif
 
 // :\ Winter_Machine

@@ -16,13 +16,12 @@ void global_init();
 size_t gc_allocations(GC * gc);
 #define global_allocations() gc_allocations(&global_gc)
 
-void * gc_alloc(GC * gc, size_t sizen);
+void * gc_alloc(GC * gc, size_t size);
 #define global_alloc(size) gc_alloc(&global_gc, (size))
 
-void gc_unmark_all(GC * gc);
-#define global_unmark_all() gc_unmark_all(&global_gc)
+void gc_modify_refcount(void * ptr, int change);
 
-void gc_mark_external(void * external_ptr);
+int32_t gc_get_refcount(void * ptr);
 
 void gc_collect(GC * gc);
 #define global_collect() gc_collect(&global_gc)

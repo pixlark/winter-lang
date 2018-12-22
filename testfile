@@ -1,7 +1,5 @@
 func a() {
-	func b() {
-		 print "b()";
-	}
+	 func b() {
+	 	  
+	 }
 }
-
-a();
