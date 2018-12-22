@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+// : GC
+
 typedef struct {
 	void ** allocations;
 } GC;
@@ -10,6 +12,9 @@ typedef struct {
 extern GC global_gc;
 
 void global_init();
+
+size_t gc_allocations(GC * gc);
+#define global_allocations() gc_allocations(&global_gc)
 
 void * gc_alloc(GC * gc, size_t sizen);
 #define global_alloc(size) gc_alloc(&global_gc, (size))
@@ -21,3 +26,6 @@ void gc_mark_external(void * external_ptr);
 
 void gc_collect(GC * gc);
 #define global_collect() gc_collect(&global_gc)
+
+// :\ GC
+

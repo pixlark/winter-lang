@@ -1,5 +1,6 @@
 #include "common.h"
 #include "value.h"
+#include "gc.h"
 
 #include <ctype.h>
 
@@ -35,7 +36,7 @@ Value value_new_string(const char * s)
 
 Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode)
 {
-	Function * func = malloc(sizeof(Function));
+	Function * func = global_alloc(sizeof(Function));
 	func->name = name;
 	func->parameters = parameters;
 	func->bytecode = bytecode;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "gc.h"
 
 // : Struct prototypes
 
@@ -186,21 +187,18 @@ Call_Frame * call_frame_alloc(BC_Chunk * bytecode);
 // The central virtual machine that runs Winter bytecode
 
 typedef struct {
-	/*
-	Variable_Map global_var_map;
-	BC_Chunk * bytecode;
-	size_t bytecode_len;
-	size_t ip;*/
-
 	Call_Frame ** call_stack;
 	Value * eval_stack;
 	
 	bool running;
+
+	size_t cycles_since_collection;
 } Winter_Machine;
 
 Winter_Machine * winter_machine_alloc();
 void winter_machine_step(Winter_Machine * wm);
 void winter_machine_prime(Winter_Machine * wm, BC_Chunk * bytecode);
+void winter_machine_garbage_collect(Winter_Machine * wm); // Defined in gc.c... should it be?
 
 // :\ Winter_Machine
 

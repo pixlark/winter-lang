@@ -208,14 +208,11 @@ void bc_chunk_print(BC_Chunk chunk)
 Winter_Machine * winter_machine_alloc()
 {
 	Winter_Machine * wm = malloc(sizeof(Winter_Machine));
-	/*
-	wm->global_var_map = variable_map_new();
-	wm->bytecode = NULL;
-	wm->ip = 0;*/
 	wm->eval_stack = NULL;
 	wm->call_stack = NULL;
 	sb_push(wm->call_stack, call_frame_alloc(NULL));
 	wm->running = false;
+	wm->cycles_since_collection = 0;
 	return wm;
 }
 
@@ -260,7 +257,7 @@ Call_Frame * winter_machine_frame(Winter_Machine * wm)
 }
 
 void winter_machine_step(Winter_Machine * wm)
-{
+{	
 	if (winter_machine_reached_end(wm)) {
 		internal_assert(sb_count(wm->call_stack) > 0);
 		if (sb_count(wm->call_stack) == 1) {
@@ -282,6 +279,8 @@ void winter_machine_step(Winter_Machine * wm)
 		Call_Frame * this_frame = winter_machine_frame(wm);
 		chunk = this_frame->bytecode[this_frame->ip++];
 	}
+
+	//printf("! ! ! Executing line %d\n", chunk.assoc.line);
 	
 	switch (chunk.instr) {
 		// No args
@@ -456,6 +455,14 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");
+	}
+
+	// Garbage collection
+	if (wm->cycles_since_collection >= 0) {
+		winter_machine_garbage_collect(wm);
+		wm->cycles_since_collection = 0;
+	} else {
+		wm->cycles_since_collection += 1;
 	}
 }
 
