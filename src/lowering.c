@@ -119,9 +119,6 @@ void lower_statement(Stmt * stmt)
 	case STMT_ASSIGN:
 		lower_expression(stmt->assign.expr);
 		break;
-	case STMT_PRINT:
-		lower_expression(stmt->print.expr);
-		break;
 	case STMT_RETURN:
 		lower_expression(stmt->_return.expr);
 		break;

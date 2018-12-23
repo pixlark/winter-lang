@@ -154,7 +154,6 @@ void bc_chunk_print(BC_Chunk chunk)
 	const char * instr_names[] = {	
 		[INSTR_NOP] = "NOP",
 		[INSTR_RETURN] = "RETURN",
-		[INSTR_PRINT] = "PRINT",
 		[INSTR_POP] = "POP",
 		[INSTR_LOOP_END] = "LOOP_END",
 		[INSTR_BREAK] = "BREAK",
@@ -332,9 +331,6 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		winter_machine_return(wm);
 	} break;
-	case INSTR_PRINT: {
-		value_print(pop());
-	} break;
 	case INSTR_POP:
 		pop();
 		break;
@@ -447,27 +443,43 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_CALL: {
 		Value func_val = pop();
-		if (func_val.type != VALUE_FUNCTION) {
+		Instr_Call instr = chunk.instr_call;
+		if (func_val.type == VALUE_FUNCTION) {
+			Function func = *(func_val._function);
+			if (sb_count(func.parameters) != instr.arg_count) {
+				fatal_assoc(chunk.assoc, "Wrong number of arguments to function");
+			}
+			Call_Frame * frame = call_frame_alloc(func.bytecode);
+			// Start off varmap with closure
+			frame->var_map = variable_map_copy(func.closure);
+			// Push arguments into varmap
+			for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
+				Value arg = pop();
+				variable_map_update(&(frame->var_map), func.parameters[i], arg);
+			}
+			// Bump refcount for all variables in new varmap
+			for (int i = 0; i < frame->var_map.size; i++) {
+				value_modify_refcount(*frame->var_map.values[i], 1);
+			}
+			sb_push(wm->call_stack, frame);	
+		} else if (func_val.type == VALUE_BUILTIN) {
+			Builtin builtin = func_val._builtin;
+			if (builtin_arg_counts[builtin] != -1) {
+				if (builtin_arg_counts[builtin] != instr.arg_count) {
+					fatal_assoc(chunk.assoc, "Wrong number of arguments to builtin function %s",
+								builtin_names[builtin]);
+				}
+			}
+			Value * args = malloc(sizeof(Value) * instr.arg_count);
+			for (int i = 0; i < instr.arg_count; i++) {
+				args[instr.arg_count - i - 1] = pop();
+			}
+			Value ret = builtin_functions[builtin](args, instr.arg_count);
+			free(args);
+			push(ret);
+		} else {
 			fatal_assoc(chunk.assoc, "Type not callable");
 		}
-		Function func = *(func_val._function);
-		Instr_Call instr = chunk.instr_call;
-		if (sb_count(func.parameters) != instr.arg_count) {
-			fatal_assoc(chunk.assoc, "Wrong number of arguments to function");
-		}
-		Call_Frame * frame = call_frame_alloc(func.bytecode);
-		// Start off varmap with closure
-		frame->var_map = variable_map_copy(func.closure);
-		// Push arguments into varmap
-		for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
-			Value arg = pop();
-			variable_map_update(&(frame->var_map), func.parameters[i], arg);
-		}
-		// Bump refcount for all variables in new varmap
-		for (int i = 0; i < frame->var_map.size; i++) {
-			value_modify_refcount(*frame->var_map.values[i], 1);
-		}
-		sb_push(wm->call_stack, frame);
 	} break;
 	case INSTR_JUMP: {
 		Instr_Jump instr = chunk.instr_jump;

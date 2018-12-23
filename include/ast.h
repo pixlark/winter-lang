@@ -93,9 +93,6 @@ typedef struct Stmt {
 		} assign;
 		struct {
 			Expr * expr;
-		} print;
-		struct {
-			Expr * expr;
 		} _return;
 		struct {
 			Expr ** conditions;

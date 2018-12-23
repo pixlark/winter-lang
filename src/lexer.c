@@ -1,5 +1,6 @@
-#include "common.h"
 #include "lexer.h"
+
+#include "common.h"
 
 #include <ctype.h>
 
@@ -66,7 +67,6 @@ const char * token_type_names[] = {
 	[TOKEN_NONE] = "none",
 	[TOKEN_TRUE] = "true",
 	[TOKEN_FALSE] = "false",
-	[TOKEN_PRINT] = "print",
 	[TOKEN_RETURN] = "return",
 	[TOKEN_IF] = "if",
 	[TOKEN_ELSE] = "else",
@@ -90,6 +90,7 @@ const char * token_type_names[] = {
 	[TOKEN_LTE] = "<=",
 
 	[TOKEN_NAME] = "<name>",
+	[TOKEN_BUILTIN] = "<builtin>",
 	[TOKEN_INTEGER_LITERAL] = "<int>",
 	[TOKEN_FLOAT_LITERAL] = "<float>",
 	[TOKEN_STRING_LITERAL] = "<string>",
@@ -119,6 +120,11 @@ char * token_to_string(Token token)
 	case TOKEN_NAME: {
 		char buffer[512];
 		sprintf(buffer, "name: '%s'", token.name);
+		return strdup(buffer);
+	} break;
+	case TOKEN_BUILTIN: {
+		char buffer[512];
+		sprintf(buffer, "builtin: %s", builtin_names[token.builtin]);
 		return strdup(buffer);
 	} break;
 	case TOKEN_INTEGER_LITERAL: {
@@ -205,7 +211,7 @@ Token lexer_lookahead(Lexer * lexer, size_t lookahead)
 
 const char * keywords[] = {
 	"none",  "true",     "false",
-	"print", "return",   "if",
+	/*print*/"return",   "if",
 	"else",  "func",     "loop",
 	"break", "continue", "or",
 	"and",   "as",       "int",
@@ -217,7 +223,7 @@ size_t keyword_count = sizeof(keywords) / sizeof(const char *);
 
 Token_Type keyword_tokens[] = {
 	TOKEN_NONE,  TOKEN_TRUE,     TOKEN_FALSE,
-	TOKEN_PRINT, TOKEN_RETURN,   TOKEN_IF,
+	/* print */  TOKEN_RETURN,   TOKEN_IF,
 	TOKEN_ELSE,  TOKEN_FUNC,     TOKEN_LOOP,
 	TOKEN_BREAK, TOKEN_CONTINUE, TOKEN_OR,
 	TOKEN_AND,   TOKEN_AS,       TOKEN_INT,
@@ -263,6 +269,16 @@ Token lexer_next_token(Lexer * lexer)
 			if (strcmp(name, keywords[i]) == 0) {
 				Token token;
 				token.type = keyword_tokens[i];
+				token.assoc = assoc_source_new(lexer, lexer->line, start, end - start);
+				return token;
+			}
+		}
+		// Check against builtins
+		for (int i = 0; i < NUM_BUILTINS; i++) {
+			if (strcmp(name, builtin_names[i]) == 0) {
+				Token token;
+				token.type = TOKEN_BUILTIN;
+				token.builtin = i;
 				token.assoc = assoc_source_new(lexer, lexer->line, start, end - start);
 				return token;
 			}

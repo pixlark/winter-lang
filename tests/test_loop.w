@@ -6,13 +6,13 @@ loop {
         break;
     }
     
-    print "hello";
+    print("hello");
 }
 
 i = 0;
 loop {
     i = i + 1;
     if i == 4 { continue; }
-    print i;
+    print(i);
     if i == 10 { break; }
 }

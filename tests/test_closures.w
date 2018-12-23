@@ -12,5 +12,5 @@ i = 0;
 loop {
     if i >= 5 { break; }
     i = i + 1;
-    print x();
+    print(x());
 }

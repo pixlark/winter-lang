@@ -9,7 +9,7 @@ func fibonacci(n) {
 			break;
 		}
 		
-		print a;
+		print(a);
 		
 		temp = b;
 		b = a + b;

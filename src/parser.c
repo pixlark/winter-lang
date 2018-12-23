@@ -127,6 +127,13 @@ Expr * parse_atom(Lexer * lexer)
 		advance();		
 		return expr;
 	} break;
+	case TOKEN_BUILTIN: {
+		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
+		expr->atom.value = value_new_builtin(token.builtin);
+		advance();
+		return expr;
+	} break;
 	default: {
 		printf("");
 		fatal_assoc(token().assoc,
@@ -469,16 +476,7 @@ Stmt * parse_statement(Lexer * lexer)
 {
 	if (is(TOKEN_EOF)) return NULL;
 	
-	if (is(TOKEN_PRINT)) {
-		// print
-		Assoc_Source as = token().assoc;
-		expect(TOKEN_PRINT);
-		STMT(STMT_PRINT);
-		mark_stmt(stmt, as);
-		stmt->print.expr = parse_expression(lexer);
-		expect(';');
-		return stmt;
-	} else if (is(TOKEN_RETURN)) {
+	if (is(TOKEN_RETURN)) {
 		// return
 		Assoc_Source as = token().assoc;
 		expect(TOKEN_RETURN);

@@ -54,9 +54,6 @@ void deep_free(Stmt * stmt)
 	case STMT_ASSIGN:
 		deep_free_expr(stmt->assign.expr);
 		break;
-	case STMT_PRINT:
-		deep_free_expr(stmt->print.expr);
-		break;
 	case STMT_RETURN:
 		deep_free_expr(stmt->_return.expr);
 		break;

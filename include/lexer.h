@@ -1,6 +1,7 @@
 #pragma once
 
 #include "error.h"
+#include "builtin.h"
 
 typedef struct Lexer Lexer;
 
@@ -10,7 +11,6 @@ typedef enum {
 	TOKEN_NONE,
 	TOKEN_TRUE,
 	TOKEN_FALSE,
-	TOKEN_PRINT,
 	TOKEN_RETURN,
 	TOKEN_IF,
 	TOKEN_ELSE,
@@ -34,6 +34,7 @@ typedef enum {
 	TOKEN_LTE,
 	
 	TOKEN_NAME,
+	TOKEN_BUILTIN,
 	TOKEN_INTEGER_LITERAL,
 	TOKEN_FLOAT_LITERAL,
 	TOKEN_STRING_LITERAL,
@@ -45,6 +46,7 @@ typedef struct {
 	Token_Type type;
 	union {
 		const char * name;
+		Builtin builtin;
 		int integer_literal;
 		float float_literal;
 		const char * string_literal;

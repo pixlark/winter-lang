@@ -4,7 +4,7 @@ func a() {
 	 func b() {
          func c() {
              func d() {
-                 print x;
+                 print(x);
              }
              d();
          }

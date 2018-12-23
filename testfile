@@ -1,7 +1,1 @@
-func a() {
-	func b() {
-        print "b()";
-    }
-}
-
-a();
+print("hello", 15, 12);

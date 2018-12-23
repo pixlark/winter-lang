@@ -108,10 +108,6 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		compile_expression(compiler, stmt->assign.expr);
 		P(bc_chunk_new_bind(stmt->assign.name), stmt->assoc);
 		break;
-	case STMT_PRINT:
-		compile_expression(compiler, stmt->print.expr);
-		P(bc_chunk_new_no_args(INSTR_PRINT), stmt->assoc);
-		break;
 	case STMT_RETURN:
 		compile_expression(compiler, stmt->_return.expr);
 		P(bc_chunk_new_no_args(INSTR_RETURN), stmt->assoc);

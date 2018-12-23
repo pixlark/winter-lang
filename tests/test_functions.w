@@ -1,9 +1,9 @@
 func outer(a) {
     func inner_1(x) {
-        print x + 1;
+        print(x + 1);
     }
     func inner_2(x) {
-        print x - 1;
+        print(x - 1);
     }
     if a > 0 {
         return inner_1;
@@ -23,4 +23,4 @@ func triangle(x) {
      }
 }
 
-print triangle(5);
+print(triangle(5));

@@ -1,10 +1,10 @@
 func ordering(a, b, c) {
 	if a > b {
-	    print "a > b";
+	    print("a > b");
     } else if b > c {
-        print "b > c";
+        print("b > c");
     } else {
-        print "c > b > a";
+        print("c > b > a");
     }
 }
 

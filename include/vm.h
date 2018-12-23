@@ -2,44 +2,8 @@
 
 #include "common.h"
 #include "gc.h"
-
-// : Struct prototypes
-
-typedef struct Function Function;
-
-// :\ Struct prototypes
-
-// : Value
-
-// This is declared here rather than in value.h to avoid circular
-// dependency problems.
-
-typedef enum {
-	VALUE_NONE,
-	VALUE_INTEGER,
-	VALUE_FLOAT,
-	VALUE_BOOL,
-	VALUE_STRING,
-	VALUE_FUNCTION,
-} Value_Type;
-
-typedef struct {
-	size_t len;
-	const char * contents;
-} Winter_String;
-
-typedef struct {
-	Value_Type type;
-	union {
-		int _integer;
-		float _float;
-		bool _bool;
-		Winter_String _string;
-		Function * _function;
-	};
-} Value;
-
-// :\ Value
+#include "builtin.h"
+#include "value.h"
 
 // : Variable_Map
 
@@ -108,7 +72,6 @@ enum Instruction {
 	// No args
 	INSTR_NOP,
 	INSTR_RETURN,
-	INSTR_PRINT,
 	INSTR_POP,
 	INSTR_LOOP_END,
 	INSTR_BREAK,

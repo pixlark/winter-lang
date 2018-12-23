@@ -1,6 +1,9 @@
 #include "common.h"
 #include "value.h"
 #include "gc.h"
+#include "vm.h"
+
+#include "builtin.h"
 
 #include <ctype.h>
 
@@ -42,6 +45,11 @@ Value value_new_function(const char * name, const char ** parameters, BC_Chunk *
 	return (Value) {
 		VALUE_FUNCTION, ._function = func
 	};
+}
+
+Value value_new_builtin(Builtin b)
+{
+	return (Value) { VALUE_BUILTIN, ._builtin = b };
 }
 
 // :\ Value creation
@@ -309,6 +317,8 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 		return value_cast_string(a, type, assoc);
 	case VALUE_FUNCTION:
 		return value_cast_function(a, type, assoc);
+	case VALUE_BUILTIN:
+		fatal("Can't cast builtin to given type");
 	default:
 		fatal_internal("Not all switch cases covered in value_cast");
 	}
@@ -333,6 +343,8 @@ void value_modify_refcount(Value value, int change)
 		break;
 	case VALUE_FUNCTION:
 		gc_modify_refcount(value._function, change);
+		break;
+	case VALUE_BUILTIN:
 		break;
 	default:
 		fatal_internal("Switch statement in value_modify_refcount not complete");

@@ -1,10 +1,40 @@
 #pragma once
 
-#include "vm.h"
+#include "error.h"
 
-/* The Value struct itself is defined in vm.h to avoid circular
- * dependency problems.
- */
+typedef size_t Builtin;
+
+// : Value
+typedef struct Function Function;
+typedef struct BC_Chunk BC_Chunk;
+
+typedef enum {
+	VALUE_NONE,
+	VALUE_INTEGER,
+	VALUE_FLOAT,
+	VALUE_BOOL,
+	VALUE_STRING,
+	VALUE_FUNCTION,
+	VALUE_BUILTIN,
+} Value_Type;
+
+typedef struct {
+	size_t len;
+	const char * contents;
+} Winter_String;
+
+typedef struct {
+	Value_Type type;
+	union {
+		int _integer;
+		float _float;
+		bool _bool;
+		Winter_String _string;
+		Function * _function;
+		Builtin _builtin;
+	};
+} Value;
+// :\ Value
 
 // : Value creation
 Value value_none();
@@ -13,6 +43,7 @@ Value value_new_float(float f);
 Value value_new_bool(bool b);
 Value value_new_string(const char * s);
 Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode);
+Value value_new_builtin(Builtin b);
 // :\ Value creation
 
 // : Value operations
