@@ -1,5 +1,7 @@
 #include "ast.h"
 
+// : Expr
+
 void deep_free_expr(Expr * expr)
 {
 	switch (expr->type) {
@@ -30,6 +32,10 @@ void deep_free_expr(Expr * expr)
 		break;
 	}
 }
+
+// :\ Expr
+
+// : Stmt
 
 void deep_free_body(Stmt ** body)
 {
@@ -83,3 +89,5 @@ void deep_free(Stmt * stmt)
 		break;
 	}
 }
+
+// :\ Stmt

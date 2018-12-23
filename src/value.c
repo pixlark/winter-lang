@@ -4,9 +4,7 @@
 
 #include <ctype.h>
 
-// : Value
-
-// Holds values in memory
+// : Value creation
 
 Value value_none()
 {
@@ -46,6 +44,10 @@ Value value_new_function(const char * name, const char ** parameters, BC_Chunk *
 	};
 }
 
+// :\ Value creation
+
+// : Value operations
+
 Value value_print(Value value)
 {
 	switch (value.type) {
@@ -65,11 +67,14 @@ Value value_print(Value value)
 		printf("%.*s\n", value._string.len, value._string.contents);
 		break;
 	case VALUE_FUNCTION:
-		//printf("<function at %p>\n", value._function);
+		#if DEBUG_PRINTS
 		printf("<function at %p; refcount %d; name %s>\n",
 			   value._function,
 			   gc_get_refcount(value._function),
 			   value._function->name);
+		#else
+		printf("<function at %p>\n", value._function);
+		#endif
 		break;
 	default:
 		fatal_internal("Tried to print a value with no implemented print routine");
@@ -309,4 +314,29 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
-// :\ Value
+// :\ Value operations
+
+// : Value GC
+
+void value_modify_refcount(Value value, int change)
+{
+	switch (value.type) {
+	case VALUE_NONE:
+		break;
+	case VALUE_INTEGER:
+		break;
+	case VALUE_FLOAT:
+		break;
+	case VALUE_BOOL:
+		break;
+	case VALUE_STRING:
+		break;
+	case VALUE_FUNCTION:
+		gc_modify_refcount(value._function, change);
+		break;
+	default:
+		fatal_internal("Switch statement in value_modify_refcount not complete");
+	}
+}
+
+// :\ Value GC

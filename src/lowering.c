@@ -96,6 +96,8 @@ void lower_operations_expr(Expr * expr)
 
 // :\ Operation Lowering
 
+// : Lowering
+
 void lower_expression(Expr * expr)
 {
 	lower_operations_expr(expr);
@@ -145,3 +147,5 @@ void lower_statement(Stmt * stmt)
 		fatal_internal("An unlowerable statement reached lower_statement");
 	}
 }
+
+// :\ Lowering

@@ -1,14 +1,8 @@
 #pragma once
 
-typedef struct Lexer Lexer;
+#include "error.h"
 
-typedef struct {
-	struct Lexer * lexer;
-	size_t line;
-	size_t position;
-	size_t len;
-	bool eof;
-} Assoc_Source;
+typedef struct Lexer Lexer;
 
 typedef enum {
 	// 0-255 reserved for ASCII

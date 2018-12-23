@@ -2,9 +2,20 @@
 
 #include "common.h"
 
+// : Compilation
+
+// Macros for reducing verbosity when it comes to very common compiling operations
+
+// Insert a NO-OP with no associated source
 #define PNOP()      (sb_push(compiler->bytecode, bc_chunk_new_no_args(INSTR_NOP)))
+
+// Insert an instruction with associated source
 #define P(x, as)    (sb_push(compiler->bytecode, (x)), sb_last(compiler->bytecode).assoc = (as))
+
+// Get the current location in our unit's bytecode list
 #define L()         (sb_count(compiler->bytecode) - 1)
+
+// Insert an instruction at i in our unit's bytecode list
 #define A(i, x, as) (compiler->bytecode[i] = (x), compiler->bytecode[i].assoc = (as))
 
 void compile_operator(Compiler * compiler, Operator operator, Assoc_Source as)
@@ -150,11 +161,6 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
 		compile_body(&decl_compiler, stmt->func_decl.body);
-		/*
-		Value function = value_new_function(stmt->func_decl.name,
-											sb_copy(stmt->func_decl.parameters),
-											decl_compiler.bytecode);
-											P(bc_chunk_new_push(function), stmt->assoc);*/
 		P(bc_chunk_new_create_function(stmt->func_decl.name,
 									   sb_copy(stmt->func_decl.parameters),
 									   decl_compiler.bytecode),
@@ -166,3 +172,5 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		fatal_internal("A non-compileable statement reached the compilation phase");
 	}
 }
+
+// :\ Compilation

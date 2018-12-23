@@ -115,6 +115,6 @@ typedef struct Stmt {
 	Assoc_Source assoc;
 } Stmt;
 
-// :\ Stmt
-
 void deep_free(Stmt * statement);
+
+// :\ Stmt

@@ -11,6 +11,9 @@ typedef struct Function Function;
 
 // : Value
 
+// This is declared here rather than in value.h to avoid circular
+// dependency problems.
+
 typedef enum {
 	VALUE_NONE,
 	VALUE_INTEGER,
@@ -216,10 +219,8 @@ void winter_machine_garbage_collect(Winter_Machine * wm); // Defined in gc.c... 
 
 // : Function
 
-// A function value has an associated name :- this has nothing to do
-// necessarily with the name it's bound to, it's simply the name that
-// it's given when it's first declared using func.
-// An anonymous function simply has NULL in the name field.
+// TODO(pixlark): name field is deprecated, remove
+
 typedef struct Function {
 	const char * name;
 	const char ** parameters; // sb

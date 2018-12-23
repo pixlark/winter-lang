@@ -76,38 +76,6 @@ Call_Frame * call_frame_alloc(BC_Chunk * bytecode)
 	return frame;
 }
 
-void call_frame_free(Call_Frame * frame)
-{
-	// What do we need to deallocate? Anything which can't be used by
-	// the program anymore...
-
-	// Ok, we can't do any of this until we have a garbage collector
-	
-	/* Because functions are first-class, we have to treat them like
-	   any other kind of reference object, which means that we can't
-	   clean up their data deterministically like this. The eventual
-	   garbage collector will have to deal with it instead.
-	   -Paul T. Mon Dec 17 19:37:57 2018 */
-	/*
-	for (int i = 0; i < frame->var_map.size; i++) {
-		Value * storage = frame->var_map.values[i];
-		if (storage->type == VALUE_FUNCTION) {
-			sb_free(storage->_function->bytecode);
-			sb_free(storage->_function->parameters);
-			free(storage->_function);
-		}
-		}*/
-
-	/*
-	// 2. Variables that have fallen out of scope should have their space deallocated
-	for (int i = 0; i < frame->var_map.size; i++) {
-		free(frame->var_map.values[i]);
-		}*/
-
-	// 3. The frame itself should be deallocated
-	free(frame);
-}
-
 // :\ Call_Frame
 
 // : BC_Chunk
@@ -233,27 +201,6 @@ void bc_chunk_print(BC_Chunk chunk)
 
 // : Value Refcount
 
-void value_modify_refcount(Value value, int change)
-{
-	switch (value.type) {
-	case VALUE_NONE:
-		break;
-	case VALUE_INTEGER:
-		break;
-	case VALUE_FLOAT:
-		break;
-	case VALUE_BOOL:
-		break;
-	case VALUE_STRING:
-		break;
-	case VALUE_FUNCTION:
-		gc_modify_refcount(value._function, change);
-		break;
-	default:
-		fatal_internal("Switch statement in value_modify_refcount not complete");
-	}
-}
-
 // :\ Value Refcount
 
 // : Winter_Machine
@@ -296,7 +243,7 @@ void winter_machine_pop_call_stack(Winter_Machine * wm)
 {
 	internal_assert(sb_count(wm->call_stack) > 0);
 	Call_Frame * frame = sb_pop(wm->call_stack);
-	call_frame_free(frame);
+	free(frame);
 }
 
 Call_Frame * winter_machine_global_frame(Winter_Machine * wm)

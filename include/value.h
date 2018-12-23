@@ -2,13 +2,20 @@
 
 #include "vm.h"
 
+/* The Value struct itself is defined in vm.h to avoid circular
+ * dependency problems.
+ */
+
+// : Value creation
 Value value_none();
 Value value_new_integer(int i);
 Value value_new_float(float f);
 Value value_new_bool(bool b);
 Value value_new_string(const char * s);
 Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode);
+// :\ Value creation
 
+// : Value operations
 Value value_print(Value value);
 
 Value value_negate(Value a, Assoc_Source assoc);
@@ -22,3 +29,8 @@ Value value_equal(Value a, Value b, Assoc_Source assoc);
 Value value_greater_than(Value a, Value b, Assoc_Source assoc);
 Value value_less_than(Value a, Value b, Assoc_Source assoc);
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
+// :\ Value operations
+
+// : Value GC
+void value_modify_refcount(Value value, int change);
+// :\ Value GC

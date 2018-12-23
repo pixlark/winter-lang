@@ -3,6 +3,8 @@
 #include "common.h"
 #include "vm.h"
 
+// : Parse utility
+
 #define EXPR(t)									\
 	Expr * expr = malloc(sizeof(Expr));			\
 	expr->type = t;								\
@@ -67,6 +69,10 @@ void __weak_expect(Lexer * lexer, Token_Type type)
 	}
 }
 #define weak_expect(x) __weak_expect(lexer, (x))
+
+// :\ Parse utility
+
+// : Parsing
 
 Expr * parse_atom(Lexer * lexer)
 {
@@ -525,3 +531,5 @@ Stmt * parse_statement(Lexer * lexer)
 		return stmt;
 	}
 }
+
+// :\ Parsing

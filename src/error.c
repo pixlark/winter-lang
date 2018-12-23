@@ -1,6 +1,9 @@
 #include "error.h"
 
 #include "common.h"
+#include "lexer.h"
+
+// : Assoc_Source
 
 Assoc_Source assoc_source_new(Lexer * lexer,
 							  size_t line,
@@ -19,6 +22,8 @@ Assoc_Source assoc_source_eof(Lexer * lexer)
 	};
 }
 
+// :\ Assoc_Source
+
 #define RESET         "\e[0m"
 #define SET_BOLD      "\e[1m"
 #define SET_DIM       "\e[2m"
@@ -33,6 +38,8 @@ Assoc_Source assoc_source_eof(Lexer * lexer)
 #define DIM(x) SET_DIM x RESET
 #define INVERTED(x) SET_INVERTED x RESET
 #define RED(x)  SET_RED x RESET
+
+// Fatal functions
 
 void fatal(const char * fmt, ...)
 {
@@ -155,6 +162,10 @@ void _internal_assert(bool cond, const char * file, size_t line)
 	}
 }
 
+// :\ Fatal functions
+
+// : Debug printing
+
 void dbprintf(const char * fmt, ...)
 {
 	va_list args;
@@ -166,3 +177,5 @@ void dbprintf(const char * fmt, ...)
 
 	va_end(args);
 }
+
+// :\ Debug printing

@@ -3,7 +3,63 @@
 
 #include <ctype.h>
 
-const char * lexer_dup_range(Lexer * lexer, size_t start, size_t end); // lazy
+// : String interning
+
+int lexer_intern_fetch(Lexer * lexer, size_t start, size_t end)
+{
+	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
+		const char * str = lexer->interned_strings[i];
+		if (strlen(str) != end - start) continue; // Assert same length
+		
+		bool matches = true;
+		for (int j = start; j < end; j++) {
+			if (lexer->source[j] != str[j - start]) {
+				matches = false;
+				break;
+			}
+		}
+		if (matches) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+const char * lexer_dup_range(Lexer * lexer, size_t start, size_t end)
+{
+	char * intern = malloc(end - start + 1);
+	intern[end - start] = '\0';
+	strncpy(intern, lexer->source + start, end - start);
+	return intern;
+}
+
+const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
+{
+	int index = lexer_intern_fetch(lexer, start, end);
+	if (index != -1) {
+		return lexer->interned_strings[index];
+	}
+	// Not already interned
+	const char * intern = lexer_dup_range(lexer, start, end);
+	sb_push(lexer->interned_strings, intern);
+	return intern;
+}
+
+const char * lexer_intern_string(Lexer * lexer, const char * str)
+{
+	internal_assert(str);
+	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
+		if (strcmp(str, lexer->interned_strings[i]) == 0) {
+			return lexer->interned_strings[i];
+		}
+	}
+	// Not already interned
+	sb_push(lexer->interned_strings, strdup(str));
+}
+
+// :\ String interning
+
+// : Token printing
 
 const char * token_type_names[] = {
 	[TOKEN_EOF] = "EOF",
@@ -80,6 +136,10 @@ char * token_to_string(Token token)
 	}
 }
 
+// :\ Token printing
+
+// : Lexer utility
+
 Lexer * lexer_alloc(const char * source)
 {
 	Lexer * lexer = malloc(sizeof(Lexer));
@@ -116,6 +176,32 @@ void lexer_advance_char(Lexer * lexer)
 }
 
 #define next() (lexer_advance_char(lexer), lexer_peek(lexer))
+
+void lexer_advance(Lexer * lexer)
+{
+	lexer->token = lexer_next_token(lexer);
+}
+
+Token lexer_lookahead(Lexer * lexer, size_t lookahead)
+{
+	// TODO(pixlark): There's probably a fancier way to do this that
+	// doesn't require any re-lexing. Let's figure that out later...
+	// TODO(pixlark): Also we really need to get string interning
+	// working so that this doesn't have memory leaks...
+	size_t current_position = lexer->position;
+	Token current_token = lexer->token;
+	for (int i = 0; i < lookahead; i++) {
+		lexer_advance(lexer);
+	}
+	Token peeked_token = lexer->token;
+	lexer->position = current_position;
+	lexer->token = current_token;
+	return peeked_token;
+}
+
+// :\ Lexer utility
+
+// : Lexing
 
 const char * keywords[] = {
 	"none",  "true",     "false",
@@ -296,76 +382,4 @@ Token lexer_next_token(Lexer * lexer)
 	#undef TWOCHARTOK
 }
 
-void lexer_advance(Lexer * lexer)
-{
-	lexer->token = lexer_next_token(lexer);
-}
-
-Token lexer_lookahead(Lexer * lexer, size_t lookahead)
-{
-	// TODO(pixlark): There's probably a fancier way to do this that
-	// doesn't require any re-lexing. Let's figure that out later...
-	// TODO(pixlark): Also we really need to get string interning
-	// working so that this doesn't have memory leaks...
-	size_t current_position = lexer->position;
-	Token current_token = lexer->token;
-	for (int i = 0; i < lookahead; i++) {
-		lexer_advance(lexer);
-	}
-	Token peeked_token = lexer->token;
-	lexer->position = current_position;
-	lexer->token = current_token;
-	return peeked_token;
-}
-
-int lexer_intern_fetch(Lexer * lexer, size_t start, size_t end)
-{
-	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
-		const char * str = lexer->interned_strings[i];
-		if (strlen(str) != end - start) continue; // Assert same length
-		
-		bool matches = true;
-		for (int j = start; j < end; j++) {
-			if (lexer->source[j] != str[j - start]) {
-				matches = false;
-				break;
-			}
-		}
-		if (matches) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-const char * lexer_dup_range(Lexer * lexer, size_t start, size_t end)
-{
-	char * intern = malloc(end - start + 1);
-	intern[end - start] = '\0';
-	strncpy(intern, lexer->source + start, end - start);
-	return intern;
-}
-
-const char * lexer_intern_range(Lexer * lexer, size_t start, size_t end)
-{
-	int index = lexer_intern_fetch(lexer, start, end);
-	if (index != -1) {
-		return lexer->interned_strings[index];
-	}
-	// Not already interned
-	const char * intern = lexer_dup_range(lexer, start, end);
-	sb_push(lexer->interned_strings, intern);
-	return intern;
-}
-
-const char * lexer_intern_string(Lexer * lexer, const char * str)
-{
-	internal_assert(str);
-	for (int i = 0; i < sb_count(lexer->interned_strings); i++) {
-		if (strcmp(str, lexer->interned_strings[i]) == 0) {
-			return lexer->interned_strings[i];
-		}
-	}
-	// Not already interned
-	sb_push(lexer->interned_strings, strdup(str));
-}
+// :\ Lexing
