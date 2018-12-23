@@ -64,3 +64,4 @@
 ** TODO String->Float casting
 
 * TODO Internal compiler errors should include file/line
+* TODO Built-in functions

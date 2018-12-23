@@ -16,6 +16,12 @@ Variable_Map variable_map_new()
 	return map;
 }
 
+void variable_map_free(Variable_Map map)
+{
+	sb_free(map.names);
+	sb_free(map.values);
+}
+
 Value * variable_map_index(Variable_Map * map, const char * name)
 {
 	for (int i = 0; i < map->size; i++) {
@@ -74,6 +80,12 @@ Call_Frame * call_frame_alloc(BC_Chunk * bytecode)
 	frame->ip = 0;
 	frame->loop_stack = NULL;
 	return frame;
+}
+
+void call_frame_free(Call_Frame * frame)
+{
+	// Variable maps are copied into closures etc, so it's fine to free them here
+	variable_map_free(frame->var_map);
 }
 
 // :\ Call_Frame
@@ -243,7 +255,7 @@ void winter_machine_pop_call_stack(Winter_Machine * wm)
 {
 	internal_assert(sb_count(wm->call_stack) > 0);
 	Call_Frame * frame = sb_pop(wm->call_stack);
-	free(frame);
+	call_frame_free(frame);
 }
 
 Call_Frame * winter_machine_global_frame(Winter_Machine * wm)
@@ -267,13 +279,15 @@ void winter_machine_print_eval_stack(Winter_Machine * wm)
 	#endif
 }
 
-void winter_machine_return_refcounts(Winter_Machine * wm)
+void winter_machine_return(Winter_Machine * wm)
 {
 	// Decrease reference count for every variable in varmap
 	Call_Frame * frame = winter_machine_frame(wm);
 	for (int i = 0; i < frame->var_map.size; i++) {
 		value_modify_refcount(*frame->var_map.values[i], -1);
 	}
+	// Pop call stack
+	winter_machine_pop_call_stack(wm);
 }
 
 void winter_machine_step(Winter_Machine * wm)
@@ -290,8 +304,7 @@ void winter_machine_step(Winter_Machine * wm)
 			// In function
 			// Inferred return, return and push none to the eval stack
 			push(value_none());
-			winter_machine_return_refcounts(wm);
-			winter_machine_pop_call_stack(wm);
+			winter_machine_return(wm);
 		}
 	}
 
@@ -315,8 +328,7 @@ void winter_machine_step(Winter_Machine * wm)
 		if (sb_count(wm->call_stack) == 0) {
 			fatal_assoc(chunk.assoc, "Can't return from global scope");
 		}
-		winter_machine_return_refcounts(wm);
-		winter_machine_pop_call_stack(wm);
+		winter_machine_return(wm);
 	} break;
 	case INSTR_PRINT: {
 		value_print(pop());
