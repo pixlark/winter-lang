@@ -26,6 +26,7 @@ Assoc_Source assoc_source_eof(Lexer * lexer);
 // : Fatal functions
 void fatal(const char * fmt, ...);
 void fatal_assoc(Assoc_Source assoc, const char * fmt, ...);
+void fatal_user_assert_failed(Assoc_Source assoc);
 void fatal_internal(const char * fmt, ...);
 void _internal_assert(bool cond, const char * file, size_t line);
 

@@ -474,7 +474,7 @@ void winter_machine_step(Winter_Machine * wm)
 			for (int i = 0; i < instr.arg_count; i++) {
 				args[instr.arg_count - i - 1] = pop();
 			}
-			Value ret = builtin_functions[builtin](args, instr.arg_count);
+			Value ret = builtin_functions[builtin](args, instr.arg_count, chunk.assoc);
 			free(args);
 			push(ret);
 		} else {

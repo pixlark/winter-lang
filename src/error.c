@@ -134,10 +134,18 @@ void fatal_assoc(Assoc_Source assoc, const char * fmt, ...)
 	fprintf(stderr, ":%d\n", assoc.line);
 	print_assoc(assoc);
 	vfprintf(stderr, fmt, args);
-	fprintf(stderr, ("\n"));
+	fprintf(stderr, "\n");
 
 	va_end(args);
 	exit(1);	
+}
+
+void fatal_user_assert_failed(Assoc_Source assoc)
+{
+	fprintf(stderr, BOLD("assertion failed") ":\n");
+	fprintf(stderr, ":%d\n", assoc.line);
+	print_assoc(assoc);
+	exit(1);
 }
 
 void fatal_internal(const char * fmt, ...)
