@@ -84,6 +84,10 @@ Value value_print(Value value)
 		printf("<function at %p>\n", value._function);
 		#endif
 		break;
+	case VALUE_BUILTIN:
+		printf("<builtin function %s>\n",
+			   builtin_names[value._builtin]);
+		break;
 	default:
 		fatal_internal("Tried to print a value with no implemented print routine");
 	}
