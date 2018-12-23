@@ -86,6 +86,8 @@ void call_frame_free(Call_Frame * frame)
 {
 	// Variable maps are copied into closures etc, so it's fine to free them here
 	variable_map_free(frame->var_map);
+	// Loop stack can't leave function, so that should get freed
+	sb_free(frame->loop_stack);
 }
 
 // :\ Call_Frame
