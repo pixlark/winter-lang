@@ -16,7 +16,10 @@ typedef enum {
 	VALUE_STRING,
 	VALUE_FUNCTION,
 	VALUE_BUILTIN,
+	VALUE_LIST,
 } Value_Type;
+
+typedef struct Value Value;
 
 typedef struct {
 	size_t len;
@@ -24,6 +27,12 @@ typedef struct {
 } Winter_String;
 
 typedef struct {
+	size_t size;
+	size_t capacity;
+	Value * contents;
+} Winter_List;
+
+struct Value {
 	Value_Type type;
 	union {
 		int _integer;
@@ -32,8 +41,10 @@ typedef struct {
 		Winter_String _string;
 		Function * _function;
 		Builtin _builtin;
+		Winter_List _list;
 	};
-} Value;
+};
+
 // :\ Value
 
 // : Value creation
@@ -44,6 +55,7 @@ Value value_new_bool(bool b);
 Value value_new_string(const char * s);
 Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode);
 Value value_new_builtin(Builtin b);
+Value value_new_list();
 // :\ Value creation
 
 // : Value operations
@@ -60,6 +72,8 @@ Value value_equal(Value a, Value b, Assoc_Source assoc);
 Value value_greater_than(Value a, Value b, Assoc_Source assoc);
 Value value_less_than(Value a, Value b, Assoc_Source assoc);
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
+/* temporary */ Value value_append_list(Value value, Value to_append);
+Value value_append(Value array, Value to_append, Assoc_Source assoc);
 // :\ Value operations
 
 // : Value GC

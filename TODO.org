@@ -66,3 +66,5 @@
 * DONE Internal compiler errors should include file/line
 
 * DONE Built-in functions
+
+* TODO Modify value_print to not newline automatically... will involve changing debug printing code REEEE

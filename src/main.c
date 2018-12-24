@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include "lowering.h"
 #include "parser.h"
+#include "value.h"
 #include "vm.h"
 
 char * load_string_from_file(char * path)

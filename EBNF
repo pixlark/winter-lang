@@ -1,15 +1,19 @@
 Winter EBNF Grammar Specification
 
+list_literal = '[' { expression ',' } [ expression ] ']'
+
 atom = NONE
 	 | INTEGER_LITERAL
 	 | FLOAT_LITERAL
 	 | TRUE
 	 | FALSE
 	 | NAME
+	 | BUILTIN
+	 | array_literal
 	 | '(' expression ')'
 
 function_call = atom
-			  | NAME '(' [comma_expression] ')'
+			  | expression '(' [comma_expression] ')'
 
 prefix = function_call
 	   | '-' prefix
@@ -28,8 +32,6 @@ lone_expression = expression ';'
 
 assignment = NAME '=' expression ';'
 
-print_stmt = PRINT expression ';'
-
 return_stmt = RETURN expression ';'
 
 if_stmt = IF expression scope {ELSE IF expression scope} [ELSE scope]
@@ -42,3 +44,4 @@ statement = lone_expression
 		  | return_stmt
 		  | if_stmt
 		  | func_declaration
+

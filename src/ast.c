@@ -27,6 +27,12 @@ void deep_free_expr(Expr * expr)
 	case EXPR_CAST:
 		deep_free_expr(expr->cast.expr);
 		break;
+	case EXPR_LIST:
+		for (int i = 0; i < sb_count(expr->list.elements); i++) {
+			deep_free_expr(expr->list.elements[i]);
+		}
+		sb_free(expr->list.elements);
+		break;
 	default:
 		fatal_internal("Can't free AST Expression!");
 		break;

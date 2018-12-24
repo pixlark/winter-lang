@@ -52,6 +52,15 @@ Value value_new_builtin(Builtin b)
 	return (Value) { VALUE_BUILTIN, ._builtin = b };
 }
 
+Value value_new_list()
+{
+	Winter_List list;
+	list.size     = 0;
+	list.capacity = 4;
+	list.contents = global_alloc(sizeof(Value) * 4);
+	return (Value) { VALUE_LIST, ._list = list };
+}
+
 // :\ Value creation
 
 // : Value operations
@@ -88,6 +97,18 @@ Value value_print(Value value)
 		printf("<builtin function %s>\n",
 			   builtin_names[value._builtin]);
 		break;
+	case VALUE_LIST: {
+		if (value._list.size == 0) {
+			printf("[]\n");
+			break;
+		}
+		printf("[\n");
+		for (int i = 0; i < value._list.size; i++) {
+			printf("  ");
+			value_print(value._list.contents[i]);
+		}
+		printf("]\n");
+	} break;
 	default:
 		fatal_internal("Tried to print a value with no implemented print routine");
 	}
@@ -323,8 +344,35 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 		return value_cast_function(a, type, assoc);
 	case VALUE_BUILTIN:
 		fatal("Can't cast builtin to given type");
+	case VALUE_LIST:
+		fatal("Can't cast list to given type");
 	default:
 		fatal_internal("Not all switch cases covered in value_cast");
+	}
+}
+
+Value value_append_list(Value value, Value to_append)
+{
+	internal_assert(value.type == VALUE_LIST);
+	Winter_List * list = &(value._list);
+	if (list->size >= list->capacity) {
+		list->capacity *= 2;
+		list->contents = global_realloc(list->contents, list->capacity);
+	}
+	list->contents[list->size] = to_append;
+	list->size++;
+	value._list = *list;
+	return value;
+}
+
+Value value_append(Value array, Value to_append, Assoc_Source assoc)
+{
+	switch (array.type) {
+	case VALUE_LIST:
+		return value_append_list(array, to_append);
+		break;
+	default:
+		fatal_assoc(assoc, "Can't append to non-list");
 	}
 }
 
@@ -349,6 +397,9 @@ void value_modify_refcount(Value value, int change)
 		gc_modify_refcount(value._function, change);
 		break;
 	case VALUE_BUILTIN:
+		break;
+	case VALUE_LIST:
+		gc_modify_refcount(value._list.contents, change);
 		break;
 	default:
 		fatal_internal("Switch statement in value_modify_refcount not complete");

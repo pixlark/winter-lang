@@ -85,6 +85,13 @@ void compile_expression(Compiler * compiler, Expr * expr)
 		compile_expression(compiler, expr->cast.expr);
 		P(bc_chunk_new_cast(expr->cast.type), expr->assoc);
 	} break;
+	case EXPR_LIST: {
+		P(bc_chunk_new_no_args(INSTR_CREATE_LIST), expr->assoc);
+		for (int i = 0; i < sb_count(expr->list.elements); i++) {
+			compile_expression(compiler, expr->list.elements[i]);
+			P(bc_chunk_new_no_args(INSTR_APPEND), expr->assoc);
+		}
+	} break;
 	default:
 		fatal_internal("A non-compileable expression reached the compilation phase.");
 	}

@@ -24,6 +24,23 @@ void * gc_alloc(GC * gc, size_t size)
 	return (void*) ((char*) allocation + ALIGNMENT); // Hide reference count
 }
 
+void * gc_realloc(GC * gc, void * external, size_t new_size)
+{
+	void * internal = (void*) ((char*) external - ALIGNMENT);
+	int index = -1;
+	for (int i = 0; i < sb_count(gc->allocations); i++) {
+		printf("%p vs %p\n", internal, gc->allocations[i]);
+		if (gc->allocations[i] == internal) {
+			index = i;
+			break;
+		}
+	}
+	internal_assert(index != -1);
+	void * new_internal = realloc(internal, new_size + ALIGNMENT);
+	gc->allocations[index] = new_internal;
+	return (void*) ((char*) new_internal + ALIGNMENT);
+}
+
 // On external-facing pointer
 void gc_modify_refcount(void * ptr, int change)
 {

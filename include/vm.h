@@ -77,6 +77,7 @@ enum Instruction {
 	INSTR_BREAK,
 	INSTR_CONTINUE,
 	INSTR_CLOSURE,
+	INSTR_APPEND,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
@@ -99,6 +100,7 @@ enum Instruction {
 	INSTR_CAST,
 	// Creation of dynamically allocated values
 	INSTR_CREATE_FUNCTION,
+	INSTR_CREATE_LIST,
 };
 
 // :\ Instruction

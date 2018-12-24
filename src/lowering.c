@@ -89,6 +89,11 @@ void lower_operations_expr(Expr * expr)
 	case EXPR_CAST:
 		lower_operations_expr(expr->cast.expr);
 		break;
+	case EXPR_LIST:
+		for (int i = 0; i < sb_count(expr->list.elements); i++) {
+			lower_operations_expr(expr->list.elements[i]);
+		}
+		break;
 	default:
 		fatal_internal("An unlowerable expression reached lower_operations_expr");
 	}

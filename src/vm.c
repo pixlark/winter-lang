@@ -367,6 +367,12 @@ void winter_machine_step(Winter_Machine * wm)
 		function->closure = variable_map_copy(winter_machine_frame(wm)->var_map);
 		push(value);
 	} break;
+	case INSTR_APPEND: {
+		Value to_append = pop();
+		Value list = pop();
+		list = value_append(list, to_append, chunk.assoc);
+		push(list);
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:
@@ -511,6 +517,10 @@ void winter_machine_step(Winter_Machine * wm)
 		Instr_Create_Function instr = chunk.instr_create_function;
 		Value func = value_new_function(instr.name, instr.parameters, instr.bytecode);
 		push(func);
+	} break;
+	case INSTR_CREATE_LIST: {
+		Value list = value_new_list();
+		push(list);
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

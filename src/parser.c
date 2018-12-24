@@ -74,6 +74,18 @@ void __weak_expect(Lexer * lexer, Token_Type type)
 
 // : Parsing
 
+Expr ** parse_list_literal(Lexer * lexer)
+{
+	Expr ** elements = NULL;
+	expect('[');
+	while (!is(']')) {
+		sb_push(elements, parse_expression(lexer));
+		if (!match(',')) break;
+	}
+	expect(']');
+	return elements;
+}
+
 Expr * parse_atom(Lexer * lexer)
 {
 	// Check for subexpression
@@ -132,6 +144,12 @@ Expr * parse_atom(Lexer * lexer)
 		mark_expr(expr, token.assoc);
 		expr->atom.value = value_new_builtin(token.builtin);
 		advance();
+		return expr;
+	} break;
+	case '[': {
+		EXPR(EXPR_LIST);
+		mark_expr(expr, token.assoc);
+		expr->list.elements = parse_list_literal(lexer);
 		return expr;
 	} break;
 	default: {
