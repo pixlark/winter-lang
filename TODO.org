@@ -68,3 +68,9 @@
 * DONE Built-in functions
 
 * TODO Modify value_print to not newline automatically... will involve changing debug printing code REEEE
+
+* TODO What do we need to do right now, and in what order?
+** TODO Make strings dynamically allocated
+** TODO Use lists of dynamically allocated strings to make functions fully dynamically allocated
+** TODO Makes types first-class
+** TODO Make records
