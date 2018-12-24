@@ -1,4 +1,4 @@
-* TODO Garbage Collection
+* DONE Garbage Collection
 
 * DONE String interning
 
@@ -22,7 +22,7 @@
 ** DONE Explicit casting
 ** TODO Coerced casting
 
-* TODO Asserts
+* DONE Asserts
 
 * TODO Control Structures
 ** DONE If-statements
@@ -64,4 +64,5 @@
 ** TODO String->Float casting
 
 * TODO Internal compiler errors should include file/line
-* TODO Built-in functions
+
+* DONE Built-in functions
