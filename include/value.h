@@ -53,7 +53,7 @@ Value value_new_integer(int i);
 Value value_new_float(float f);
 Value value_new_bool(bool b);
 Value value_new_string(const char * s);
-Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode);
+Value value_new_function(const char ** parameters, BC_Chunk * bytecode);
 Value value_new_builtin(Builtin b);
 Value value_new_list();
 // :\ Value creation

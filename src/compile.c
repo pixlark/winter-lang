@@ -167,8 +167,7 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
 		compile_body(&decl_compiler, stmt->func_decl.body);
-		P(bc_chunk_new_create_function(stmt->func_decl.name,
-									   sb_copy(stmt->func_decl.parameters),
+		P(bc_chunk_new_create_function(sb_copy(stmt->func_decl.parameters),
 									   decl_compiler.bytecode),
 		  stmt->assoc);
 		P(bc_chunk_new_no_args(INSTR_CLOSURE), stmt->assoc);

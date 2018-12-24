@@ -143,9 +143,9 @@ BC_Chunk bc_chunk_new_cast(Value_Type type)
 	return (BC_Chunk) { INSTR_CAST, .instr_cast = (Instr_Cast) { type } };
 }
 
-BC_Chunk bc_chunk_new_create_function(const char * name, const char ** parameters, BC_Chunk * bytecode)
+BC_Chunk bc_chunk_new_create_function(const char ** parameters, BC_Chunk * bytecode)
 {
-	Instr_Create_Function instr = (Instr_Create_Function) { name, parameters, bytecode };
+	Instr_Create_Function instr = (Instr_Create_Function) { parameters, bytecode };
 	return (BC_Chunk) { INSTR_CREATE_FUNCTION, .instr_create_function = instr };
 }
 
@@ -521,7 +521,7 @@ void winter_machine_step(Winter_Machine * wm)
 		// Creation of dynamically allocated values
 	case INSTR_CREATE_FUNCTION: {
 		Instr_Create_Function instr = chunk.instr_create_function;
-		Value func = value_new_function(instr.name, instr.parameters, instr.bytecode);
+		Value func = value_new_function(instr.parameters, instr.bytecode);
 		push(func);
 	} break;
 	case INSTR_CREATE_LIST: {

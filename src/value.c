@@ -38,10 +38,9 @@ Value value_new_string(const char * s)
 	return (Value) { VALUE_STRING, ._string = string };
 }
 
-Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode)
+Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
 {
 	Function * func = global_alloc(sizeof(Function));
-	func->name = name;
 	func->parameters = parameters;
 	func->bytecode = bytecode;
 	func->closure = variable_map_new();
