@@ -68,6 +68,10 @@ typedef struct {
 	BC_Chunk * bytecode;	
 } Instr_Create_Function;
 
+typedef struct {
+	const char * literal;
+} Instr_Create_String;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
@@ -101,6 +105,7 @@ enum Instruction {
 	// Creation of dynamically allocated values
 	INSTR_CREATE_FUNCTION,
 	INSTR_CREATE_LIST,
+	INSTR_CREATE_STRING,
 };
 
 // :\ Instruction
@@ -121,6 +126,7 @@ struct BC_Chunk {
 		Instr_Set_Loop instr_set_loop;
 		Instr_Cast instr_cast;
 		Instr_Create_Function instr_create_function;
+		Instr_Create_String instr_create_string;
 	};
 	Assoc_Source assoc;
 };
@@ -135,6 +141,7 @@ BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
 BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
 BC_Chunk bc_chunk_new_cast(Value_Type type);
 BC_Chunk bc_chunk_new_create_function(const char * name, const char ** parameters, BC_Chunk * bytecode);
+BC_Chunk bc_chunk_new_create_string(const char * literal);
 
 void bc_chunk_print(BC_Chunk chunk);
 

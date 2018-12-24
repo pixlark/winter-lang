@@ -31,8 +31,11 @@ Value value_new_bool(bool b)
 
 Value value_new_string(const char * s)
 {
-	return (Value) { VALUE_STRING, ._string =
-			(Winter_String) { s ? strlen(s) : 0, s } };
+	Winter_String string;
+	string.len = strlen(s);
+	string.contents = global_alloc(string.len + 1);
+	strcpy(string.contents, s);
+	return (Value) { VALUE_STRING, ._string = string };
 }
 
 Value value_new_function(const char * name, const char ** parameters, BC_Chunk * bytecode)
@@ -392,6 +395,7 @@ void value_modify_refcount(Value value, int change)
 	case VALUE_BOOL:
 		break;
 	case VALUE_STRING:
+		gc_modify_refcount(value._string.contents, change);
 		break;
 	case VALUE_FUNCTION:
 		gc_modify_refcount(value._function, change);

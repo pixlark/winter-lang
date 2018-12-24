@@ -94,6 +94,8 @@ void lower_operations_expr(Expr * expr)
 			lower_operations_expr(expr->list.elements[i]);
 		}
 		break;
+	case EXPR_STRING:
+		break;
 	default:
 		fatal_internal("An unlowerable expression reached lower_operations_expr");
 	}

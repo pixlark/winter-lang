@@ -149,6 +149,12 @@ BC_Chunk bc_chunk_new_create_function(const char * name, const char ** parameter
 	return (BC_Chunk) { INSTR_CREATE_FUNCTION, .instr_create_function = instr };
 }
 
+BC_Chunk bc_chunk_new_create_string(const char * literal)
+{
+	Instr_Create_String instr = (Instr_Create_String) { literal };
+	return (BC_Chunk) { INSTR_CREATE_STRING, .instr_create_string = instr };
+}
+
 void bc_chunk_print(BC_Chunk chunk)
 {
 	const char * instr_names[] = {	
@@ -521,6 +527,11 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_CREATE_LIST: {
 		Value list = value_new_list();
 		push(list);
+	} break;
+	case INSTR_CREATE_STRING: {
+		Instr_Create_String instr = chunk.instr_create_string;
+		Value string = value_new_string(instr.literal);
+		push(string);
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

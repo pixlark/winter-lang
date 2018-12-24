@@ -23,7 +23,7 @@ typedef struct Value Value;
 
 typedef struct {
 	size_t len;
-	const char * contents;
+	char * contents;
 } Winter_String;
 
 typedef struct {

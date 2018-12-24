@@ -348,7 +348,7 @@ Token lexer_next_token(Lexer * lexer)
 		token.type = TOKEN_STRING_LITERAL;
 		// TODO(pixlark): Should this be interned in the same place as names/keywords?
 		sb_push(buffer, '\0');
-		token.string_literal = buffer ? lexer_intern_string(lexer, buffer) : NULL;
+		token.string_literal = lexer_intern_string(lexer, buffer);
 		sb_free(buffer);
 		token.assoc = assoc_source_new(lexer, lexer->line, start, end - start);
 		return token;

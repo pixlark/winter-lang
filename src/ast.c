@@ -33,6 +33,8 @@ void deep_free_expr(Expr * expr)
 		}
 		sb_free(expr->list.elements);
 		break;
+	case EXPR_STRING:
+		break;
 	default:
 		fatal_internal("Can't free AST Expression!");
 		break;

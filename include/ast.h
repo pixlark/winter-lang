@@ -33,6 +33,7 @@ typedef enum {
 	EXPR_BINARY,
 	EXPR_CAST,
 	EXPR_LIST,
+	EXPR_STRING,
 } Expr_Type;
 
 typedef struct Expr {
@@ -64,6 +65,9 @@ typedef struct Expr {
 		struct {
 			struct Expr ** elements;
 		} list;
+		struct {
+			const char * literal;
+		} string;
 	};
 	bool marked;
 	Assoc_Source assoc;

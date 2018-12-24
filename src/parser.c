@@ -126,9 +126,9 @@ Expr * parse_atom(Lexer * lexer)
 		return expr;
 	} break;
 	case TOKEN_STRING_LITERAL: {
-		EXPR(EXPR_ATOM);
+		EXPR(EXPR_STRING);
 		mark_expr(expr, token.assoc);
-		expr->atom.value = value_new_string(token.string_literal);
+		expr->string.literal = token.string_literal;
 		advance();
 		return expr;
 	} break;
