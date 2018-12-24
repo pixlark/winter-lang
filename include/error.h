@@ -27,7 +27,11 @@ Assoc_Source assoc_source_eof(Lexer * lexer);
 void fatal(const char * fmt, ...);
 void fatal_assoc(Assoc_Source assoc, const char * fmt, ...);
 void fatal_user_assert_failed(Assoc_Source assoc);
-void fatal_internal(const char * fmt, ...);
+void _fatal_internal(const char * file, size_t line, const char * fmt, ...);
+
+// I think this may cause a dependency on GCC... is that ok?
+#define fatal_internal(fmt, ...) _fatal_internal(__FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+
 void _internal_assert(bool cond, const char * file, size_t line);
 
 #define internal_assert(cond) _internal_assert((cond), __FILE__, __LINE__)

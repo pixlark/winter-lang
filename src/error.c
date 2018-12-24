@@ -148,12 +148,13 @@ void fatal_user_assert_failed(Assoc_Source assoc)
 	exit(1);
 }
 
-void fatal_internal(const char * fmt, ...)
+void _fatal_internal(const char * file, size_t line, const char * fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
 
 	fprintf(stderr, INVERTED(BOLD(RED("internal compiler error"))) ":\n");
+	fprintf(stderr, "%s:%d\n", file, line);
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 
