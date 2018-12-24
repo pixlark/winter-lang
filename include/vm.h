@@ -63,7 +63,7 @@ typedef struct {
 } Instr_Cast;
 
 typedef struct {
-	const char ** parameters;
+	size_t parameter_count;
 	BC_Chunk * bytecode;	
 } Instr_Create_Function;
 
@@ -139,7 +139,7 @@ BC_Chunk bc_chunk_new_jump(int offset);
 BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
 BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
 BC_Chunk bc_chunk_new_cast(Value_Type type);
-BC_Chunk bc_chunk_new_create_function(const char ** parameters, BC_Chunk * bytecode);
+BC_Chunk bc_chunk_new_create_function(size_t parameter_count, BC_Chunk * bytecode);
 BC_Chunk bc_chunk_new_create_string(const char * literal);
 
 void bc_chunk_print(BC_Chunk chunk);
@@ -191,7 +191,8 @@ void winter_machine_garbage_collect(Winter_Machine * wm); // Defined in gc.c... 
 // : Function
 
 typedef struct Function {
-	const char ** parameters; // sb
+	//const char ** parameters; // sb
+	Value parameter_list;
 	Variable_Map closure;
 	BC_Chunk * bytecode;
 } Function;

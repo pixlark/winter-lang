@@ -18,6 +18,9 @@ Variable_Map variable_map_new()
 
 void variable_map_free(Variable_Map map)
 {
+	for (int i = 0; i < sb_count(map.names); i++) {
+		free((void*) map.names[i]);
+	}
 	sb_free(map.names);
 	sb_free(map.values);
 }
@@ -25,8 +28,10 @@ void variable_map_free(Variable_Map map)
 Value * variable_map_index(Variable_Map * map, const char * name)
 {
 	for (int i = 0; i < map->size; i++) {
-		// We can do this because names are interned in the lexer
-		if (name == map->names[i]) {
+		// Can't do string intern comparison because if name is a
+		// function parameter, it's dynamically allocated. Way to fix
+		// this?
+		if (strcmp(name, map->names[i]) == 0) {
 			return map->values[i];
 		}
 	}
@@ -41,7 +46,7 @@ Value * variable_map_update(Variable_Map * map, const char * name, Value value)
 		return index;
 	} else {
 		map->size++;
-		sb_push(map->names, name);
+		sb_push(map->names, strdup(name));
 		Value * storage = malloc(sizeof(Value));
 		*storage = value;
 		sb_push(map->values, storage);
@@ -49,12 +54,15 @@ Value * variable_map_update(Variable_Map * map, const char * name, Value value)
 	}
 }
 
-// note: NOT a deep copy
+// note: Does not copy values
 Variable_Map variable_map_copy(Variable_Map map)
 {
 	Variable_Map nmap = variable_map_new();
 	nmap.size = map.size;
-	nmap.names = sb_copy(map.names);
+	nmap.names = NULL;
+	for (int i = 0; i < sb_count(map.names); i++) {
+		sb_push(nmap.names, strdup(map.names[i]));
+	}
 	nmap.values = sb_copy(map.values);
 	return nmap;
 }
@@ -143,9 +151,9 @@ BC_Chunk bc_chunk_new_cast(Value_Type type)
 	return (BC_Chunk) { INSTR_CAST, .instr_cast = (Instr_Cast) { type } };
 }
 
-BC_Chunk bc_chunk_new_create_function(const char ** parameters, BC_Chunk * bytecode)
+BC_Chunk bc_chunk_new_create_function(size_t parameter_count, BC_Chunk * bytecode)
 {
-	Instr_Create_Function instr = (Instr_Create_Function) { parameters, bytecode };
+	Instr_Create_Function instr = (Instr_Create_Function) { parameter_count, bytecode };
 	return (BC_Chunk) { INSTR_CREATE_FUNCTION, .instr_create_function = instr };
 }
 
@@ -165,6 +173,7 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_BREAK] = "BREAK",
 		[INSTR_CONTINUE] = "CONTINUE",
 		[INSTR_CLOSURE] = "CLOSURE",
+		[INSTR_APPEND] = "APPEND",
 
 		[INSTR_NEGATE] = "NEGATE",
 		[INSTR_ADD] = "ADD",
@@ -187,6 +196,8 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_CAST] = "CAST",
 
 		[INSTR_CREATE_FUNCTION] = "CREATE_FUNCTION",
+		[INSTR_CREATE_LIST] = "CREATE_LIST",
+		[INSTR_CREATE_STRING] = "CREATE_STRING",
 	};
 
 	#if DEBUG_PRINTS
@@ -441,12 +452,12 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_GET: {
 		Instr_Get instr = chunk.instr_get;
-		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
-		Value * var_storage = variable_map_index(varmap, instr.name);
+		Variable_Map * var_map = &(winter_machine_frame(wm)->var_map);
+		Value * var_storage = variable_map_index(var_map, instr.name);
 		if (!var_storage) {
 			// Resort to looking in global scope
-			Variable_Map * global_varmap = &(winter_machine_global_frame(wm)->var_map);
-			var_storage = variable_map_index(global_varmap, instr.name);
+			Variable_Map * global_var_map = &(winter_machine_global_frame(wm)->var_map);
+			var_storage = variable_map_index(global_var_map, instr.name);
 			if (!var_storage) {
 				fatal_assoc(chunk.assoc, "%s not bound", instr.name);
 			}
@@ -458,16 +469,19 @@ void winter_machine_step(Winter_Machine * wm)
 		Instr_Call instr = chunk.instr_call;
 		if (func_val.type == VALUE_FUNCTION) {
 			Function func = *(func_val._function);
-			if (sb_count(func.parameters) != instr.arg_count) {
-				fatal_assoc(chunk.assoc, "Wrong number of arguments to function");
+			internal_assert(func.parameter_list.type == VALUE_LIST);
+			Winter_List * parameters = &(func.parameter_list._list);
+			if (parameters->size != instr.arg_count) {
+				fatal_assoc(chunk.assoc, "Expected %d arguments, got %d", parameters->size, instr.arg_count);
 			}
 			Call_Frame * frame = call_frame_alloc(func.bytecode);
 			// Start off varmap with closure
 			frame->var_map = variable_map_copy(func.closure);
 			// Push arguments into varmap
-			for (int i = sb_count(func.parameters) - 1; i >= 0; i--) {
+			for (int i = parameters->size - 1; i >= 0; i--) {
 				Value arg = pop();
-				variable_map_update(&(frame->var_map), func.parameters[i], arg);
+				internal_assert(parameters->contents[i].type == VALUE_STRING);
+				variable_map_update(&(frame->var_map), parameters->contents[i]._string.contents, arg);
 			}
 			// Bump refcount for all variables in new varmap
 			for (int i = 0; i < frame->var_map.size; i++) {
@@ -521,7 +535,14 @@ void winter_machine_step(Winter_Machine * wm)
 		// Creation of dynamically allocated values
 	case INSTR_CREATE_FUNCTION: {
 		Instr_Create_Function instr = chunk.instr_create_function;
-		Value func = value_new_function(instr.parameters, instr.bytecode);
+		Value parameter_list = value_new_list();
+		for (int i = 0; i < instr.parameter_count; i++) {
+			Value parameter = pop();
+			internal_assert(parameter.type == VALUE_STRING);
+			parameter_list = value_append_list(parameter_list, parameter);
+		}
+		Value func = value_new_function(instr.bytecode);
+		func._function->parameter_list = parameter_list;
 		push(func);
 	} break;
 	case INSTR_CREATE_LIST: {

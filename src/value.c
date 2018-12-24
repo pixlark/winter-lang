@@ -38,10 +38,9 @@ Value value_new_string(const char * s)
 	return (Value) { VALUE_STRING, ._string = string };
 }
 
-Value value_new_function(const char ** parameters, BC_Chunk * bytecode)
+Value value_new_function(BC_Chunk * bytecode)
 {
 	Function * func = global_alloc(sizeof(Function));
-	func->parameters = parameters;
 	func->bytecode = bytecode;
 	func->closure = variable_map_new();
 	return (Value) {
@@ -87,10 +86,9 @@ Value value_print(Value value)
 		break;
 	case VALUE_FUNCTION:
 		#if DEBUG_PRINTS
-		printf("<function at %p; refcount %d; name %s>\n",
+		printf("<function at %p; refcount %d>\n",
 			   value._function,
-			   gc_get_refcount(value._function),
-			   value._function->name);
+			   gc_get_refcount(value._function));
 		#else
 		printf("<function at %p>\n", value._function);
 		#endif
@@ -398,6 +396,7 @@ void value_modify_refcount(Value value, int change)
 		break;
 	case VALUE_FUNCTION:
 		gc_modify_refcount(value._function, change);
+		value_modify_refcount(value._function->parameter_list, change);
 		break;
 	case VALUE_BUILTIN:
 		break;

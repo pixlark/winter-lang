@@ -167,7 +167,11 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		Compiler decl_compiler;
 		decl_compiler.bytecode = NULL;
 		compile_body(&decl_compiler, stmt->func_decl.body);
-		P(bc_chunk_new_create_function(sb_copy(stmt->func_decl.parameters),
+		// Push parameters in reverse order
+		for (int i = sb_count(stmt->func_decl.parameters) - 1; i >= 0; i--) {
+			P(bc_chunk_new_create_string(stmt->func_decl.parameters[i]), stmt->assoc);
+		}
+		P(bc_chunk_new_create_function(sb_count(stmt->func_decl.parameters),
 									   decl_compiler.bytecode),
 		  stmt->assoc);
 		P(bc_chunk_new_no_args(INSTR_CLOSURE), stmt->assoc);
