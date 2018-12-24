@@ -400,6 +400,9 @@ void value_modify_refcount(Value value, int change)
 		break;
 	case VALUE_LIST:
 		gc_modify_refcount(value._list.contents, change);
+		for (int i = 0; i < value._list.size; i++) {
+			value_modify_refcount(value._list.contents[i], change);
+		}
 		break;
 	default:
 		fatal_internal("Switch statement in value_modify_refcount not complete");
