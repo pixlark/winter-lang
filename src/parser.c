@@ -237,8 +237,8 @@ Expr * parse_cast(Lexer * lexer)
 		case TOKEN_STRING:
 			expr->cast.type = VALUE_STRING;
 			break;
-		case TOKEN_FUNCTION:
-			expr->cast.type = VALUE_FUNCTION;
+		case TOKEN_LIST:
+			expr->cast.type = VALUE_LIST;
 			break;
 		default:
 			fatal_assoc(token().assoc,

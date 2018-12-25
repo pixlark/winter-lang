@@ -253,6 +253,17 @@ Value value_less_than(Value a, Value b, Assoc_Source assoc)
 	}
 }
 
+Value value_cast_none(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_STRING:
+		return value_new_string("none");
+		break;
+	default:
+		fatal_assoc(assoc, "Can't cast none to given type");
+	}
+}
+
 Value value_cast_integer(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
@@ -262,6 +273,11 @@ Value value_cast_integer(Value a, Value_Type type, Assoc_Source assoc)
 		return value_new_float((float) a._integer);
 	case VALUE_BOOL:
 		return value_new_bool(a._integer);
+	case VALUE_STRING: {
+		char buffer[512];
+		sprintf(buffer, "%d", a._integer);
+		return value_new_string(buffer);
+	} break;
 	default:
 		fatal_assoc(assoc, "Can't cast integer to given type");
 	}
@@ -274,6 +290,11 @@ Value value_cast_float(Value a, Value_Type type, Assoc_Source assoc)
 		return value_new_integer((int) a._float);
 	case VALUE_FLOAT:
 		return a;
+	case VALUE_STRING: {
+		char buffer[512];
+		sprintf(buffer, "%f", a._float);
+		return value_new_string(buffer);
+	} break;
 	default:
 		fatal_assoc(assoc, "Can't cast float to given type");
 	}
@@ -286,6 +307,8 @@ Value value_cast_bool(Value a, Value_Type type, Assoc_Source assoc)
 		return value_new_integer(a._bool ? 1 : 0);
 	case VALUE_BOOL:
 		return a;
+	case VALUE_STRING:
+		return value_new_string(a._bool ? "true" : "false");
 	default:
 		fatal_assoc(assoc, "Can't cast bool to given type");
 	}
@@ -324,14 +347,60 @@ Value value_cast_function(Value a, Value_Type type, Assoc_Source assoc)
 	switch (type) {
 	case VALUE_FUNCTION:
 		return a;
+	case VALUE_STRING: {
+		char buffer[512];
+		sprintf(buffer, "<function at %p>", a._function);
+		return value_new_string(buffer);
+	} break;
 	default:
 		fatal_assoc(assoc, "Can't cast function to given type");
+	}
+}
+
+Value value_cast_builtin(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_STRING: {
+		char buffer[512];
+		sprintf(buffer, "<builtin function %s>", builtin_names[a._builtin]);
+		return value_new_string(buffer);
+	} break;
+	case VALUE_BUILTIN:
+		return a;
+	default:
+		fatal_assoc(assoc, "Can't cast builtin to given type");
+	}	
+}
+
+Value value_cast_list(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_STRING: {
+		// TODO(pixlark): This of indeterminate length, so using a
+		// static buffer is dangerous. Make a string builder and use that!
+		char buffer[512];
+		strcpy(buffer, "[");
+		for (int i = 0; i < a._list.size; i++) {
+			// s will get collected automatically
+			Value s = value_cast(a._list.contents[i], VALUE_STRING, assoc);
+			strcat(buffer, s._string.contents);
+			if (i != a._list.size - 1) strcat(buffer, ", ");	
+		}
+		strcat(buffer, "]");
+		return value_new_string(buffer);
+	} break;
+	case VALUE_LIST:
+		return a;
+	default:
+		fatal_assoc(assoc, "Can't cast list to given type");
 	}
 }
 
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (a.type) {
+	case VALUE_NONE:
+		return value_cast_none(a, type, assoc);
 	case VALUE_INTEGER:
 		return value_cast_integer(a, type, assoc);
 	case VALUE_FLOAT:
@@ -343,9 +412,9 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 	case VALUE_FUNCTION:
 		return value_cast_function(a, type, assoc);
 	case VALUE_BUILTIN:
-		fatal("Can't cast builtin to given type");
+		return value_cast_builtin(a, type, assoc);
 	case VALUE_LIST:
-		fatal("Can't cast list to given type");
+		return value_cast_list(a, type, assoc);
 	default:
 		fatal_internal("Not all switch cases covered in value_cast");
 	}

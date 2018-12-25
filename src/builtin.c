@@ -17,9 +17,16 @@ int builtin_arg_counts[] = {
 Value builtin_print(Value * args, size_t arg_count, Assoc_Source assoc)
 {
 	for (int i = 0; i < arg_count; i++) {
-		value_print(args[i]);
+		// to_print should get collected automatically
+		Value to_print = value_cast(args[i], VALUE_STRING, assoc);
+		internal_assert(to_print.type == VALUE_STRING);
+		if (i != arg_count - 1) {
+			printf("%s ", to_print._string.contents);
+		} else {
+			printf("%s", to_print._string.contents);
+		}
 	}
-	if (arg_count == 0) printf("\n");
+	printf("\n");
 	return value_none();
 }
 
