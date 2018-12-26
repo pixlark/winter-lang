@@ -1,1 +1,1 @@
-print(list);
+print(typeof(15));

@@ -18,5 +18,6 @@ extern Value (*builtin_functions[])(Value*, size_t, Assoc_Source);
 enum {
 	BUILTIN_PRINT,
 	BUILTIN_ASSERT,
+	BUILTIN_TYPEOF,
 	NUM_BUILTINS,
 };

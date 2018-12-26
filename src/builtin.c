@@ -5,11 +5,13 @@
 const char * builtin_names[] = {
 	"print",
 	"assert",
+	"typeof",
 };
 
 // -1 means varargs
 int builtin_arg_counts[] = {
 	-1,
+	1,
 	1,
 };
 
@@ -44,7 +46,13 @@ Value builtin_assert(Value * args, size_t arg_count, Assoc_Source assoc)
 	}
 }
 
+Value builtin_typeof(Value * args, size_t arg_count, Assoc_Source assoc)
+{
+	return value_new_type(args[0].type);
+}
+
 Value (*builtin_functions[])(Value*, size_t, Assoc_Source) = {
 	builtin_print,
 	builtin_assert,
+	builtin_typeof,
 };
