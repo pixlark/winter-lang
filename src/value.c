@@ -7,11 +7,32 @@
 
 #include <ctype.h>
 
+// : Value
+
+const char * value_type_names[] = {
+	"none",
+	"type",
+	"integer",
+	"float",
+	"bool",
+	"string",
+	"function",
+	"builtin",
+	"list",
+};
+
+// :\ Value
+
 // : Value creation
 
 Value value_none()
 {
 	return (Value) { VALUE_NONE };
+}
+
+Value value_new_type(Value_Type t)
+{
+	return (Value) { VALUE_TYPE, ._type = t };
 }
 
 Value value_new_integer(int i)
@@ -264,6 +285,19 @@ Value value_cast_none(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
+Value value_cast_type(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_STRING: {
+		char buffer[512];
+		sprintf(buffer, "<type: %s>", value_type_names[a._type]);
+		return value_new_string(buffer);
+	} break;
+	default:
+		fatal_assoc(assoc, "Can't cast type to given type");
+	}
+}
+
 Value value_cast_integer(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
@@ -401,6 +435,8 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 	switch (a.type) {
 	case VALUE_NONE:
 		return value_cast_none(a, type, assoc);
+	case VALUE_TYPE:
+		return value_cast_type(a, type, assoc);
 	case VALUE_INTEGER:
 		return value_cast_integer(a, type, assoc);
 	case VALUE_FLOAT:
@@ -453,6 +489,8 @@ void value_modify_refcount(Value value, int change)
 {
 	switch (value.type) {
 	case VALUE_NONE:
+		break;
+	case VALUE_TYPE:
 		break;
 	case VALUE_INTEGER:
 		break;

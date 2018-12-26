@@ -83,7 +83,9 @@ void compile_expression(Compiler * compiler, Expr * expr)
 	} break;
 	case EXPR_CAST: {
 		compile_expression(compiler, expr->cast.expr);
-		P(bc_chunk_new_cast(expr->cast.type), expr->assoc);
+		compile_expression(compiler, expr->cast.type);
+		P(bc_chunk_new_no_args(INSTR_CAST), expr->assoc);
+		//P(bc_chunk_new_cast(expr->cast.type), expr->assoc);
 	} break;
 	case EXPR_LIST: {
 		P(bc_chunk_new_no_args(INSTR_CREATE_LIST), expr->assoc);

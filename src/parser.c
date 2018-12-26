@@ -152,6 +152,35 @@ Expr * parse_atom(Lexer * lexer)
 		expr->list.elements = parse_list_literal(lexer);
 		return expr;
 	} break;
+	case TOKEN_INT:
+	case TOKEN_FLOAT:
+	case TOKEN_BOOL:
+	case TOKEN_STRING:
+	case TOKEN_LIST: {
+		EXPR(EXPR_ATOM);
+		mark_expr(expr, token.assoc);
+		Value_Type type;
+		switch (token().type) {
+		case TOKEN_INT:
+			type = VALUE_INTEGER;
+			break;
+		case TOKEN_FLOAT:
+			type = VALUE_FLOAT;
+			break;
+		case TOKEN_BOOL:
+			type = VALUE_BOOL;
+			break;
+		case TOKEN_STRING:
+			type = VALUE_STRING;
+			break;
+		case TOKEN_LIST:
+			type = VALUE_LIST;
+			break;
+		}
+		advance();
+		expr->atom.value = value_new_type(type);
+		return expr;
+	} break;
 	default: {
 		printf("");
 		fatal_assoc(token().assoc,
@@ -224,28 +253,7 @@ Expr * parse_cast(Lexer * lexer)
 		EXPR(EXPR_CAST);
 		mark_expr(expr, as);
 		expr->cast.expr = left;
-		switch (token().type) {
-		case TOKEN_INT:
-			expr->cast.type = VALUE_INTEGER;
-			break;
-		case TOKEN_FLOAT:
-			expr->cast.type = VALUE_FLOAT;
-			break;
-		case TOKEN_BOOL:
-			expr->cast.type = VALUE_BOOL;
-			break;
-		case TOKEN_STRING:
-			expr->cast.type = VALUE_STRING;
-			break;
-		case TOKEN_LIST:
-			expr->cast.type = VALUE_LIST;
-			break;
-		default:
-			fatal_assoc(token().assoc,
-						"Expected type, got %s instead",
-						token_to_string(lexer->token));
-			break;
-		}
+		expr->cast.type = parse_prefix(lexer);
 		advance();
 		left = expr;
 	}

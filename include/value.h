@@ -10,6 +10,7 @@ typedef struct BC_Chunk BC_Chunk;
 
 typedef enum {
 	VALUE_NONE,
+	VALUE_TYPE,
 	VALUE_INTEGER,
 	VALUE_FLOAT,
 	VALUE_BOOL,
@@ -18,6 +19,8 @@ typedef enum {
 	VALUE_BUILTIN,
 	VALUE_LIST,
 } Value_Type;
+
+extern const char * value_type_names[];
 
 typedef struct Value Value;
 
@@ -35,6 +38,7 @@ typedef struct {
 struct Value {
 	Value_Type type;
 	union {
+		Value_Type _type;
 		int _integer;
 		float _float;
 		bool _bool;
@@ -49,6 +53,7 @@ struct Value {
 
 // : Value creation
 Value value_none();
+Value value_new_type(Value_Type t);
 Value value_new_integer(int i);
 Value value_new_float(float f);
 Value value_new_bool(bool b);

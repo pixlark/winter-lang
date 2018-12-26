@@ -59,10 +59,6 @@ typedef struct {
 } Instr_Set_Loop;
 
 typedef struct {
-	Value_Type type;
-} Instr_Cast;
-
-typedef struct {
 	size_t parameter_count;
 	BC_Chunk * bytecode;	
 } Instr_Create_Function;
@@ -81,6 +77,7 @@ enum Instruction {
 	INSTR_CONTINUE,
 	INSTR_CLOSURE,
 	INSTR_APPEND,
+	INSTR_CAST,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
@@ -100,7 +97,6 @@ enum Instruction {
 	INSTR_JUMP,
 	INSTR_CONDJUMP,
 	INSTR_SET_LOOP,
-	INSTR_CAST,
 	// Creation of dynamically allocated values
 	INSTR_CREATE_FUNCTION,
 	INSTR_CREATE_LIST,
@@ -123,7 +119,6 @@ struct BC_Chunk {
 		Instr_Jump instr_jump;
 		Instr_Condjump instr_condjump;
 		Instr_Set_Loop instr_set_loop;
-		Instr_Cast instr_cast;
 		Instr_Create_Function instr_create_function;
 		Instr_Create_String instr_create_string;
 	};
@@ -138,7 +133,6 @@ BC_Chunk bc_chunk_new_call(size_t arg_count);
 BC_Chunk bc_chunk_new_jump(int offset);
 BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
 BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
-BC_Chunk bc_chunk_new_cast(Value_Type type);
 BC_Chunk bc_chunk_new_create_function(size_t parameter_count, BC_Chunk * bytecode);
 BC_Chunk bc_chunk_new_create_string(const char * literal);
 

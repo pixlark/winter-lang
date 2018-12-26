@@ -146,11 +146,6 @@ BC_Chunk bc_chunk_new_set_loop(size_t end_offset)
 			.instr_set_loop = (Instr_Set_Loop) { end_offset } };
 }
 
-BC_Chunk bc_chunk_new_cast(Value_Type type)
-{
-	return (BC_Chunk) { INSTR_CAST, .instr_cast = (Instr_Cast) { type } };
-}
-
 BC_Chunk bc_chunk_new_create_function(size_t parameter_count, BC_Chunk * bytecode)
 {
 	Instr_Create_Function instr = (Instr_Create_Function) { parameter_count, bytecode };
@@ -174,6 +169,7 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_CONTINUE] = "CONTINUE",
 		[INSTR_CLOSURE] = "CLOSURE",
 		[INSTR_APPEND] = "APPEND",
+		[INSTR_CAST] = "CAST",
 
 		[INSTR_NEGATE] = "NEGATE",
 		[INSTR_ADD] = "ADD",
@@ -193,7 +189,6 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_JUMP] = "JUMP",
 		[INSTR_CONDJUMP] = "CONDJUMP",
 		[INSTR_SET_LOOP] = "SET_LOOP",
-		[INSTR_CAST] = "CAST",
 
 		[INSTR_CREATE_FUNCTION] = "CREATE_FUNCTION",
 		[INSTR_CREATE_LIST] = "CREATE_LIST",
@@ -528,9 +523,13 @@ void winter_machine_step(Winter_Machine * wm)
 		sb_push(frame->loop_stack, new_loop);
 	} break;
 	case INSTR_CAST: {
-		Instr_Cast instr = chunk.instr_cast;
+		//Instr_Cast instr = chunk.instr_cast;
+		Value type = pop();
+		if (type.type != VALUE_TYPE) {
+			fatal_assoc(chunk.assoc, "Can't cast to non-type");
+		}
 		Value to_cast = pop();
-		push(value_cast(to_cast, instr.type, chunk.assoc));
+		push(value_cast(to_cast, type._type, chunk.assoc));
 	} break;
 		// Creation of dynamically allocated values
 	case INSTR_CREATE_FUNCTION: {

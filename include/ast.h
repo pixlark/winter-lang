@@ -60,7 +60,8 @@ typedef struct Expr {
 		} binary;
 		struct {
 			struct Expr * expr;
-			Value_Type type;
+			struct Expr * type;
+			//Value_Type type;
 		} cast;
 		struct {
 			struct Expr ** elements;
