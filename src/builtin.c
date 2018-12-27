@@ -6,6 +6,7 @@ const char * builtin_names[] = {
 	"print",
 	"assert",
 	"typeof",
+	"list_append",
 };
 
 // -1 means varargs
@@ -13,9 +14,9 @@ int builtin_arg_counts[] = {
 	-1,
 	1,
 	1,
+	2,
 };
 
-// TODO(pixlark): Seperate w/ spaces rather than newlines
 Value builtin_print(Value * args, size_t arg_count, Assoc_Source assoc)
 {
 	for (int i = 0; i < arg_count; i++) {
@@ -51,8 +52,18 @@ Value builtin_typeof(Value * args, size_t arg_count, Assoc_Source assoc)
 	return value_new_type(args[0].type);
 }
 
+Value builtin_list_append(Value * args, size_t arg_count, Assoc_Source assoc)
+{
+	Value list = args[0];
+	internal_assert(list.type == VALUE_LIST);
+	Value to_append = args[1];
+	value_append_list(list, to_append);
+	return value_none();
+}
+
 Value (*builtin_functions[])(Value*, size_t, Assoc_Source) = {
 	builtin_print,
 	builtin_assert,
 	builtin_typeof,
+	builtin_list_append,
 };

@@ -382,7 +382,7 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_APPEND: {
 		Value to_append = pop();
 		Value list = pop();
-		list = value_append(list, to_append, chunk.assoc);
+		value_append(list, to_append, chunk.assoc);
 		push(list);
 	} break;
 
@@ -465,7 +465,7 @@ void winter_machine_step(Winter_Machine * wm)
 		if (func_val.type == VALUE_FUNCTION) {
 			Function func = *(func_val._function);
 			internal_assert(func.parameter_list.type == VALUE_LIST);
-			Winter_List * parameters = &(func.parameter_list._list);
+			Winter_List * parameters = func.parameter_list._list;
 			if (parameters->size != instr.arg_count) {
 				fatal_assoc(chunk.assoc, "Expected %d arguments, got %d", parameters->size, instr.arg_count);
 			}
@@ -538,7 +538,7 @@ void winter_machine_step(Winter_Machine * wm)
 		for (int i = 0; i < instr.parameter_count; i++) {
 			Value parameter = pop();
 			internal_assert(parameter.type == VALUE_STRING);
-			parameter_list = value_append_list(parameter_list, parameter);
+			value_append_list(parameter_list, parameter);
 		}
 		Value func = value_new_function(instr.bytecode);
 		func._function->parameter_list = parameter_list;

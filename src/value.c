@@ -76,10 +76,10 @@ Value value_new_builtin(Builtin b)
 
 Value value_new_list()
 {
-	Winter_List list;
-	list.size     = 0;
-	list.capacity = 4;
-	list.contents = global_alloc(sizeof(Value) * 4);
+	Winter_List * list = global_alloc(sizeof(Winter_List));
+	list->size     = 0;
+	list->capacity = 4;
+	list->contents = global_alloc(sizeof(Value) * 4);
 	return (Value) { VALUE_LIST, ._list = list };
 }
 
@@ -119,14 +119,14 @@ Value value_print(Value value)
 			   builtin_names[value._builtin]);
 		break;
 	case VALUE_LIST: {
-		if (value._list.size == 0) {
+		if (value._list->size == 0) {
 			printf("[]\n");
 			break;
 		}
 		printf("[\n");
-		for (int i = 0; i < value._list.size; i++) {
+		for (int i = 0; i < value._list->size; i++) {
 			printf("  ");
-			value_print(value._list.contents[i]);
+			value_print(value._list->contents[i]);
 		}
 		printf("]\n");
 	} break;
@@ -414,11 +414,11 @@ Value value_cast_list(Value a, Value_Type type, Assoc_Source assoc)
 		// static buffer is dangerous. Make a string builder and use that!
 		char buffer[512];
 		strcpy(buffer, "[");
-		for (int i = 0; i < a._list.size; i++) {
+		for (int i = 0; i < a._list->size; i++) {
 			// s will get collected automatically
-			Value s = value_cast(a._list.contents[i], VALUE_STRING, assoc);
+			Value s = value_cast(a._list->contents[i], VALUE_STRING, assoc);
 			strcat(buffer, s._string.contents);
-			if (i != a._list.size - 1) strcat(buffer, ", ");	
+			if (i != a._list->size - 1) strcat(buffer, ", ");
 		}
 		strcat(buffer, "]");
 		return value_new_string(buffer);
@@ -456,25 +456,24 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
-Value value_append_list(Value value, Value to_append)
+void value_append_list(Value value, Value to_append)
 {
 	internal_assert(value.type == VALUE_LIST);
-	Winter_List * list = &(value._list);
+	Winter_List * list = value._list;
 	if (list->size >= list->capacity) {
 		list->capacity *= 2;
-		list->contents = global_realloc(list->contents, list->capacity);
+		list->contents = global_realloc(list->contents,
+										list->capacity * sizeof(Value));
 	}
 	list->contents[list->size] = to_append;
 	list->size++;
-	value._list = *list;
-	return value;
 }
 
-Value value_append(Value array, Value to_append, Assoc_Source assoc)
+void value_append(Value array, Value to_append, Assoc_Source assoc)
 {
 	switch (array.type) {
 	case VALUE_LIST:
-		return value_append_list(array, to_append);
+		value_append_list(array, to_append);
 		break;
 	default:
 		fatal_assoc(assoc, "Can't append to non-list");
@@ -508,9 +507,10 @@ void value_modify_refcount(Value value, int change)
 	case VALUE_BUILTIN:
 		break;
 	case VALUE_LIST:
-		gc_modify_refcount(value._list.contents, change);
-		for (int i = 0; i < value._list.size; i++) {
-			value_modify_refcount(value._list.contents[i], change);
+		gc_modify_refcount(value._list, change);
+		gc_modify_refcount(value._list->contents, change);
+		for (int i = 0; i < value._list->size; i++) {
+			value_modify_refcount(value._list->contents[i], change);
 		}
 		break;
 	default:

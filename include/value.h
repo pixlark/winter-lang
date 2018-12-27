@@ -45,7 +45,7 @@ struct Value {
 		Winter_String _string;
 		Function * _function;
 		Builtin _builtin;
-		Winter_List _list;
+		Winter_List * _list;
 	};
 };
 
@@ -77,8 +77,8 @@ Value value_equal(Value a, Value b, Assoc_Source assoc);
 Value value_greater_than(Value a, Value b, Assoc_Source assoc);
 Value value_less_than(Value a, Value b, Assoc_Source assoc);
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
-/* temporary */ Value value_append_list(Value value, Value to_append);
-Value value_append(Value array, Value to_append, Assoc_Source assoc);
+/* temporary */ void value_append_list(Value value, Value to_append);
+void value_append(Value array, Value to_append, Assoc_Source assoc);
 // :\ Value operations
 
 // : Value GC
