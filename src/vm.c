@@ -181,6 +181,7 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_LT] = "LT",
 		[INSTR_AND] = "AND",
 		[INSTR_OR] = "OR",
+		[INSTR_INDEX] = "INDEX",
 		
 		[INSTR_PUSH] = "PUSH",
 		[INSTR_BIND] = "BIND",
@@ -432,6 +433,20 @@ void winter_machine_step(Winter_Machine * wm)
 		Value b = pop();
 		Value a = pop();
 		push(value_or(a, b, chunk.assoc));
+	} break;
+	case INSTR_INDEX: {
+		Value index = pop();
+		Value list = pop();
+		if (list.type != VALUE_LIST) {
+			fatal_assoc(chunk.assoc, "Can only index lists");
+		}
+		if (index.type != VALUE_INTEGER) {
+			fatal_assoc(chunk.assoc, "Invalid index for list");
+		}
+		if (index._integer >= list._list->size || index._integer < 0) {
+			fatal_assoc(chunk.assoc, "List index out of bounds");
+		}
+		push(list._list->contents[index._integer]);
 	} break;
 		// Args
 	case INSTR_PUSH: {

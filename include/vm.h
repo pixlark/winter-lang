@@ -89,6 +89,7 @@ enum Instruction {
 	INSTR_LT,
 	INSTR_AND,
 	INSTR_OR,
+	INSTR_INDEX,
 	// Args
 	INSTR_PUSH,
 	INSTR_BIND,

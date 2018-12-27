@@ -220,6 +220,24 @@ Expr * parse_function_call(Lexer * lexer)
 	return left;
 }
 
+// Precedence level 0.5
+Expr * parse_postfix(Lexer * lexer)
+{
+	Expr * left = parse_function_call(lexer);
+	while (is('[')) {
+		Assoc_Source as = token().assoc;
+		expect('[');
+		EXPR(EXPR_BINARY);
+		mark_expr(expr, as);
+		expr->binary.operator = OP_INDEX;
+		expr->binary.left = left;
+		expr->binary.right = parse_expression(lexer);
+		expect(']');
+		left = expr;
+	}
+	return left;
+}
+
 // Precedence level 1
 Expr * parse_prefix(Lexer * lexer)
 {
@@ -239,7 +257,7 @@ Expr * parse_prefix(Lexer * lexer)
 		expr->unary.operator = OP_NOT;
 		expr->unary.operand = parse_prefix(lexer);
 	} else {
-		return parse_function_call(lexer);
+		return parse_postfix(lexer);
 	}
 }
 
