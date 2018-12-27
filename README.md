@@ -9,38 +9,30 @@ support both iterative and functional principles.
 
 ```
 func fibonacci(n) {
-	a = 0;
-	b = 1;
-	
-	i = 0;
-	loop {
-		i = i + 1;
-		if i > n {
-			break;
-		}
-		
-		print(a);
-		
-		temp = b;
-		b = a + b;
-		a = temp;
-	}
+    a = 0;
+    b = 1;
+    fibs = [];
+
+    loop {
+        if list_count(fibs) > n {
+            break;
+        }
+
+        list_append(fibs, a);
+        
+        temp = b;
+        b = a + b;
+        a = temp;
+    }
+
+    return fibs;
 }
 
-fibonacci(10);
+print(fibonacci(10));
 ```
 
 produces
 
 ```
-0
-1
-1
-2
-3
-5
-8
-13
-21
-34
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
 ```

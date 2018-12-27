@@ -359,7 +359,7 @@ void winter_machine_step(Winter_Machine * wm)
 		if (sb_count(frame->loop_stack) == 0) {
 			fatal_assoc(chunk.assoc, "Can't use break in non-loop");
 		}
-		Loop loop = sb_last(frame->loop_stack);
+		Loop loop = sb_pop(frame->loop_stack);
 		frame->ip = loop.end;
 	} break;
 	case INSTR_CONTINUE: {

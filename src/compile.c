@@ -157,7 +157,7 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		compile_body(compiler, stmt->loop.body);
 		P(bc_chunk_new_no_args(INSTR_LOOP_END), stmt->assoc);
 		PNOP(); // Landing spot for loop end
-		A(loc, bc_chunk_new_set_loop(L()), stmt->assoc);
+		A(loc, bc_chunk_new_set_loop(L() - loc), stmt->assoc);
 	} break;
 	case STMT_BREAK:
 		P(bc_chunk_new_no_args(INSTR_BREAK), stmt->assoc);
