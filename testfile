@@ -1,7 +1,4 @@
-x = [10, 9, 8];
-
-i = 0;
-while i < list_count(x) {
-	print(i, x[i]);
-    i = i + 1;
-}
+x = [1, 2, 3];
+print(x);
+x[2] = 5;
+print(x);

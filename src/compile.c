@@ -112,6 +112,33 @@ void compile_body(Compiler * compiler, Stmt ** body)
 	}
 }
 
+void compile_assignment(Compiler * compiler, Stmt * assign)
+{
+	Expr * target = assign->assign.target;
+	Expr * expr = assign->assign.expr;
+	switch (target->type) {
+	case EXPR_VAR:
+		compile_expression(compiler, expr);
+		P(bc_chunk_new_create_string(target->var.name), assign->assoc);
+		P(bc_chunk_new_no_args(INSTR_BIND), assign->assoc);
+		break;
+	case EXPR_BINARY:
+		if (target->binary.operator != OP_INDEX) {
+			// Kind of a hack, but whatever
+			goto _default;
+		}
+		compile_expression(compiler, expr);
+		compile_expression(compiler, target->binary.left);
+		compile_expression(compiler, target->binary.right);
+		P(bc_chunk_new_no_args(INSTR_LIST_ASSIGN), assign->assoc);
+		break;
+	default:
+	_default:
+		fatal_assoc(target->assoc, "Invalid target expression for assignment");
+		break;
+	}
+}
+
 void compile_statement(Compiler * compiler, Stmt * stmt)
 {
 	switch (stmt->type) {
@@ -120,8 +147,7 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		P(bc_chunk_new_no_args(INSTR_POP), stmt->assoc);
 		break;
 	case STMT_ASSIGN:
-		compile_expression(compiler, stmt->assign.expr);
-		P(bc_chunk_new_bind(stmt->assign.name), stmt->assoc);
+		compile_assignment(compiler, stmt);
 		break;
 	case STMT_RETURN:
 		compile_expression(compiler, stmt->_return.expr);
@@ -180,7 +206,8 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 									   decl_compiler.bytecode),
 		  stmt->assoc);
 		P(bc_chunk_new_no_args(INSTR_CLOSURE), stmt->assoc);
-		P(bc_chunk_new_bind(stmt->func_decl.name), stmt->assoc);
+		P(bc_chunk_new_create_string(stmt->func_decl.name), stmt->assoc);
+		P(bc_chunk_new_no_args(INSTR_BIND), stmt->assoc);
 	} break;
 	default:
 		fatal_internal("A non-compileable statement reached the compilation phase");

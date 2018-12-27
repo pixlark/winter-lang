@@ -35,10 +35,6 @@ typedef struct {
 
 typedef struct {
 	const char * name;
-} Instr_Bind;
-
-typedef struct {
-	const char * name;
 } Instr_Get;
 
 typedef struct {
@@ -78,6 +74,8 @@ enum Instruction {
 	INSTR_CLOSURE,
 	INSTR_APPEND,
 	INSTR_CAST,
+	INSTR_BIND,
+	INSTR_LIST_ASSIGN,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
@@ -92,7 +90,6 @@ enum Instruction {
 	INSTR_INDEX,
 	// Args
 	INSTR_PUSH,
-	INSTR_BIND,
 	INSTR_GET,
 	INSTR_CALL,
 	INSTR_JUMP,
@@ -114,7 +111,6 @@ struct BC_Chunk {
 	enum Instruction instr;
 	union {
 		Instr_Push instr_push;
-		Instr_Bind instr_bind;
 		Instr_Get  instr_get;
 		Instr_Call instr_call;
 		Instr_Jump instr_jump;
@@ -128,7 +124,6 @@ struct BC_Chunk {
 
 BC_Chunk bc_chunk_new_no_args(enum Instruction instr);
 BC_Chunk bc_chunk_new_push(Value value);
-BC_Chunk bc_chunk_new_bind(const char * name);
 BC_Chunk bc_chunk_new_get(const char * name);
 BC_Chunk bc_chunk_new_call(size_t arg_count);
 BC_Chunk bc_chunk_new_jump(int offset);

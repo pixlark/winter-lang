@@ -80,6 +80,7 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
 void value_append(Value array, Value to_append, Assoc_Source assoc);
 
 void value_append_list(Value value, Value to_append);
+Value * value_element(Value list, Value index, Assoc_Source assoc);
 Value value_pop_list(Value value);
 // :\ Value operations
 

@@ -114,11 +114,6 @@ BC_Chunk bc_chunk_new_push(Value value)
 	return (BC_Chunk) { INSTR_PUSH, .instr_push = (Instr_Push) { value } };
 }
 
-BC_Chunk bc_chunk_new_bind(const char * name)
-{
-	return (BC_Chunk) { INSTR_BIND, .instr_bind = (Instr_Bind) { name } };
-}
-
 BC_Chunk bc_chunk_new_get(const char * name)
 {
 	return (BC_Chunk) { INSTR_GET, .instr_get = (Instr_Get) { name } };
@@ -386,6 +381,32 @@ void winter_machine_step(Winter_Machine * wm)
 		value_append(list, to_append, chunk.assoc);
 		push(list);
 	} break;
+	case INSTR_CAST: {
+		//Instr_Cast instr = chunk.instr_cast;
+		Value type = pop();
+		if (type.type != VALUE_TYPE) {
+			fatal_assoc(chunk.assoc, "Can't cast to non-type");
+		}
+		Value to_cast = pop();
+		push(value_cast(to_cast, type._type, chunk.assoc));
+	} break;
+	case INSTR_BIND: {
+		Value name = pop();
+		internal_assert(name.type == VALUE_STRING);
+		
+		Value value = pop();
+		value_modify_refcount(value, 1);
+		
+		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
+		variable_map_update(varmap, name._string.contents, value);
+	} break;
+	case INSTR_LIST_ASSIGN: {
+		Value index = pop();
+		Value list = pop();
+		Value value = pop();
+		Value * element = value_element(list, index, chunk.assoc);
+		*element = value;
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:
@@ -437,28 +458,13 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_INDEX: {
 		Value index = pop();
 		Value list = pop();
-		if (list.type != VALUE_LIST) {
-			fatal_assoc(chunk.assoc, "Can only index lists");
-		}
-		if (index.type != VALUE_INTEGER) {
-			fatal_assoc(chunk.assoc, "Invalid index for list");
-		}
-		if (index._integer >= list._list->size || index._integer < 0) {
-			fatal_assoc(chunk.assoc, "List index out of bounds");
-		}
-		push(list._list->contents[index._integer]);
+		Value element = *value_element(list, index, chunk.assoc);
+		push(element);
 	} break;
 		// Args
 	case INSTR_PUSH: {
 		Instr_Push instr = chunk.instr_push;
 		push(instr.value);
-	} break;
-	case INSTR_BIND: {
-		Instr_Bind instr = chunk.instr_bind;
-		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
-		Value value = pop();
-		value_modify_refcount(value, 1);
-		variable_map_update(varmap, instr.name, value);
 	} break;
 	case INSTR_GET: {
 		Instr_Get instr = chunk.instr_get;
@@ -536,15 +542,6 @@ void winter_machine_step(Winter_Machine * wm)
 		Call_Frame * frame = winter_machine_frame(wm);
 		Loop new_loop = (Loop) { frame->ip, frame->ip + instr.end_offset };
 		sb_push(frame->loop_stack, new_loop);
-	} break;
-	case INSTR_CAST: {
-		//Instr_Cast instr = chunk.instr_cast;
-		Value type = pop();
-		if (type.type != VALUE_TYPE) {
-			fatal_assoc(chunk.assoc, "Can't cast to non-type");
-		}
-		Value to_cast = pop();
-		push(value_cast(to_cast, type._type, chunk.assoc));
 	} break;
 		// Creation of dynamically allocated values
 	case INSTR_CREATE_FUNCTION: {

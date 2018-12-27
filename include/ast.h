@@ -99,7 +99,8 @@ typedef struct Stmt {
 			Expr * expr;
 		} expr;
 		struct {
-			const char * name;
+			//const char * name;
+			Expr * target;
 			Expr * expr;
 		} assign;
 		struct {

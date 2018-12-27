@@ -469,6 +469,20 @@ void value_append_list(Value value, Value to_append)
 	list->size++;
 }
 
+Value * value_element(Value list, Value index, Assoc_Source assoc)
+{
+	if (list.type != VALUE_LIST) {
+		fatal_assoc(assoc, "Can only index lists");
+	}
+	if (index.type != VALUE_INTEGER) {
+		fatal_assoc(assoc, "Invalid index for list");
+	}
+	if (index._integer >= list._list->size || index._integer < 0) {
+		fatal_assoc(assoc, "List index out of bounds");
+	}
+	return list._list->contents + index._integer;
+}
+
 Value value_pop_list(Value value)
 {
 	internal_assert(value.type == VALUE_LIST);

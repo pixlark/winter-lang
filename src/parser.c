@@ -425,23 +425,6 @@ Expr * parse_expression(Lexer * lexer)
 	return parse_or(lexer);
 }
 
-Stmt * parse_assignment(Lexer * lexer)
-{
-	STMT(STMT_ASSIGN);
-	
-	weak_expect(TOKEN_NAME);
-	stmt->assign.name = token().name;
-	advance();
-	
-	Assoc_Source as = token().assoc;
-	expect('=');
-	mark_stmt(stmt, as);
-	stmt->assign.expr = parse_expression(lexer);
-	expect(';');
-	
-	return stmt;
-}
-
 const char ** parse_function_parameters(Lexer * lexer)
 {
 	const char ** parameters = NULL;
@@ -515,6 +498,11 @@ Stmt * parse_if_statement(Lexer * lexer)
 	return stmt;
 }
 
+bool is_assign_target(Expr * expr)
+{
+	return true;
+}	
+
 Stmt * parse_statement(Lexer * lexer)
 {
 	if (is(TOKEN_EOF)) return NULL;
@@ -563,7 +551,9 @@ Stmt * parse_statement(Lexer * lexer)
 		mark_stmt(stmt, as);
 		expect(';');
 		return stmt;
-	} else if (lexer_lookahead(lexer, 1).type == '=') {
+	}
+	#if 0
+	else if (lexer_lookahead(lexer, 1).type == '=') {
 		// TODO(pixlark): Kluge.
 		/* Once we have l-expressions as a detailed thing, with
 		   indexing and all that, how will we know that this is an
@@ -571,13 +561,32 @@ Stmt * parse_statement(Lexer * lexer)
 		   -Paul T. Sun Dec 16 23:12:45 2018 */
 		// assignment
 		return parse_assignment(lexer);
-	} else {
-		// expression
-		STMT(STMT_EXPR);
-		stmt->expr.expr = parse_expression(lexer);
-		mark_stmt(stmt, stmt->expr.expr->assoc);
-		expect(';');
-		return stmt;
+	}
+	#endif
+	else {
+		// Expression or Assignment
+		Expr * left = parse_expression(lexer);
+		if (is('=')) {
+			// Assignment
+			if (!is_assign_target(left)) {
+				fatal_assoc(left->assoc, "Expression not valid target for assignment");
+			}
+			STMT(STMT_ASSIGN);
+			stmt->assign.target = left;
+			Assoc_Source as = token().assoc;
+			mark_stmt(stmt, as);
+			advance();
+			stmt->assign.expr = parse_expression(lexer);
+			expect(';');
+			return stmt;
+		} else {
+			// Expression
+			STMT(STMT_EXPR);
+			stmt->expr.expr = left;
+			mark_stmt(stmt, stmt->expr.expr->assoc);
+			expect(';');
+			return stmt;
+		}
 	}
 }
 
