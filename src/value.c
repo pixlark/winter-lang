@@ -469,6 +469,15 @@ void value_append_list(Value value, Value to_append)
 	list->size++;
 }
 
+Value value_pop_list(Value value)
+{
+	internal_assert(value.type == VALUE_LIST);
+	Winter_List * list = value._list;
+	Value popped = list->contents[--list->size];
+	value_modify_refcount(popped, -1);
+	return popped;
+}
+
 void value_append(Value array, Value to_append, Assoc_Source assoc)
 {
 	switch (array.type) {

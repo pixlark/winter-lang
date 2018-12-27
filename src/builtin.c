@@ -7,6 +7,8 @@ const char * builtin_names[] = {
 	"assert",
 	"typeof",
 	"list_append",
+	"list_pop",
+	"list_count",
 };
 
 // -1 means varargs
@@ -15,9 +17,13 @@ int builtin_arg_counts[] = {
 	1,
 	1,
 	2,
+	1,
+	1,
 };
 
-Value builtin_print(Value * args, size_t arg_count, Assoc_Source assoc)
+#define DEFINE_BUILTIN(name) Value name (Value * args, size_t arg_count, Assoc_Source assoc)
+
+DEFINE_BUILTIN(builtin_print)
 {
 	for (int i = 0; i < arg_count; i++) {
 		// to_print should get collected automatically
@@ -33,12 +39,12 @@ Value builtin_print(Value * args, size_t arg_count, Assoc_Source assoc)
 	return value_none();
 }
 
-Value builtin_assert(Value * args, size_t arg_count, Assoc_Source assoc)
+DEFINE_BUILTIN(builtin_assert)
 {
 	internal_assert(arg_count == 1);
 	Value condition = args[0];
 	if (condition.type != VALUE_BOOL) {
-		fatal_assoc(assoc, "Assert requires a bool");
+		fatal_assoc(assoc, "assert requires a bool");
 	}
 	if (condition._bool) {
 		return value_none();
@@ -47,18 +53,38 @@ Value builtin_assert(Value * args, size_t arg_count, Assoc_Source assoc)
 	}
 }
 
-Value builtin_typeof(Value * args, size_t arg_count, Assoc_Source assoc)
+DEFINE_BUILTIN(builtin_typeof)
 {
 	return value_new_type(args[0].type);
 }
 
-Value builtin_list_append(Value * args, size_t arg_count, Assoc_Source assoc)
+DEFINE_BUILTIN(builtin_list_append)
+{
+	Value list = args[0];
+	if (list.type != VALUE_LIST) {
+		fatal_assoc(assoc, "list_append requires a list");
+	}
+	Value to_append = args[1];
+	value_append_list(list, to_append);
+	value_modify_refcount(to_append, 1);
+	return value_none();
+}
+
+DEFINE_BUILTIN(builtin_list_pop)
+{
+	Value list = args[0];
+	if (list.type != VALUE_LIST) {
+		fatal_assoc(assoc, "list_pop requires a list");
+	}
+	Value popped = value_pop_list(list);
+	return popped;
+}
+
+DEFINE_BUILTIN(builtin_list_count)
 {
 	Value list = args[0];
 	internal_assert(list.type == VALUE_LIST);
-	Value to_append = args[1];
-	value_append_list(list, to_append);
-	return value_none();
+	return value_new_integer(list._list->size);
 }
 
 Value (*builtin_functions[])(Value*, size_t, Assoc_Source) = {
@@ -66,4 +92,6 @@ Value (*builtin_functions[])(Value*, size_t, Assoc_Source) = {
 	builtin_assert,
 	builtin_typeof,
 	builtin_list_append,
+	builtin_list_pop,
+	builtin_list_count,
 };

@@ -1,1 +1,6 @@
-print(typeof(15));
+ls = [1];
+print(ls);
+list_append(ls, "test");
+print(ls);
+list_pop(ls);
+print(ls);

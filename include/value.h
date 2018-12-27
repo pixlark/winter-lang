@@ -77,8 +77,10 @@ Value value_equal(Value a, Value b, Assoc_Source assoc);
 Value value_greater_than(Value a, Value b, Assoc_Source assoc);
 Value value_less_than(Value a, Value b, Assoc_Source assoc);
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
-/* temporary */ void value_append_list(Value value, Value to_append);
 void value_append(Value array, Value to_append, Assoc_Source assoc);
+
+void value_append_list(Value value, Value to_append);
+Value value_pop_list(Value value);
 // :\ Value operations
 
 // : Value GC
