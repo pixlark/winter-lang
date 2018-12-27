@@ -74,3 +74,9 @@
 ** DONE Use lists of dynamically allocated strings to make functions fully dynamically allocated
 ** TODO Makes types first-class
 ** TODO Make records
+
+* TODO Appending a list to itself causes stack overflow
+ How do we deal with this? Just disallow it by comparing pointers when
+ we append an item to a list? Or should we try to *handle* it? I can't
+ say that I've ever encountered a situation where that would be
+ useful, so maybe we should just disallow it entirely.
