@@ -254,7 +254,6 @@ Expr * parse_cast(Lexer * lexer)
 		mark_expr(expr, as);
 		expr->cast.expr = left;
 		expr->cast.type = parse_prefix(lexer);
-		advance();
 		left = expr;
 	}
 	return left;
