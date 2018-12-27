@@ -13,11 +13,7 @@ func fibonacci(n) {
     b = 1;
     fibs = [];
 
-    loop {
-        if list_count(fibs) > n {
-            break;
-        }
-
+    while list_count(fibs) <= n {
         list_append(fibs, a);
         
         temp = b;
