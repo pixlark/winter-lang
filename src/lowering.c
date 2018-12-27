@@ -117,18 +117,63 @@ void lower_body(Stmt ** body)
 	}
 }
 
-void lower_statement(Stmt * stmt)
+Stmt * lower_while(Stmt * stmt)
+{
+	internal_assert(stmt->type == STMT_WHILE);
+	// Create lowered statement
+	Stmt * lowered = malloc(sizeof(Stmt));
+	lowered->type = STMT_LOOP;
+	// Create body of lowered statement
+	Stmt ** new_body = NULL;
+	Stmt * condition = malloc(sizeof(Stmt));
+	condition->type = STMT_IF;
+	// Put the condition, negated, in an if
+	condition->_if.conditions = NULL;
+	{
+		Expr * condition_expr = stmt->_while.condition;
+		not_sleeve(condition_expr);
+		sb_push(condition->_if.conditions, condition_expr);
+	}
+	// Put a break in the if body
+	condition->_if.bodies = NULL;
+	{
+		Stmt ** if_body = NULL;
+		Stmt * break_stmt = malloc(sizeof(Stmt));
+		break_stmt->type = STMT_BREAK;
+		sb_push(if_body, break_stmt);
+		sb_push(condition->_if.bodies, if_body);
+	}
+	// Add if to beginning of lowered statement body
+	sb_push(new_body, condition);
+	// Add rest of while body to lowered statement body
+	Stmt ** while_body = (stmt->_while.body);
+	Stmt ** add_from = sb_add(new_body, sb_count(while_body));
+	for (int i = 0; i < sb_count(while_body); i++) {
+		add_from[i] = while_body[i];
+	}
+	// Add new body to lowered statement + assign lowered to input statement
+	lowered->loop.body = new_body;
+	// Clean up memory
+	sb_free(while_body);
+	return lowered;
+}
+
+// TODO(pixlark): Rewrite all lowering functions to operate via return
+// value, simply handling any intermediate freeing explicitly. A lot
+// simpler this way I think.
+
+Stmt * lower_statement(Stmt * stmt)
 {
 	switch (stmt->type) {
 	case STMT_EXPR:
 		lower_expression(stmt->expr.expr);
-		break;
+		return stmt;
 	case STMT_ASSIGN:
 		lower_expression(stmt->assign.expr);
-		break;
+		return stmt;
 	case STMT_RETURN:
 		lower_expression(stmt->_return.expr);
-		break;
+		return stmt;
 	case STMT_IF:
 		for (int i = 0; i < sb_count(stmt->_if.conditions); i++) {
 			lower_expression(stmt->_if.conditions[i]);
@@ -137,16 +182,21 @@ void lower_statement(Stmt * stmt)
 			lower_body(stmt->_if.bodies[i]);
 		}
 		if (stmt->_if.else_body) lower_body(stmt->_if.else_body);
-		break;
+		return stmt;
 	case STMT_LOOP:
 		lower_body(stmt->loop.body);
-		break;
+		return stmt;
+	case STMT_WHILE:
+		lower_expression(stmt->_while.condition);
+		lower_body(stmt->_while.body);
+		stmt = lower_while(stmt);
+		return stmt;
 	case STMT_BREAK:
 	case STMT_CONTINUE:
-		break;
+		return stmt;
 	case STMT_FUNC_DECL:
 		lower_body(stmt->func_decl.body);
-		break;
+		return stmt;
 	default:
 		fatal_internal("An unlowerable statement reached lower_statement");
 	}

@@ -85,6 +85,7 @@ typedef enum {
 	STMT_RETURN,
 	STMT_IF,
 	STMT_LOOP,
+	STMT_WHILE,
 	STMT_BREAK,
 	STMT_CONTINUE,
 	STMT_FUNC_DECL,
@@ -111,6 +112,10 @@ typedef struct Stmt {
 		struct {
 			struct Stmt ** body;
 		} loop;
+		struct {
+			Expr * condition;
+			struct Stmt ** body;
+		} _while;
 		struct {
 			const char * name;
 			const char ** parameters;

@@ -523,6 +523,14 @@ Stmt * parse_statement(Lexer * lexer)
 		mark_stmt(stmt, as);
 		stmt->loop.body = parse_scope(lexer);
 		return stmt;
+	} else if (is(TOKEN_WHILE)) {
+		Assoc_Source as = token().assoc;
+		expect(TOKEN_WHILE);
+		STMT(STMT_WHILE);
+		mark_stmt(stmt, as);
+		stmt->_while.condition = parse_expression(lexer);
+		stmt->_while.body = parse_scope(lexer);
+		return stmt;
 	} else if (is(TOKEN_BREAK)) {
 		Assoc_Source as = token().assoc;
 		expect(TOKEN_BREAK);

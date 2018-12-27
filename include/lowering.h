@@ -2,4 +2,4 @@
 
 #include "ast.h"
 
-void lower_statement(Stmt * stmt);
+Stmt * lower_statement(Stmt * stmt);

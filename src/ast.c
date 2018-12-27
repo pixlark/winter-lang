@@ -82,6 +82,10 @@ void deep_free(Stmt * stmt)
 	case STMT_LOOP:
 		deep_free_body(stmt->loop.body);
 		break;
+	case STMT_WHILE:
+		deep_free_expr(stmt->_while.condition);
+		deep_free_body(stmt->_while.body);
+		break;
 	case STMT_BREAK:
 	case STMT_CONTINUE:
 		break;

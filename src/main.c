@@ -43,7 +43,7 @@ int main(int argc, char ** argv)
 		if (!statement) break;
 		
 		// Lowering
-		lower_statement(statement);
+		statement = lower_statement(statement);
 		
 		// Compilation
 		Compiler compiler;
