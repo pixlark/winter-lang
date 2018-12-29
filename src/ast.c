@@ -24,6 +24,9 @@ void deep_free_expr(Expr * expr)
 	case EXPR_FUNCALL:
 		deep_free_exprs(expr->funcall.args);
 		break;
+	case EXPR_FIELD_ACCESS:
+		deep_free_expr(expr->field_access.expr);
+		break;
 	case EXPR_UNARY:
 		deep_free_expr(expr->unary.operand);
 		break;

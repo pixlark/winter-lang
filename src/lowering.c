@@ -78,6 +78,9 @@ void lower_operations_expr(Expr * expr)
 			lower_operations_expr(expr->funcall.args[i]);
 		}
 		break;
+	case EXPR_FIELD_ACCESS:
+		lower_operations_expr(expr->field_access.expr);
+		break;
 	case EXPR_UNARY:
 		lower_operations_expr(expr->unary.operand);
 		break;

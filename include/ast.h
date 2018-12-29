@@ -30,6 +30,7 @@ typedef enum {
 	EXPR_ATOM,
 	EXPR_VAR,
 	EXPR_FUNCALL,
+	EXPR_FIELD_ACCESS,
 	EXPR_UNARY,
 	EXPR_BINARY,
 	EXPR_CAST,
@@ -51,6 +52,10 @@ typedef struct Expr {
 			struct Expr * func;
 			struct Expr ** args;
 		} funcall;
+		struct {
+			struct Expr * expr;
+			const char * field;
+		} field_access;
 		struct {
 			Operator operator;
 			struct Expr * operand;

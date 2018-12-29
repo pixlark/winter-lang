@@ -297,7 +297,7 @@ Token lexer_next_token(Lexer * lexer)
 	// TODO(pixlark): Leading +/- signs
 	
 	// Integer/Float literals
-	if (isdigit(next_char) || next_char == '.') {
+	if (isdigit(next_char) /*|| next_char == '.'*/) {
 		size_t start = lexer->position;
 		bool has_decimal_point = false;
 		while (true) {
@@ -384,6 +384,7 @@ Token lexer_next_token(Lexer * lexer)
 	case '*':
 	case '/':
 	case ',':
+	case '.':
 		lexer_advance_char(lexer);
 		return (Token) { next_char, .assoc = assoc_source_new(lexer, lexer->line,
 															  lexer->position - 1, 1) };

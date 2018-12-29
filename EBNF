@@ -17,6 +17,9 @@ atom = NONE
 	 | dict_literal
 	 | '(' expression ')'
 
+field_access = atom
+			 | atom '.' atom
+
 function_call = atom
 			  | expression '(' [comma_expression] ')'
 

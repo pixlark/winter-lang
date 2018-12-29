@@ -81,6 +81,7 @@ enum Instruction {
 	INSTR_BIND,
 	INSTR_INDEX_ASSIGN,
 	INSTR_ADD_PAIR,
+	INSTR_GET_FIELD,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,

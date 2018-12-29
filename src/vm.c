@@ -431,6 +431,19 @@ void winter_machine_step(Winter_Machine * wm)
 		value_add_pair(dict, key, value, chunk.assoc);
 		push(dict);
 	} break;
+	case INSTR_GET_FIELD: {
+		Value field = pop();
+		internal_assert(field.type == VALUE_STRING);
+		Value record = pop();
+		if (record.type != VALUE_RECORD) {
+			fatal_assoc(chunk.assoc, "Can't get field from non-record");
+		}
+		Value * val = value_index_dictionary(record._record->field_dict, field);
+		if (!val) {
+			fatal_assoc(chunk.assoc, "Field does not exist");
+		}
+		push(*val);
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:

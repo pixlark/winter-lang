@@ -75,6 +75,11 @@ void compile_expression(Compiler * compiler, Expr * expr)
 		compile_expression(compiler, expr->funcall.func);
 		P(bc_chunk_new_call(sb_count(expr->funcall.args)), expr->assoc);
 		break;
+	case EXPR_FIELD_ACCESS:
+		compile_expression(compiler, expr->field_access.expr);
+		P(bc_chunk_new_create_string(expr->field_access.field), expr->assoc);
+		P(bc_chunk_new_no_args(INSTR_GET_FIELD), expr->assoc);
+		break;
 	case EXPR_UNARY: {
 		compile_expression(compiler, expr->unary.operand);
 		compile_operator(compiler, expr->unary.operator, expr->assoc);

@@ -212,6 +212,23 @@ Expr * parse_atom(Lexer * lexer)
 	}
 }
 
+Expr * parse_field_access(Lexer * lexer)
+{
+	Expr * left = parse_atom(lexer);
+	while (is('.')) {
+		Assoc_Source as = token().assoc;
+		expect('.');
+		EXPR(EXPR_FIELD_ACCESS);
+		mark_expr(expr, as);
+		expr->field_access.expr = left;
+		weak_expect(TOKEN_NAME);
+		expr->field_access.field = token().name;
+		advance();
+		left = expr;
+	}
+	return left;
+}
+
 Expr ** parse_comma_expression(Lexer * lexer)
 {
 	Expr ** expressions = NULL;
@@ -224,7 +241,8 @@ Expr ** parse_comma_expression(Lexer * lexer)
 
 Expr * parse_function_call(Lexer * lexer)
 {
-	Expr * left = parse_atom(lexer);
+	// TODO(pixlark): strung calls?
+	Expr * left = parse_field_access(lexer);
 	if (match('(')) {
 		Expr ** args = NULL;
 		if (match(')')) {
