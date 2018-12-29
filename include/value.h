@@ -26,7 +26,7 @@ extern const char * value_type_names[];
 typedef struct Value Value;
 
 typedef struct {
-	size_t len;
+	size_t size;
 	char * contents;
 } Winter_String;
 
@@ -93,11 +93,12 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
 // : List operations
 void value_append(Value array, Value to_append, Assoc_Source assoc);
 void value_append_list(Value value, Value to_append);
-Value * value_element(Value list, Value index, Assoc_Source assoc);
+Value * value_index(Value collection, Value index, Assoc_Source assoc);
 Value value_pop_list(Value value);
 // :\ List operations
 
 // : Dictionary operations
+Value * value_index_dictionary(Value collection, Value key);
 void value_add_pair_dictionary(Value dict, Value key, Value value);
 void value_add_pair(Value dict, Value key, Value value, Assoc_Source assoc);
 // :\ Dictionary operations

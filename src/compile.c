@@ -147,7 +147,7 @@ void compile_assignment(Compiler * compiler, Stmt * assign)
 		compile_expression(compiler, expr);
 		compile_expression(compiler, target->binary.left);
 		compile_expression(compiler, target->binary.right);
-		P(bc_chunk_new_no_args(INSTR_LIST_ASSIGN), assign->assoc);
+		P(bc_chunk_new_no_args(INSTR_INDEX_ASSIGN), assign->assoc);
 		break;
 	default:
 	_default:

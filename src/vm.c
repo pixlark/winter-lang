@@ -400,11 +400,11 @@ void winter_machine_step(Winter_Machine * wm)
 		Variable_Map * varmap = &(winter_machine_frame(wm)->var_map);
 		variable_map_update(varmap, name._string.contents, value);
 	} break;
-	case INSTR_LIST_ASSIGN: {
+	case INSTR_INDEX_ASSIGN: {
 		Value index = pop();
-		Value list = pop();
+		Value collection = pop();
 		Value value = pop();
-		Value * element = value_element(list, index, chunk.assoc);
+		Value * element = value_index(collection, index, chunk.assoc);
 		*element = value;
 	} break;
 	case INSTR_ADD_PAIR: {
@@ -464,8 +464,8 @@ void winter_machine_step(Winter_Machine * wm)
 	} break;
 	case INSTR_INDEX: {
 		Value index = pop();
-		Value list = pop();
-		Value element = *value_element(list, index, chunk.assoc);
+		Value collection = pop();
+		Value element = *value_index(collection, index, chunk.assoc);
 		push(element);
 	} break;
 		// Args

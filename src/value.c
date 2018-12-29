@@ -53,8 +53,8 @@ Value value_new_bool(bool b)
 Value value_new_string(const char * s)
 {
 	Winter_String string;
-	string.len = strlen(s);
-	string.contents = global_alloc(string.len + 1);
+	string.size = strlen(s);
+	string.contents = global_alloc(string.size + 1);
 	strcpy(string.contents, s);
 	return (Value) { VALUE_STRING, ._string = string };
 }
@@ -119,7 +119,7 @@ Value value_print(Value value)
 		printf("%s\n", value._bool ? "true" : "false");
 		break;
 	case VALUE_STRING:
-		printf("%.*s\n", value._string.len, value._string.contents);
+		printf("%.*s\n", value._string.size, value._string.contents);
 		break;
 	case VALUE_FUNCTION:
 		#if DEBUG_PRINTS
@@ -245,19 +245,39 @@ Value value_or(Value a, Value b, Assoc_Source assoc)
 	return value_new_bool(a._bool || b._bool);
 }
 
+bool value_internal_equal(Value a, Value b)
+{
+	switch (a.type) {
+	case VALUE_NONE:
+		return true;
+	case VALUE_TYPE:
+		return a._type == b._type;
+	case VALUE_INTEGER:
+		return a._integer == b._integer;
+	case VALUE_FLOAT:
+		return a._float == b._float;
+	case VALUE_BOOL:
+		return a._bool == b._bool;
+	case VALUE_STRING:
+		if (a._string.size != b._string.size) return false;
+		return strncmp(a._string.contents, b._string.contents, a._string.size);
+	case VALUE_FUNCTION:
+		return a._function == b._function;
+	case VALUE_BUILTIN:
+		return a._builtin == b._builtin;
+	case VALUE_LIST:
+		internal_assert(false); // TODO(pixlark): Do this
+	case VALUE_DICTIONARY:
+		internal_assert(false);
+	default:
+		fatal_internal("Switch cases for value_internal_equal not complete");
+	}
+}
+
 Value value_equal(Value a, Value b, Assoc_Source assoc)
 {
 	check_same_type();
-	switch (a.type) {
-	case VALUE_INTEGER:
-		return value_new_bool(a._integer == b._integer);
-	case VALUE_FLOAT:
-		return value_new_bool(a._float == b._float);
-	case VALUE_BOOL:
-		return value_new_bool(a._bool == b._bool);
-	default:
-		fatal_given_type();
-	}
+	return value_new_bool(value_internal_equal(a, b));
 }
 
 Value value_greater_than(Value a, Value b, Assoc_Source assoc)
@@ -369,7 +389,7 @@ Value value_cast_bool(Value a, Value_Type type, Assoc_Source assoc)
 
 bool string_can_be_int(Winter_String s)
 {
-	for (int i = 0; i < s.len; i++) {
+	for (int i = 0; i < s.size; i++) {
 		if (!isdigit(s.contents[i])) return false;
 	}
 	return true;
@@ -499,6 +519,30 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
+Value * value_index(Value collection, Value index, Assoc_Source assoc)
+{
+	switch (collection.type) {
+	case VALUE_LIST:
+		if (index.type != VALUE_INTEGER) {
+			fatal_assoc(assoc, "Invalid index for list");
+		}
+		if (index._integer >= collection._list->size || index._integer < 0) {
+			fatal_assoc(assoc, "List index out of bounds");
+		}
+		return collection._list->contents + index._integer;
+	case VALUE_DICTIONARY: {
+		Value * val = value_index_dictionary(collection, index);
+		if (!val) {
+			fatal_assoc(assoc, "Key not found in dictionary");
+		}
+		return val;
+	} break;
+	default:
+		fatal_assoc(assoc, "Can't index type");
+	}
+
+}
+
 // :\ Value operations
 
 // : List operations
@@ -514,20 +558,6 @@ void value_append_list(Value value, Value to_append)
 	}
 	list->contents[list->size] = to_append;
 	list->size++;
-}
-
-Value * value_element(Value list, Value index, Assoc_Source assoc)
-{
-	if (list.type != VALUE_LIST) {
-		fatal_assoc(assoc, "Can only index lists");
-	}
-	if (index.type != VALUE_INTEGER) {
-		fatal_assoc(assoc, "Invalid index for list");
-	}
-	if (index._integer >= list._list->size || index._integer < 0) {
-		fatal_assoc(assoc, "List index out of bounds");
-	}
-	return list._list->contents + index._integer;
 }
 
 Value value_pop_list(Value value)
@@ -554,20 +584,36 @@ void value_append(Value list, Value to_append, Assoc_Source assoc)
 
 // : Dictionary operations
 
+static void check_dictionary_sizes(Winter_Dictionary * dict)
+{
+	size_t dict_size = dict->size;
+	size_t keys_size = dict->keys->_list->size;
+	size_t vals_size = dict->values->_list->size;
+	if (dict_size != keys_size ||
+		keys_size != vals_size ||
+		vals_size != dict_size) {
+		fatal_internal("Dictionary sizes fallen out of sync: d:%d vs k:%d vs v:%d",
+					   dict_size, keys_size, vals_size);
+	}
+}
+
+Value * value_index_dictionary(Value collection, Value key)
+{
+	internal_assert(collection.type == VALUE_DICTIONARY);
+	Winter_Dictionary * dict = collection._dictionary;
+	check_dictionary_sizes(dict);
+	for (int i = 0; i < dict->size; i++) {
+		if (value_internal_equal(key, dict->keys->_list->contents[i])) {
+			return dict->values->_list->contents + i;
+		}
+	}
+	return NULL;
+}
+
 void value_add_pair_dictionary(Value dict, Value key, Value value)
 {
 	internal_assert(dict.type == VALUE_DICTIONARY);
-	{
-		size_t dict_size = dict._dictionary->size;
-		size_t keys_size = dict._dictionary->keys->_list->size;
-		size_t vals_size = dict._dictionary->values->_list->size;
-		if (dict_size != keys_size ||
-			keys_size != vals_size ||
-			vals_size != dict_size) {
-			fatal_internal("Dictionary sizes fallen out of sync: d:%d vs k:%d vs v:%d",
-						   dict_size, keys_size, vals_size);
-		}
-	}
+	check_dictionary_sizes(dict._dictionary);
 	dict._dictionary->size++;
 	value_append_list(*(dict._dictionary->keys), key);
 	value_append_list(*(dict._dictionary->values), value);
