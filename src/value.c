@@ -19,6 +19,7 @@ const char * value_type_names[] = {
 	"builtin",
 	"list",
 	"dictionary",
+	"record",
 };
 
 // :\ Value
@@ -32,7 +33,7 @@ Value value_none()
 
 Value value_new_type(Value_Type t)
 {
-	return (Value) { VALUE_TYPE, ._type = t };
+	return (Value) { VALUE_TYPE, ._type = (Winter_Type) { t, NULL } };
 }
 
 Value value_new_integer(int i)
@@ -251,7 +252,11 @@ bool value_internal_equal(Value a, Value b)
 	case VALUE_NONE:
 		return true;
 	case VALUE_TYPE:
-		return a._type == b._type;
+		if (a._type.type == VALUE_RECORD && b._type.type == VALUE_RECORD) {
+			return a._type.canon == b._type.canon;
+		} else {
+			return a._type.type == b._type.type;
+		}
 	case VALUE_INTEGER:
 		return a._integer == b._integer;
 	case VALUE_FLOAT:
@@ -325,8 +330,25 @@ Value value_cast_type(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
 	case VALUE_STRING: {
+		// TODO(pixlark): static buffer
 		char buffer[512];
-		sprintf(buffer, "<type: %s>", value_type_names[a._type]);
+		if (a._type.type == VALUE_RECORD) {
+			sprintf(buffer, "<type: %s (", value_type_names[a._type.type]);
+			size_t len = a._type.canon->fields._list->size;
+			for (int i = 0; i < len; i++) {
+				char buf2[512];
+				const char * s = a._type.canon->fields._list->contents[i]._string.contents;
+				if (i == len - 1) {
+					sprintf(buf2, "%s", s);
+				} else {
+					sprintf(buf2, "%s, ", s);
+				}
+				strcat(buffer, buf2);
+			}
+			strcat(buffer, ")>");
+		} else {
+			sprintf(buffer, "<type: %s>", value_type_names[a._type.type]);
+		}
 		return value_new_string(buffer);
 	} break;
 	default:
@@ -640,6 +662,10 @@ void value_modify_refcount(Value value, int change)
 	case VALUE_NONE:
 		break;
 	case VALUE_TYPE:
+		if (value._type.type == VALUE_RECORD) {
+			gc_modify_refcount(value._type.canon, change);
+			value_modify_refcount(value._type.canon->fields, change);
+		}
 		break;
 	case VALUE_INTEGER:
 		break;

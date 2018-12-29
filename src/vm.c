@@ -152,6 +152,12 @@ BC_Chunk bc_chunk_new_create_string(const char * literal)
 	return (BC_Chunk) { INSTR_CREATE_STRING, .instr_create_string = instr };
 }
 
+BC_Chunk bc_chunk_new_create_type_canon(size_t field_count)
+{
+	Instr_Create_Type_Canon instr = (Instr_Create_Type_Canon) { field_count };
+	return (BC_Chunk) { INSTR_CREATE_TYPE_CANON, .instr_create_type_canon = instr };
+}
+
 void bc_chunk_print(BC_Chunk chunk)
 {
 	const char * instr_names[] = {	
@@ -388,7 +394,7 @@ void winter_machine_step(Winter_Machine * wm)
 			fatal_assoc(chunk.assoc, "Can't cast to non-type");
 		}
 		Value to_cast = pop();
-		push(value_cast(to_cast, type._type, chunk.assoc));
+		push(value_cast(to_cast, type._type.type, chunk.assoc));
 	} break;
 	case INSTR_BIND: {
 		Value name = pop();
@@ -587,6 +593,20 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_CREATE_DICTIONARY: {
 		Value dict = value_new_dictionary();
 		push(dict);
+	} break;
+	case INSTR_CREATE_TYPE_CANON: {
+		Instr_Create_Type_Canon instr = chunk.instr_create_type_canon;
+		Value fields = value_new_list();
+		for (int i = 0; i < instr.field_count; i++) {
+			Value field_name = pop();
+			internal_assert(field_name.type == VALUE_STRING);
+			value_append_list(fields, field_name);
+		}
+		Winter_Canon * canon = global_alloc(sizeof(Winter_Canon));
+		canon->fields = fields;
+		Value type_value = value_new_type(VALUE_RECORD);
+		type_value._type.canon = canon;
+		push(type_value);
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

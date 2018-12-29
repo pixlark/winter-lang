@@ -19,6 +19,7 @@ typedef enum {
 	VALUE_BUILTIN,
 	VALUE_LIST,
 	VALUE_DICTIONARY,
+	VALUE_RECORD,
 } Value_Type;
 
 extern const char * value_type_names[];
@@ -44,10 +45,17 @@ typedef struct {
 	Value * values; // VALUE_LIST
 } Winter_Dictionary;
 
+typedef struct Winter_Canon Winter_Canon;
+
+typedef struct {
+	Value_Type type;
+	Winter_Canon * canon;
+} Winter_Type;
+
 struct Value {
 	Value_Type type;
 	union {
-		Value_Type _type;
+		Winter_Type _type;
 		int _integer;
 		float _float;
 		bool _bool;
@@ -57,6 +65,10 @@ struct Value {
 		Winter_List * _list;
 		Winter_Dictionary * _dictionary;
 	};
+};
+
+struct Winter_Canon {
+	Value fields;
 };
 
 // :\ Value

@@ -492,6 +492,31 @@ Stmt * parse_function_declaration(Lexer * lexer)
 	return stmt;
 }
 
+Stmt * parse_record_declaration(Lexer * lexer)
+{
+	Assoc_Source as = token().assoc;
+	expect(TOKEN_RECORD);
+
+	STMT(STMT_RECORD_DECL);
+	mark_stmt(stmt, as);
+	weak_expect(TOKEN_NAME);
+	stmt->record_decl.name = token().name;
+	advance();
+	
+	expect('{');
+	stmt->record_decl.fields = NULL;
+	while (!is('}')) {
+		weak_expect(TOKEN_NAME);
+		sb_push(stmt->record_decl.fields, token().name);
+		advance();
+		if (!is(',')) break;
+		expect(',');
+	}
+	expect('}');
+	
+	return stmt;
+}
+
 Stmt * parse_if_statement(Lexer * lexer)
 {
 	Assoc_Source as = token().assoc;
@@ -544,6 +569,9 @@ Stmt * parse_statement(Lexer * lexer)
 	} else if (is(TOKEN_FUNC)) {
 		// function declaration
 		return parse_function_declaration(lexer);
+	} else if (is(TOKEN_RECORD)) {
+		// record declaration
+		return parse_record_declaration(lexer);
 	} else if (is(TOKEN_LOOP)) {
 		Assoc_Source as = token().assoc;
 		expect(TOKEN_LOOP);

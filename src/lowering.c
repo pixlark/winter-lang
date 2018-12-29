@@ -204,6 +204,8 @@ Stmt * lower_statement(Stmt * stmt)
 	case STMT_FUNC_DECL:
 		lower_body(stmt->func_decl.body);
 		return stmt;
+	case STMT_RECORD_DECL:
+		return stmt;
 	default:
 		fatal_internal("An unlowerable statement reached lower_statement");
 	}

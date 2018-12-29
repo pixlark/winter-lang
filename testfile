@@ -1,4 +1,4 @@
-dict = {"a" -> "a"};
-print(dict);
-dict["f"] = "a";
-print(dict);
+record Point {
+	x, y, z,
+}
+print(Point);

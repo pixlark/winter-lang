@@ -63,6 +63,10 @@ typedef struct {
 	const char * literal;
 } Instr_Create_String;
 
+typedef struct {
+	size_t field_count;
+} Instr_Create_Type_Canon;
+
 enum Instruction {
 	// No args
 	INSTR_NOP,
@@ -101,6 +105,7 @@ enum Instruction {
 	INSTR_CREATE_LIST,
 	INSTR_CREATE_STRING,
 	INSTR_CREATE_DICTIONARY,
+	INSTR_CREATE_TYPE_CANON,
 };
 
 // :\ Instruction
@@ -120,6 +125,7 @@ struct BC_Chunk {
 		Instr_Set_Loop instr_set_loop;
 		Instr_Create_Function instr_create_function;
 		Instr_Create_String instr_create_string;
+		Instr_Create_Type_Canon instr_create_type_canon;
 	};
 	Assoc_Source assoc;
 };
@@ -133,6 +139,7 @@ BC_Chunk bc_chunk_new_condjump(int offset, bool cond);
 BC_Chunk bc_chunk_new_set_loop(size_t end_offset);
 BC_Chunk bc_chunk_new_create_function(size_t parameter_count, BC_Chunk * bytecode);
 BC_Chunk bc_chunk_new_create_string(const char * literal);
+BC_Chunk bc_chunk_new_create_type_canon(size_t field_count);
 
 void bc_chunk_print(BC_Chunk chunk);
 

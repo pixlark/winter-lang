@@ -98,8 +98,13 @@ void deep_free(Stmt * stmt)
 	case STMT_CONTINUE:
 		break;
 	case STMT_FUNC_DECL:
+		// TODO(pixlark): Free parameters?
 		sb_free(stmt->func_decl.parameters);
 		deep_free_body(stmt->func_decl.body);
+		break;
+	case STMT_RECORD_DECL:
+		// TODO(pixlark): Free strings?
+		sb_free(stmt->record_decl.fields);
 		break;
 	default:
 		fatal_internal("Can't free AST Statement!");

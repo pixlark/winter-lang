@@ -95,6 +95,7 @@ typedef enum {
 	STMT_BREAK,
 	STMT_CONTINUE,
 	STMT_FUNC_DECL,
+	STMT_RECORD_DECL,
 } Stmt_Type;
 
 typedef struct Stmt {
@@ -128,6 +129,10 @@ typedef struct Stmt {
 			const char ** parameters;
 			struct Stmt ** body;
 		} func_decl;
+		struct {
+			const char * name;
+			const char ** fields;
+		} record_decl;
 	};
 	bool marked;
 	Assoc_Source assoc;
