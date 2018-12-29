@@ -203,9 +203,8 @@ void bc_chunk_print(BC_Chunk chunk)
 	case INSTR_PUSH:
 		value_print(chunk.instr_push.value);
 		break;
-	case INSTR_BIND:
 	case INSTR_GET:
-		printf("%s\n", chunk.instr_bind.name);
+		printf("%s\n", chunk.instr_get.name);
 		break;
 	case INSTR_CALL:
 		printf("%d\n", chunk.instr_call.arg_count);
@@ -505,6 +504,7 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		push(*var_storage);
 	} break;
+		// TODO(pixlark): Have calls push args in reverse order to simplify logic here
 	case INSTR_CALL: {
 		Value func_val = pop();
 		Instr_Call instr = chunk.instr_call;
@@ -544,6 +544,22 @@ void winter_machine_step(Winter_Machine * wm)
 			Value ret = builtin_functions[builtin](args, instr.arg_count, chunk.assoc);
 			free(args);
 			push(ret);
+		} else if (func_val.type == VALUE_TYPE) {
+			if (func_val._type.type != VALUE_RECORD) {
+				fatal_assoc(chunk.assoc, "Can't construct non-record");
+			}
+			Value record = value_new_record(func_val._type.canon);
+			if (instr.arg_count > func_val._type.canon->fields._list->size) {
+				fatal_assoc(chunk.assoc, "Too many arguments for record initialization");
+			}
+			for (int i = instr.arg_count - 1; i >= 0; i--) {
+				Value value = pop();
+				Value s = value_cast(value, VALUE_STRING, (Assoc_Source) {0});
+				Value * spot = value_index_dictionary(record._record->field_dict,
+													  func_val._type.canon->fields._list->contents[i]);
+				*spot = value;
+			}
+			push(record);
 		} else {
 			fatal_assoc(chunk.assoc, "Type not callable");
 		}

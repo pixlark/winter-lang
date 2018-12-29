@@ -227,7 +227,8 @@ void compile_statement(Compiler * compiler, Stmt * stmt)
 		P(bc_chunk_new_no_args(INSTR_BIND), stmt->assoc);
 	} break;
 	case STMT_RECORD_DECL: {
-		for (int i = 0; i < sb_count(stmt->record_decl.fields); i++) {
+		// Push fields in reverse order
+		for (int i = sb_count(stmt->record_decl.fields) - 1; i >= 0; i--) {
 			P(bc_chunk_new_create_string(stmt->record_decl.fields[i]), stmt->assoc);
 		}
 		P(bc_chunk_new_create_type_canon(sb_count(stmt->record_decl.fields)), stmt->assoc);

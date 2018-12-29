@@ -100,56 +100,27 @@ Value value_new_dictionary()
 	return (Value) { VALUE_DICTIONARY, ._dictionary = dict };
 }
 
+Value value_new_record(Winter_Canon * canon)
+{
+	Winter_Record * record = global_alloc(sizeof(Winter_Record));
+	record->canon = canon;
+	record->field_dict = value_new_dictionary();
+	size_t field_count = canon->fields._list->size;
+	for (int i = 0; i < field_count; i++) {
+		value_add_pair_dictionary(record->field_dict, canon->fields._list->contents[i], value_none());
+	}
+	return (Value) { VALUE_RECORD, ._record = record };
+}
+
 // :\ Value creation
 
 // : Value operations
 
+// Debug purposes only
 Value value_print(Value value)
 {
-	switch (value.type) {
-	case VALUE_NONE:
-		printf("none\n");
-		break;
-	case VALUE_INTEGER:
-		printf("%d\n", value._integer);
-		break;
-	case VALUE_FLOAT:
-		printf("%f\n", value._float);
-		break;
-	case VALUE_BOOL:
-		printf("%s\n", value._bool ? "true" : "false");
-		break;
-	case VALUE_STRING:
-		printf("%.*s\n", value._string.size, value._string.contents);
-		break;
-	case VALUE_FUNCTION:
-		#if DEBUG_PRINTS
-		printf("<function at %p; refcount %d>\n",
-			   value._function,
-			   gc_get_refcount(value._function));
-		#else
-		printf("<function at %p>\n", value._function);
-		#endif
-		break;
-	case VALUE_BUILTIN:
-		printf("<builtin function %s>\n",
-			   builtin_names[value._builtin]);
-		break;
-	case VALUE_LIST: {
-		if (value._list->size == 0) {
-			printf("[]\n");
-			break;
-		}
-		printf("[\n");
-		for (int i = 0; i < value._list->size; i++) {
-			printf("  ");
-			value_print(value._list->contents[i]);
-		}
-		printf("]\n");
-	} break;
-	default:
-		fatal_internal("Tried to print a value with no implemented print routine");
-	}
+	Value s = value_cast(value, VALUE_STRING, (Assoc_Source) {0});
+	printf("%s\n", s._string.contents);
 }
 
 #define fatal_given_type() fatal_assoc(assoc, "Not valid on given type");
@@ -326,6 +297,25 @@ Value value_cast_none(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
+static Value canon_as_str(Winter_Canon * canon)
+{
+	char buffer[512];
+	strcpy(buffer, "(");
+	size_t len = canon->fields._list->size;
+	for (int i = 0; i < len; i++) {
+		char buf2[512];
+		const char * s = canon->fields._list->contents[i]._string.contents;
+		if (i == len - 1) {
+			sprintf(buf2, "%s", s);
+		} else {
+			sprintf(buf2, "%s, ", s);
+		}
+		strcat(buffer, buf2);
+	}
+	strcat(buffer, ")");
+	return value_new_string(buffer);
+}
+
 Value value_cast_type(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (type) {
@@ -333,19 +323,9 @@ Value value_cast_type(Value a, Value_Type type, Assoc_Source assoc)
 		// TODO(pixlark): static buffer
 		char buffer[512];
 		if (a._type.type == VALUE_RECORD) {
-			sprintf(buffer, "<type: %s (", value_type_names[a._type.type]);
-			size_t len = a._type.canon->fields._list->size;
-			for (int i = 0; i < len; i++) {
-				char buf2[512];
-				const char * s = a._type.canon->fields._list->contents[i]._string.contents;
-				if (i == len - 1) {
-					sprintf(buf2, "%s", s);
-				} else {
-					sprintf(buf2, "%s, ", s);
-				}
-				strcat(buffer, buf2);
-			}
-			strcat(buffer, ")>");
+			sprintf(buffer, "<type: %s ", value_type_names[a._type.type]);
+			strcat(buffer, canon_as_str(a._type.canon)._string.contents);
+			strcat(buffer, ">");
 		} else {
 			sprintf(buffer, "<type: %s>", value_type_names[a._type.type]);
 		}
@@ -513,6 +493,23 @@ Value value_cast_dictionary(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
+Value value_cast_record(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_STRING: {
+		Value t = canon_as_str(a._record->canon);
+		Value f = value_cast_dictionary(a._record->field_dict, VALUE_STRING, assoc);
+		char buffer[1024];
+		strcpy(buffer, t._string.contents);
+		strcat(buffer, " : ");
+		strcat(buffer, f._string.contents);
+		return value_new_string(buffer);
+	} break;
+	default:
+		fatal_assoc(assoc, "Cannot cast records to anything but string");
+	}
+}
+
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (a.type) {
@@ -536,6 +533,8 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 		return value_cast_list(a, type, assoc);
 	case VALUE_DICTIONARY:
 		return value_cast_dictionary(a, type, assoc);
+	case VALUE_RECORD:
+		return value_cast_record(a, type, assoc);
 	default:
 		fatal_internal("Not all switch cases covered in value_cast");
 	}
@@ -695,6 +694,12 @@ void value_modify_refcount(Value value, int change)
 		value_modify_refcount(*value._dictionary->keys, change);
 		gc_modify_refcount(value._dictionary->values, change);
 		value_modify_refcount(*value._dictionary->values, change);
+		break;
+	case VALUE_RECORD:
+		gc_modify_refcount(value._record, change);
+		gc_modify_refcount(value._record->canon, change);
+		value_modify_refcount(value._record->canon->fields, change);
+		value_modify_refcount(value._record->field_dict, change);
 		break;
 	default:
 		fatal_internal("Switch statement in value_modify_refcount not complete");

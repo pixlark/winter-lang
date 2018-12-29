@@ -52,6 +52,8 @@ typedef struct {
 	Winter_Canon * canon;
 } Winter_Type;
 
+typedef struct Winter_Record Winter_Record;
+
 struct Value {
 	Value_Type type;
 	union {
@@ -64,7 +66,13 @@ struct Value {
 		Builtin _builtin;
 		Winter_List * _list;
 		Winter_Dictionary * _dictionary;
+		Winter_Record * _record;
 	};
+};
+
+struct Winter_Record {
+	Winter_Canon * canon;
+	Value field_dict;
 };
 
 struct Winter_Canon {
@@ -84,6 +92,7 @@ Value value_new_function(BC_Chunk * bytecode);
 Value value_new_builtin(Builtin b);
 Value value_new_list();
 Value value_new_dictionary();
+Value value_new_record(Winter_Canon * canon);
 // :\ Value creation
 
 // : Value operations
