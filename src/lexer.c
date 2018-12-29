@@ -75,6 +75,7 @@ const char * token_type_names[] = {
 	[TOKEN_WHILE] = "while",
 	[TOKEN_BREAK] = "break",
 	[TOKEN_CONTINUE] = "continue",
+	[TOKEN_RARROW] = "->",
 
 	[TOKEN_AS] = "as",
 	[TOKEN_INT] = "int",
@@ -379,7 +380,6 @@ Token lexer_next_token(Lexer * lexer)
 	case ']':
 	case ';':
 	case '+':
-	case '-':
 	case '*':
 	case '/':
 	case ',':
@@ -394,6 +394,8 @@ Token lexer_next_token(Lexer * lexer)
 		TWOCHARTOK('>', '=', TOKEN_GTE);
 	case '<':
 		TWOCHARTOK('<', '=', TOKEN_LTE);
+	case '-':
+		TWOCHARTOK('-', '>', TOKEN_RARROW);
 	default:
 		fatal("Unexpected character '%c'", next_char);
 	}

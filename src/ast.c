@@ -2,6 +2,16 @@
 
 // : Expr
 
+void deep_free_expr(Expr * expr);
+
+void deep_free_exprs(Expr ** exprs)
+{
+	for (int i = 0; i < sb_count(exprs); i++) {
+		deep_free_expr(exprs[i]);
+	}
+	sb_free(exprs);
+}
+
 void deep_free_expr(Expr * expr)
 {
 	switch (expr->type) {
@@ -12,10 +22,7 @@ void deep_free_expr(Expr * expr)
 	case EXPR_VAR:
 		break;
 	case EXPR_FUNCALL:
-		for (int i = 0; i < sb_count(expr->funcall.args); i++) {
-			deep_free_expr(expr->funcall.args[i]);
-		}
-		sb_free(expr->funcall.args);
+		deep_free_exprs(expr->funcall.args);
 		break;
 	case EXPR_UNARY:
 		deep_free_expr(expr->unary.operand);
@@ -28,10 +35,11 @@ void deep_free_expr(Expr * expr)
 		deep_free_expr(expr->cast.expr);
 		break;
 	case EXPR_LIST:
-		for (int i = 0; i < sb_count(expr->list.elements); i++) {
-			deep_free_expr(expr->list.elements[i]);
-		}
-		sb_free(expr->list.elements);
+		deep_free_exprs(expr->list.elements);
+		break;
+	case EXPR_DICT:
+		deep_free_exprs(expr->dict.keys);
+		deep_free_exprs(expr->dict.values);
 		break;
 	case EXPR_STRING:
 		break;

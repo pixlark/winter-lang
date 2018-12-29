@@ -1,5 +1,4 @@
 #include <string.h>
-
 #include "common.h"
 #include "value.h"
 #include "vm.h"
@@ -189,6 +188,7 @@ void bc_chunk_print(BC_Chunk chunk)
 		[INSTR_CREATE_FUNCTION] = "CREATE_FUNCTION",
 		[INSTR_CREATE_LIST] = "CREATE_LIST",
 		[INSTR_CREATE_STRING] = "CREATE_STRING",
+		[INSTR_CREATE_DICTIONARY] = "CREATE_DICTIONARY",
 	};
 
 	#if DEBUG_PRINTS
@@ -407,6 +407,13 @@ void winter_machine_step(Winter_Machine * wm)
 		Value * element = value_element(list, index, chunk.assoc);
 		*element = value;
 	} break;
+	case INSTR_ADD_PAIR: {
+		Value value = pop();
+		Value key = pop();
+		Value dict = pop();
+		value_add_pair(dict, key, value, chunk.assoc);
+		push(dict);
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:
@@ -564,6 +571,10 @@ void winter_machine_step(Winter_Machine * wm)
 		Instr_Create_String instr = chunk.instr_create_string;
 		Value string = value_new_string(instr.literal);
 		push(string);
+	} break;
+	case INSTR_CREATE_DICTIONARY: {
+		Value dict = value_new_dictionary();
+		push(dict);
 	} break;
 	default:
 		fatal_internal("Nonexistent instruction reached winter_machine_step()");

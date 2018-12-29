@@ -2,6 +2,10 @@ Winter EBNF Grammar Specification
 
 list_literal = '[' { expression ',' } [ expression ] ']'
 
+dict_entry_literal = expression '->' expression
+
+dict_literal = '{' { dict_entry_literal ',' } [ dict_entry_literal ] '}'
+
 atom = NONE
 	 | INTEGER_LITERAL
 	 | FLOAT_LITERAL
@@ -9,7 +13,8 @@ atom = NONE
 	 | FALSE
 	 | NAME
 	 | BUILTIN
-	 | array_literal
+	 | list_literal
+	 | dict_literal
 	 | '(' expression ')'
 
 function_call = atom

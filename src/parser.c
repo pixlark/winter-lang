@@ -74,6 +74,7 @@ void __weak_expect(Lexer * lexer, Token_Type type)
 
 // : Parsing
 
+// Have this return just an expr
 Expr ** parse_list_literal(Lexer * lexer)
 {
 	Expr ** elements = NULL;
@@ -84,6 +85,24 @@ Expr ** parse_list_literal(Lexer * lexer)
 	}
 	expect(']');
 	return elements;
+}
+
+Expr * parse_dict_literal(Lexer * lexer)
+{
+	EXPR(EXPR_DICT);
+	mark_expr(expr, token().assoc);
+	expect('{');
+	expr->dict.keys = NULL;
+	expr->dict.values = NULL;
+	while (!is('}')) {
+		sb_push(expr->dict.keys, parse_expression(lexer));
+		expect(TOKEN_RARROW);
+		sb_push(expr->dict.values, parse_expression(lexer));
+		if (!match(',')) break;
+	}
+	internal_assert(sb_count(expr->dict.keys) == sb_count(expr->dict.values));
+	expect('}');
+	return expr;
 }
 
 Expr * parse_atom(Lexer * lexer)
@@ -151,6 +170,9 @@ Expr * parse_atom(Lexer * lexer)
 		mark_expr(expr, token.assoc);
 		expr->list.elements = parse_list_literal(lexer);
 		return expr;
+	} break;
+	case '{': {
+		return parse_dict_literal(lexer);
 	} break;
 	case TOKEN_INT:
 	case TOKEN_FLOAT:

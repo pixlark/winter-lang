@@ -2,7 +2,6 @@
 #include "value.h"
 #include "gc.h"
 #include "vm.h"
-
 #include "builtin.h"
 
 #include <ctype.h>
@@ -19,6 +18,7 @@ const char * value_type_names[] = {
 	"function",
 	"builtin",
 	"list",
+	"dictionary",
 };
 
 // :\ Value
@@ -81,6 +81,22 @@ Value value_new_list()
 	list->capacity = 4;
 	list->contents = global_alloc(sizeof(Value) * 4);
 	return (Value) { VALUE_LIST, ._list = list };
+}
+
+Value * value_as_gc_pointer(Value value)
+{
+	Value * value_ptr = global_alloc(sizeof(Value));
+	memcpy(value_ptr, &value, sizeof(Value));
+	return value_ptr;
+}
+
+Value value_new_dictionary()
+{
+	Winter_Dictionary * dict = global_alloc(sizeof(Winter_Dictionary));
+	dict->size   = 0;
+	dict->keys   = value_as_gc_pointer(value_new_list());
+	dict->values = value_as_gc_pointer(value_new_list());
+	return (Value) { VALUE_DICTIONARY, ._dictionary = dict };
 }
 
 // :\ Value creation
@@ -430,6 +446,31 @@ Value value_cast_list(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
+Value value_cast_dictionary(Value a, Value_Type type, Assoc_Source assoc)
+{
+	switch (type) {
+	case VALUE_STRING: {
+		// TODO(pixlark): See warning in value_cast_list!!
+		char buffer[512];
+		strcpy(buffer, "{");
+		for (int i = 0; i < a._dictionary->size; i++) {
+			Value k = value_cast(a._dictionary->keys->_list->contents[i], VALUE_STRING, assoc);
+			strcat(buffer, k._string.contents);
+			strcat(buffer, " -> ");
+			Value v = value_cast(a._dictionary->values->_list->contents[i], VALUE_STRING, assoc);
+			strcat(buffer, v._string.contents);
+			if (i != a._dictionary->size - 1) strcat(buffer, ", ");
+		}
+		strcat(buffer, "}");
+		return value_new_string(buffer);
+	} break;
+	case VALUE_DICTIONARY:
+		return a;
+	default:
+		fatal_assoc(assoc, "Can't cast dictionary to given type");
+	}
+}
+
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 {
 	switch (a.type) {
@@ -451,10 +492,16 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 		return value_cast_builtin(a, type, assoc);
 	case VALUE_LIST:
 		return value_cast_list(a, type, assoc);
+	case VALUE_DICTIONARY:
+		return value_cast_dictionary(a, type, assoc);
 	default:
 		fatal_internal("Not all switch cases covered in value_cast");
 	}
 }
+
+// :\ Value operations
+
+// : List operations
 
 void value_append_list(Value value, Value to_append)
 {
@@ -492,18 +539,52 @@ Value value_pop_list(Value value)
 	return popped;
 }
 
-void value_append(Value array, Value to_append, Assoc_Source assoc)
+void value_append(Value list, Value to_append, Assoc_Source assoc)
 {
-	switch (array.type) {
+	switch (list.type) {
 	case VALUE_LIST:
-		value_append_list(array, to_append);
+		value_append_list(list, to_append);
 		break;
 	default:
 		fatal_assoc(assoc, "Can't append to non-list");
 	}
 }
 
-// :\ Value operations
+// :\ List operations
+
+// : Dictionary operations
+
+void value_add_pair_dictionary(Value dict, Value key, Value value)
+{
+	internal_assert(dict.type == VALUE_DICTIONARY);
+	{
+		size_t dict_size = dict._dictionary->size;
+		size_t keys_size = dict._dictionary->keys->_list->size;
+		size_t vals_size = dict._dictionary->values->_list->size;
+		if (dict_size != keys_size ||
+			keys_size != vals_size ||
+			vals_size != dict_size) {
+			fatal_internal("Dictionary sizes fallen out of sync: d:%d vs k:%d vs v:%d",
+						   dict_size, keys_size, vals_size);
+		}
+	}
+	dict._dictionary->size++;
+	value_append_list(*(dict._dictionary->keys), key);
+	value_append_list(*(dict._dictionary->values), value);
+}
+
+void value_add_pair(Value dict, Value key, Value value, Assoc_Source assoc)
+{
+	switch (dict.type) {
+	case VALUE_DICTIONARY:
+		value_add_pair_dictionary(dict, key, value);
+		break;
+	default:
+		fatal_assoc(assoc, "Can't add pair to non-dictionary");
+	}
+}
+
+// :\ Dictionary operations
 
 // : Value GC
 
@@ -535,6 +616,13 @@ void value_modify_refcount(Value value, int change)
 		for (int i = 0; i < value._list->size; i++) {
 			value_modify_refcount(value._list->contents[i], change);
 		}
+		break;
+	case VALUE_DICTIONARY:
+		gc_modify_refcount(value._dictionary, change);
+		gc_modify_refcount(value._dictionary->keys, change);
+		value_modify_refcount(*value._dictionary->keys, change);
+		gc_modify_refcount(value._dictionary->values, change);
+		value_modify_refcount(*value._dictionary->values, change);
 		break;
 	default:
 		fatal_internal("Switch statement in value_modify_refcount not complete");

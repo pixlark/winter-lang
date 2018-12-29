@@ -97,6 +97,15 @@ void compile_expression(Compiler * compiler, Expr * expr)
 			P(bc_chunk_new_no_args(INSTR_APPEND), expr->assoc);
 		}
 	} break;
+	case EXPR_DICT: {
+		P(bc_chunk_new_no_args(INSTR_CREATE_DICTIONARY), expr->assoc);
+		internal_assert(sb_count(expr->dict.keys) == sb_count(expr->dict.values));
+		for (int i = 0; i < sb_count(expr->dict.keys); i++) {
+			compile_expression(compiler, expr->dict.keys[i]);
+			compile_expression(compiler, expr->dict.values[i]);
+			P(bc_chunk_new_no_args(INSTR_ADD_PAIR), expr->assoc);
+		}
+	} break;
 	case EXPR_STRING: {
 		P(bc_chunk_new_create_string(expr->string.literal), expr->assoc);
 	} break;
@@ -112,6 +121,14 @@ void compile_body(Compiler * compiler, Stmt ** body)
 	}
 }
 
+/* compile_assignment checks whether the target expression in the
+ * assignment has the form of an l-expression. Meaning that, if the
+ * *contents* are correct, it will produce assignment to somewhere
+ * that can be assigned to. The only expression forms where that is
+ * true are:
+ *  - Target expression is a variable
+ *  - Target expression is an index into some list/map/whatever
+ */
 void compile_assignment(Compiler * compiler, Stmt * assign)
 {
 	Expr * target = assign->assign.target;

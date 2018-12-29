@@ -18,6 +18,7 @@ typedef enum {
 	VALUE_FUNCTION,
 	VALUE_BUILTIN,
 	VALUE_LIST,
+	VALUE_DICTIONARY,
 } Value_Type;
 
 extern const char * value_type_names[];
@@ -35,6 +36,14 @@ typedef struct {
 	Value * contents;
 } Winter_List;
 
+// TODO(pixlark): This should be a real hash table, right now it's
+// just two VALUE_LISTs strung together.
+typedef struct {
+	size_t size;
+	Value * keys;   // VALUE_LIST
+	Value * values; // VALUE_LIST
+} Winter_Dictionary;
+
 struct Value {
 	Value_Type type;
 	union {
@@ -46,6 +55,7 @@ struct Value {
 		Function * _function;
 		Builtin _builtin;
 		Winter_List * _list;
+		Winter_Dictionary * _dictionary;
 	};
 };
 
@@ -61,6 +71,7 @@ Value value_new_string(const char * s);
 Value value_new_function(BC_Chunk * bytecode);
 Value value_new_builtin(Builtin b);
 Value value_new_list();
+Value value_new_dictionary();
 // :\ Value creation
 
 // : Value operations
@@ -77,12 +88,19 @@ Value value_equal(Value a, Value b, Assoc_Source assoc);
 Value value_greater_than(Value a, Value b, Assoc_Source assoc);
 Value value_less_than(Value a, Value b, Assoc_Source assoc);
 Value value_cast(Value a, Value_Type type, Assoc_Source assoc);
-void value_append(Value array, Value to_append, Assoc_Source assoc);
+// :\ Value operations
 
+// : List operations
+void value_append(Value array, Value to_append, Assoc_Source assoc);
 void value_append_list(Value value, Value to_append);
 Value * value_element(Value list, Value index, Assoc_Source assoc);
 Value value_pop_list(Value value);
-// :\ Value operations
+// :\ List operations
+
+// : Dictionary operations
+void value_add_pair_dictionary(Value dict, Value key, Value value);
+void value_add_pair(Value dict, Value key, Value value, Assoc_Source assoc);
+// :\ Dictionary operations
 
 // : Value GC
 void value_modify_refcount(Value value, int change);

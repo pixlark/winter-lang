@@ -76,6 +76,7 @@ enum Instruction {
 	INSTR_CAST,
 	INSTR_BIND,
 	INSTR_LIST_ASSIGN,
+	INSTR_ADD_PAIR,
 	// Operations
 	INSTR_NEGATE,
 	INSTR_ADD,
@@ -99,6 +100,7 @@ enum Instruction {
 	INSTR_CREATE_FUNCTION,
 	INSTR_CREATE_LIST,
 	INSTR_CREATE_STRING,
+	INSTR_CREATE_DICTIONARY,
 };
 
 // :\ Instruction

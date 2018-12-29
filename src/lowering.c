@@ -94,6 +94,13 @@ void lower_operations_expr(Expr * expr)
 			lower_operations_expr(expr->list.elements[i]);
 		}
 		break;
+	case EXPR_DICT:
+		internal_assert(sb_count(expr->dict.keys) == sb_count(expr->dict.values));
+		for (int i = 0; i < sb_count(expr->dict.keys); i++) {
+			lower_operations_expr(expr->dict.keys[i]);
+			lower_operations_expr(expr->dict.values[i]);
+		}
+		break;
 	case EXPR_STRING:
 		break;
 	default:
