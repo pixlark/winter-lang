@@ -1,8 +1,2 @@
-record R {
-	a, b
-}
+# comment
 
-x = R();
-print(x);
-x.b = 15;
-print(x);

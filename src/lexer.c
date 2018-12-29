@@ -245,6 +245,14 @@ Token lexer_next_token(Lexer * lexer)
 	}
 	char next_char = lexer_peek(lexer);
 
+	// Comments
+	if (next_char == '#') {
+		do {
+			lexer_advance_char(lexer);
+			next_char = lexer_peek(lexer);
+		} while (next_char != '\n');
+	}
+	
 	// Whitespace
 	if (isspace(next_char)) {
 		if (next_char == '\n') {
