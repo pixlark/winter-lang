@@ -260,7 +260,7 @@ bool value_internal_equal(Value a, Value b)
 		return a._bool == b._bool;
 	case VALUE_STRING:
 		if (a._string.size != b._string.size) return false;
-		return strncmp(a._string.contents, b._string.contents, a._string.size);
+		return strncmp(a._string.contents, b._string.contents, a._string.size) == 0;
 	case VALUE_FUNCTION:
 		return a._function == b._function;
 	case VALUE_BUILTIN:

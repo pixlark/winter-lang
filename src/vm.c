@@ -404,8 +404,20 @@ void winter_machine_step(Winter_Machine * wm)
 		Value index = pop();
 		Value collection = pop();
 		Value value = pop();
-		Value * element = value_index(collection, index, chunk.assoc);
-		*element = value;
+		if (collection.type == VALUE_DICTIONARY) {
+			// Dictionaries are unique in that a failed lookup will
+			// result in adding a new item
+			Value * element = value_index_dictionary(collection, index);
+			if (element) {
+				*element = value;
+			} else {
+				value_add_pair_dictionary(collection, index, value);
+			}
+		} else {
+			Value * element = value_index(collection, index, chunk.assoc);
+			*element = value;
+		}
+		push(collection);
 	} break;
 	case INSTR_ADD_PAIR: {
 		Value value = pop();

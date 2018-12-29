@@ -1,4 +1,4 @@
-x = { 5 -> 10 };
-print(x);
-x[5] = 11;
-print(x);
+dict = {"a" -> "a"};
+print(dict);
+dict["f"] = "a";
+print(dict);
