@@ -154,6 +154,12 @@ void compile_assignment(Compiler * compiler, Stmt * assign)
 		compile_expression(compiler, target->binary.right);
 		P(bc_chunk_new_no_args(INSTR_INDEX_ASSIGN), assign->assoc);
 		break;
+	case EXPR_FIELD_ACCESS:
+		compile_expression(compiler, expr);
+		compile_expression(compiler, target->field_access.expr);
+		P(bc_chunk_new_create_string(target->field_access.field), assign->assoc);
+		P(bc_chunk_new_no_args(INSTR_ASSIGN_FIELD), assign->assoc);
+		break;
 	default:
 	_default:
 		fatal_assoc(target->assoc, "Invalid target expression for assignment");

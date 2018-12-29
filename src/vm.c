@@ -444,6 +444,20 @@ void winter_machine_step(Winter_Machine * wm)
 		}
 		push(*val);
 	} break;
+	case INSTR_ASSIGN_FIELD: {
+		Value field = pop();
+		internal_assert(field.type == VALUE_STRING);
+		// TODO(pixlark): cutnpaste from GET_FIELD
+		Value record = pop();
+		if (record.type != VALUE_RECORD) {
+			fatal_assoc(chunk.assoc, "Can't get field from non-record");
+		}
+		Value * val = value_index_dictionary(record._record->field_dict, field);
+		if (!val) {
+			fatal_assoc(chunk.assoc, "Field does not exist");
+		}
+		*val = pop();
+	} break;
 
 		// Operations
 	case INSTR_NEGATE:

@@ -1,0 +1,8 @@
+record R {
+	a, b
+}
+
+x = R();
+print(x);
+x.b = 15;
+print(x);

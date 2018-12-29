@@ -9,3 +9,6 @@ func return_record() {
 
 x = return_record();
 print(x);
+
+x.field_a = 15;
+print(x.field_a, x);
