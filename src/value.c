@@ -540,7 +540,7 @@ Value value_cast(Value a, Value_Type type, Assoc_Source assoc)
 	}
 }
 
-Value * value_index(Value collection, Value index, Assoc_Source assoc)
+Value * value_mutable_index(Value collection, Value index, Assoc_Source assoc)
 {
 	switch (collection.type) {
 	case VALUE_LIST:
@@ -560,8 +560,30 @@ Value * value_index(Value collection, Value index, Assoc_Source assoc)
 	} break;
 	default:
 		fatal_assoc(assoc, "Can't index type");
+		break;
 	}
+}
 
+Value value_index(Value collection, Value index, Assoc_Source assoc)
+{
+	switch (collection.type) {
+	case VALUE_LIST:
+	case VALUE_DICTIONARY: {
+		Value * value_ptr = value_mutable_index(collection, index, assoc);
+		return *value_ptr;
+	} break;
+	case VALUE_STRING: {
+		if (index.type != VALUE_INTEGER) {
+			fatal_assoc(assoc, "Invalid index for string");
+		}
+		if (index._integer >= collection._string.size || index._integer < 0) {
+			fatal_assoc(assoc, "String index out of bounds");
+		}
+		char buf[2] = {0, 0};
+		buf[0] = collection._string.contents[index._integer];
+		return value_new_string(buf);
+	} break;
+	}
 }
 
 // :\ Value operations
@@ -598,6 +620,7 @@ void value_append(Value list, Value to_append, Assoc_Source assoc)
 		break;
 	default:
 		fatal_assoc(assoc, "Can't append to non-list");
+		break;
 	}
 }
 

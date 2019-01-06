@@ -1,3 +1,4 @@
 #!/usr/bin/winter
 
-print(read_input("> "));
+x = "abcdef";
+print(x[8]);

@@ -419,7 +419,7 @@ void winter_machine_step(Winter_Machine * wm)
 				value_add_pair_dictionary(collection, index, value);
 			}
 		} else {
-			Value * element = value_index(collection, index, chunk.assoc);
+			Value * element = value_mutable_index(collection, index, chunk.assoc);
 			*element = value;
 		}
 		push(collection);
@@ -509,7 +509,7 @@ void winter_machine_step(Winter_Machine * wm)
 	case INSTR_INDEX: {
 		Value index = pop();
 		Value collection = pop();
-		Value element = *value_index(collection, index, chunk.assoc);
+		Value element = value_index(collection, index, chunk.assoc);
 		push(element);
 	} break;
 		// Args
