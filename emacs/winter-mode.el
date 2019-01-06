@@ -43,11 +43,13 @@
 		(save-excursion
 		  (while not-indented
 			(forward-line -1)
-			(if (looking-at "^[ \t]*\\(}\\|)\\|\\]\\)")
+			;;(if (looking-at "^[ \t]*\\(}\\|)\\|\\]\\)")
+			(if (looking-at "^[ \t]*}")
 				(progn
 				  (setq cur-indent (current-indentation))
 				  (setq not-indented nil))
-			  (if (looking-at "^[ \\t]*.*\\({\\|(\\|\\[\\)")
+			  ;;(if (looking-at "^[ \\t]*.*\\({\\|(\\|\\[\\)")
+			  (if (looking-at "^[ \\t]*.*{")
 				  (progn
 					(setq cur-indent (+ (current-indentation) default-tab-width))
 					(setq not-indented nil))

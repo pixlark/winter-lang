@@ -4,6 +4,7 @@
 
 const char * builtin_names[] = {
 	"print",
+	"read_input",
 	"assert",
 	"typeof",
 	"list_append",
@@ -14,6 +15,7 @@ const char * builtin_names[] = {
 // -1 means varargs
 int builtin_arg_counts[] = {
 	-1,
+	1,
 	1,
 	1,
 	2,
@@ -37,6 +39,23 @@ DEFINE_BUILTIN(builtin_print)
 	}
 	printf("\n");
 	return value_none();
+}
+
+DEFINE_BUILTIN(builtin_read_input)
+{
+	internal_assert(arg_count == 1);
+	Value prompt_val = args[0];
+	if (prompt_val.type != VALUE_STRING) {
+		fatal_assoc(assoc, "read_input requires a string");
+	}
+	const char * prompt = prompt_val._string.contents;
+	printf("%s", prompt);
+	// TODO(pixlark): Limits input size
+	char buffer[1024];
+	buffer[0] = '\0';
+	scanf("%1023[^\n]", buffer);
+	Value ret = value_new_string(buffer);
+	return ret;
 }
 
 DEFINE_BUILTIN(builtin_assert)
@@ -89,6 +108,7 @@ DEFINE_BUILTIN(builtin_list_count)
 
 Value (*builtin_functions[])(Value*, size_t, Assoc_Source) = {
 	builtin_print,
+	builtin_read_input,
 	builtin_assert,
 	builtin_typeof,
 	builtin_list_append,
